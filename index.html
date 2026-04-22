@@ -6,8 +6,8 @@
     <title>Administration - Faculté Agronomique</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Hybrilink Compta">
-    <meta name="description" content="Gestion comptabilité">
+    <meta name="apple-mobile-web-app-title" content="Hybrilink Admin">
+    <meta name="description" content="Gestion administrative">
     <meta name="theme-color" content="#003366">
     
     <link rel="manifest" href="manifest.json">
@@ -77,6 +77,13 @@
         .logout-btn:hover { background: #c82333; transform: translateY(-2px); }
         .app-container { display: none; flex: 1; }
         .app-container.active { display: block; }
+        .refresh-btn { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
+        .refresh-btn:hover { background: #218838; transform: rotate(180deg); }
+        .refresh-btn i { transition: transform 0.3s; }
+        .refresh-btn:hover i { transform: rotate(180deg); }
+        .sync-status { font-size: 12px; padding: 5px 10px; border-radius: 20px; background: #28a745; color: white; display: inline-flex; align-items: center; gap: 5px; }
+        .sync-status.offline { background: #dc3545; }
+        .last-update-badge { font-size: 11px; color: #888; margin-left: 10px; font-weight: normal; }
 
         /* Modal Styles */
         .modal-overlay {
@@ -145,11 +152,48 @@
             transition: all 0.2s;
             font-weight: 500;
         }
-        .promotion-btn:hover {
+        .promotion-btn:hover, .promotion-btn.active {
             background: #003366;
             color: white;
             transform: translateY(-2px);
         }
+        
+        /* Semester configuration styles */
+        .semester-config-card {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .fiche-selector-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary-blue);
+        }
+        .semester-badge {
+            font-size: 14px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: var(--primary-blue);
+            color: white;
+        }
+        .semester-badge.premier { background: #28a745; }
+        .semester-badge.deuxieme { background: #ff9800; }
+        
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .search-export-bar { background: #f8f9fa; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+        .search-group { flex: 1; min-width: 200px; }
+        .search-input-group { position: relative; }
+        .search-input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+        .search-input-group input { padding-left: 35px; }
+        .clear-search { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; display: none; }
+        .etudiants-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .etudiants-table th { background: var(--primary-blue); color: white; padding: 12px 15px; text-align: left; }
+        .etudiants-table td { padding: 12px 15px; border-bottom: 1px solid #e0e0e0; }
+        .etudiants-table tr:hover { background: #f8f9fa; }
+        .badge-offline { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -182,7 +226,9 @@
         <nav class="navbar navbar-custom">
             <div class="container">
                 <a class="navbar-brand text-white" href="#"><i class="bi bi-gear-fill"></i> Administration - Faculté Agronomique</a>
-                <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div id="syncStatus" class="sync-status"><i class="bi bi-cloud-check"></i> Synchro</div>
+                   
                     <button class="logout-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Déconnexion</button>
                 </div>
             </div>
@@ -190,6 +236,9 @@
         
         <div class="container mt-4" style="flex: 1;">
             <div id="toastContainer" class="toast-notification"></div>
+            <div class="badge-offline" id="offlineIndicator" style="display: none;">
+                <span class="badge bg-warning text-dark"><i class="bi bi-wifi-off"></i> Mode hors-ligne</span>
+            </div>
             
             <!-- Menu des formulaires -->
             <div class="menu-buttons">
@@ -198,6 +247,7 @@
                 <button class="menu-btn" data-section="promotion"><i class="bi bi-trophy-fill"></i> Promotion</button>
                 <button class="menu-btn" data-section="fiche"><i class="bi bi-file-text-fill"></i> Fiche</button>
                 <button class="menu-btn" data-section="etudiant"><i class="bi bi-mortarboard-fill"></i> Étudiant</button>
+                <button class="menu-btn" data-section="semestre"><i class="bi bi-calendar2-week-fill"></i> Config. Semestres</button>
                 <button class="menu-btn" data-section="transfert"><i class="bi bi-arrow-left-right"></i> Transfert Promotion</button>
             </div>
             
@@ -205,7 +255,10 @@
             <div id="section-annee" class="form-section active">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-calendar-week-fill"></i> Créer une année académique</h5>
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-calendar-week-fill"></i> Années Académiques</h5>
+                            <button class="refresh-btn" id="refreshAnneesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form id="anneeForm">
@@ -225,7 +278,7 @@
                             <button type="submit" class="btn-action">Créer année académique</button>
                         </form>
                         <hr>
-                        <h6>Liste des années existantes</h6>
+                        <h6>Liste des années existantes <span id="anneeLastUpdate" class="last-update-badge"></span></h6>
                         <div id="anneesListe" class="mt-2"></div>
                     </div>
                 </div>
@@ -235,7 +288,10 @@
             <div id="section-compta" class="form-section">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-person-badge-fill"></i> Créer un compte comptabilité</h5>
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-person-badge-fill"></i> Comptes Comptabilité</h5>
+                            <button class="refresh-btn" id="refreshComptesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form id="comptaForm">
@@ -260,7 +316,7 @@
                             <button type="submit" class="btn-action">Créer compte comptabilité</button>
                         </form>
                         <hr>
-                        <h6>Liste des comptes existants</h6>
+                        <h6>Liste des comptes existants <span id="compteLastUpdate" class="last-update-badge"></span></h6>
                         <div id="comptesListe" class="mt-2"></div>
                     </div>
                 </div>
@@ -270,7 +326,10 @@
             <div id="section-promotion" class="form-section">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-trophy-fill"></i> Créer une promotion</h5>
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-trophy-fill"></i> Promotions</h5>
+                            <button class="refresh-btn" id="refreshPromotionsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form id="promotionForm">
@@ -287,7 +346,7 @@
                             <button type="submit" class="btn-action">Créer promotion</button>
                         </form>
                         <hr>
-                        <h6>Liste des promotions existantes</h6>
+                        <h6>Liste des promotions existantes <span id="promotionLastUpdate" class="last-update-badge"></span></h6>
                         <div id="promotionsListe" class="mt-2"></div>
                     </div>
                 </div>
@@ -297,7 +356,10 @@
             <div id="section-fiche" class="form-section">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-file-text-fill"></i> Créer une fiche (liée à une ou plusieurs promotions)</h5>
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-file-text-fill"></i> Fiches</h5>
+                            <button class="refresh-btn" id="refreshFichesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form id="ficheForm">
@@ -325,8 +387,40 @@
                             <button type="submit" class="btn-action">Créer fiche</button>
                         </form>
                         <hr>
-                        <h6>Liste des fiches existantes</h6>
+                        <h6>Liste des fiches existantes <span id="ficheLastUpdate" class="last-update-badge"></span></h6>
                         <div id="fichesListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Configuration Semestres -->
+            <div id="section-semestre" class="form-section">
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <h5 class="mb-0"><i class="bi bi-calendar2-week-fill"></i> Configuration des semestres</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill"></i> 
+                            <strong>Configuration des fiches par semestre</strong><br>
+                            Sélectionnez les fiches qui seront exigées pour le premier semestre et celles pour le deuxième semestre.
+                        </div>
+                        
+                        <div class="semester-config-card">
+                            <h5><span class="semester-badge premier"><i class="bi bi-calendar-check"></i> Premier Semestre</span></h5>
+                            <div id="premierSemestreFiches" class="mt-3">Chargement...</div>
+                            <button class="btn-action mt-2" id="savePremierSemestreBtn"><i class="bi bi-save"></i> Enregistrer Premier Semestre</button>
+                        </div>
+                        
+                        <div class="semester-config-card">
+                            <h5><span class="semester-badge deuxieme"><i class="bi bi-calendar-week"></i> Deuxième Semestre</span></h5>
+                            <div id="deuxiemeSemestreFiches" class="mt-3">Chargement...</div>
+                            <button class="btn-action mt-2" id="saveDeuxiemeSemestreBtn"><i class="bi bi-save"></i> Enregistrer Deuxième Semestre</button>
+                        </div>
+                        
+                        <hr>
+                        <h6>Configuration actuelle</h6>
+                        <div id="semestreConfigStatus" class="alert alert-secondary">Chargement...</div>
                     </div>
                 </div>
             </div>
@@ -335,7 +429,10 @@
             <div id="section-etudiant" class="form-section">
                 <div class="card">
                     <div class="card-header bg-success">
-                        <h5 class="mb-0"><i class="bi bi-person-plus"></i> Ajouter un étudiant</h5>
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-person-plus"></i> Ajouter un étudiant</h5>
+                            <button class="refresh-btn" id="refreshEtudiantsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="alert alert-info">
@@ -382,8 +479,7 @@
                         
                         <div class="excel-format-info">
                             <i class="bi bi-file-earmark-excel-fill"></i> 
-                            <strong>Format attendu:</strong> La colonne B (2ème colonne) doit contenir les noms complets des étudiants.<br>
-                            La première ligne peut être un en-tête (ex: "Nom").
+                            <strong>Format attendu:</strong> La colonne B (2ème colonne) doit contenir les noms complets des étudiants.
                         </div>
                         
                         <div class="mt-3">
@@ -411,16 +507,17 @@
                 <!-- Liste des étudiants -->
                 <div class="card mt-3">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-people-fill"></i> Liste des étudiants</h5>
+                        <h5 class="mb-0"><i class="bi bi-people-fill"></i> Liste des étudiants <span id="etudiantLastUpdate" class="last-update-badge"></span></h5>
                     </div>
                     <div class="card-body">
                         <div id="promotionButtons" class="promotion-buttons" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;"></div>
-                        <div class="search-export-bar" style="background: #f8f9fa; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                            <div class="search-group" style="flex: 1;">
-                                <label><i class="bi bi-search"></i> Rechercher</label>
-                                <div class="search-input-group" style="position: relative;">
-                                    <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);"></i>
-                                    <input type="text" class="form-control" id="searchEtudiantList" placeholder="Nom..." style="padding-left: 35px;">
+                        <div class="search-export-bar">
+                            <div class="search-group">
+                                <label><i class="bi bi-search"></i> Rechercher un étudiant</label>
+                                <div class="search-input-group">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="form-control" id="searchEtudiantList" placeholder="Nom, matricule...">
+                                    <i class="bi bi-x-circle-fill clear-search" id="clearSearchEtudiant" style="cursor:pointer;display:none;"></i>
                                 </div>
                             </div>
                             <div class="export-group" style="display: flex; gap: 10px;">
@@ -428,7 +525,7 @@
                                 <button class="btn-action" id="exportCsvListBtn"><i class="bi bi-file-text"></i> CSV</button>
                             </div>
                         </div>
-                        <div id="etudiantsListeAdmin"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
+                        <div id="etudiantsListeAdmin"><div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;"><i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i><h5 class="mt-3">Sélectionnez une promotion</h5><p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p></div></div>
                     </div>
                 </div>
             </div>
@@ -464,7 +561,7 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="container">
-                <p class="mb-0">© 2024 HYBRILINK - tech | Votre partenaire tech de A à Z</p>
+                <p class="mb-0">© 2024 HYBRILINK-TECH | Votre partenaire tech de A à Z</p>
             </div>
         </footer>
     </div>
@@ -473,6 +570,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script>
+        // ========== CONFIGURATION FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
             authDomain: "fsa-unilu.firebaseapp.com",
@@ -485,6 +583,50 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
+        // Activer persistance
+        db.enablePersistence({ synchronizeTabs: true })
+            .then(() => console.log('✅ Persistance Firestore activée'))
+            .catch((err) => console.warn('Persistance non activée:', err));
+        
+        // ========== SYSTÈME DE CACHE ==========
+        class StaticDataCache {
+            constructor() {
+                this.cache = {};
+                this.CACHE_DURATION = 5 * 60 * 1000;
+            }
+            
+            async getCollection(collectionName, forceRefresh = false) {
+                const now = Date.now();
+                if (!forceRefresh && this.cache[collectionName] && 
+                    now - this.cache[collectionName].timestamp < this.CACHE_DURATION) {
+                    console.log(`📦 Cache utilisé pour ${collectionName}`);
+                    return this.cache[collectionName].data;
+                }
+                return this.refreshCollection(collectionName);
+            }
+            
+            async refreshCollection(collectionName) {
+                const cachedData = this.cache[collectionName]?.data;
+                if (cachedData && cachedData.length > 0) {
+                    console.log(`📦 Cache utilisé pour ${collectionName} (0 lecture)`);
+                    return cachedData;
+                }
+                
+                try {
+                    const snapshot = await db.collection(collectionName).get({ source: 'cache' });
+                    let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    this.cache[collectionName] = { data: data, timestamp: Date.now() };
+                    return data;
+                } catch (error) {
+                    console.warn(`Erreur chargement ${collectionName}:`, error);
+                    return [];
+                }
+            }
+        }
+        
+        const staticCache = new StaticDataCache();
+        
+        // ========== VARIABLES GLOBALES ==========
         let allPromotions = [];
         let allEtudiants = [];
         let allAnnees = [];
@@ -493,8 +635,53 @@
         let currentSelectedPromotion = null;
         let currentSearchTerm = '';
         let currentUser = null;
+        let semestreConfig = { premier: [], deuxieme: [] };
+        let isOnline = navigator.onLine;
         
-        // Helper functions
+        let lastUpdates = {
+            annees: null,
+            comptes: null,
+            promotions: null,
+            fiches: null,
+            etudiants: null
+        };
+        
+        // ========== FONCTIONS UTILITAIRES ==========
+        function updateSyncStatus(online) {
+            const statusEl = document.getElementById('syncStatus');
+            if (!statusEl) return;
+            if (!online) {
+                statusEl.innerHTML = '<i class="bi bi-cloud-off"></i> Hors-ligne';
+                statusEl.className = 'sync-status offline';
+            } else {
+                statusEl.innerHTML = '<i class="bi bi-cloud-check"></i> Synchro';
+                statusEl.className = 'sync-status';
+            }
+        }
+        
+        function updateLastUpdateDisplay(collection) {
+            const elementId = `${collection}LastUpdate`;
+            const element = document.getElementById(elementId);
+            if (element && lastUpdates[collection]) {
+                const date = new Date(lastUpdates[collection]);
+                element.innerHTML = `Dernière mise à jour: ${date.toLocaleTimeString()}`;
+            }
+        }
+        
+        window.addEventListener('online', () => {
+            isOnline = true;
+            updateSyncStatus(true);
+            document.getElementById('offlineIndicator').style.display = 'none';
+            showToast('🟢 Connecté - Synchronisation en cours', 'success');
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            updateSyncStatus(false);
+            document.getElementById('offlineIndicator').style.display = 'block';
+            showToast('🔴 Mode hors-ligne - Données en cache', 'warning');
+        });
+        
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             if(!container) return;
@@ -516,10 +703,8 @@
             document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
         }
         
-        // Modal générique
         function ouvrirModal(titre, contenuHtml, onSave) {
             fermerTousLesModals();
-            
             const modalHtml = `
                 <div class="modal-overlay" onclick="if(event.target===this) fermerTousLesModals()">
                     <div class="modal-content">
@@ -537,9 +722,7 @@
                     </div>
                 </div>
             `;
-            
             document.body.insertAdjacentHTML('beforeend', modalHtml);
-            
             const saveBtn = document.getElementById('modalSaveBtn');
             if(saveBtn) {
                 saveBtn.addEventListener('click', async (e) => {
@@ -548,18 +731,9 @@
                     fermerTousLesModals();
                 });
             }
-            
-            // Fermer avec Echap
-            const handleEscape = (e) => {
-                if(e.key === 'Escape') {
-                    fermerTousLesModals();
-                    document.removeEventListener('keydown', handleEscape);
-                }
-            };
-            document.addEventListener('keydown', handleEscape);
         }
         
-        // Auth functions
+        // ========== AUTHENTIFICATION ==========
         function checkAuth() {
             const userStr = localStorage.getItem('admin_user');
             if(userStr) {
@@ -584,6 +758,9 @@
         }
         
         document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        document.getElementById('gestionPaiementBtn')?.addEventListener('click', () => {
+            window.location.href = 'gestion_paiement.html';
+        });
         
         document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -623,59 +800,191 @@
             }
         });
         
-        function loadAppData() {
-            // Menu navigation
-            document.querySelectorAll('.menu-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    document.querySelectorAll('.form-section').forEach(section => section.classList.remove('active'));
-                    const sectionId = `section-${btn.dataset.section}`;
-                    document.getElementById(sectionId).classList.add('active');
-                });
+        // ========== CONFIGURATION SEMESTRES ==========
+        async function chargerConfigurationSemestres() {
+            const configDoc = await db.collection('configurations').doc('semestres').get();
+            if(configDoc.exists) {
+                semestreConfig = configDoc.data();
+            } else {
+                semestreConfig = { premier: [], deuxieme: [] };
+            }
+            afficherConfigurationSemestres();
+            afficherStatutSemestres();
+        }
+        
+        function afficherConfigurationSemestres() {
+            const premierContainer = document.getElementById('premierSemestreFiches');
+            const deuxiemeContainer = document.getElementById('deuxiemeSemestreFiches');
+            if(!premierContainer || !deuxiemeContainer) return;
+            
+            if(allFiches.length === 0) {
+                premierContainer.innerHTML = '<div class="alert alert-warning">Aucune fiche disponible. Créez des fiches d\'abord.</div>';
+                deuxiemeContainer.innerHTML = '<div class="alert alert-warning">Aucune fiche disponible. Créez des fiches d\'abord.</div>';
+                return;
+            }
+            
+            let premierHtml = '', deuxiemeHtml = '';
+            allFiches.forEach(fiche => {
+                const isPremierChecked = semestreConfig.premier?.includes(fiche.id) || false;
+                const isDeuxiemeChecked = semestreConfig.deuxieme?.includes(fiche.id) || false;
+                
+                premierHtml += `
+                    <div class="fiche-selector-item">
+                        <input type="checkbox" class="form-check-input me-2" id="premier_${fiche.id}" value="${fiche.id}" ${isPremierChecked ? 'checked' : ''}>
+                        <label for="premier_${fiche.id}">
+                            <strong>${escapeHtml(fiche.nom)}</strong> - ${(fiche.montant || 0).toLocaleString()} FC
+                        </label>
+                    </div>
+                `;
+                
+                deuxiemeHtml += `
+                    <div class="fiche-selector-item">
+                        <input type="checkbox" class="form-check-input me-2" id="deuxieme_${fiche.id}" value="${fiche.id}" ${isDeuxiemeChecked ? 'checked' : ''}>
+                        <label for="deuxieme_${fiche.id}">
+                            <strong>${escapeHtml(fiche.nom)}</strong> - ${(fiche.montant || 0).toLocaleString()} FC
+                        </label>
+                    </div>
+                `;
             });
             
-            // Firestore listeners
-            db.collection('anneesAcademiques').onSnapshot(snapshot => {
-                allAnnees = [];
-                snapshot.forEach(doc => allAnnees.push({ id: doc.id, ...doc.data() }));
+            premierContainer.innerHTML = premierHtml;
+            deuxiemeContainer.innerHTML = deuxiemeHtml;
+        }
+        
+        async function sauvegarderSemestre(semestre, fichesIds) {
+            try {
+                const config = { ...semestreConfig };
+                config[semestre] = fichesIds;
+                await db.collection('configurations').doc('semestres').set(config);
+                semestreConfig = config;
+                showToast(`Configuration du ${semestre === 'premier' ? 'premier' : 'deuxième'} semestre enregistrée`, 'success');
+                afficherStatutSemestres();
+            } catch(err) {
+                console.error(err);
+                showToast('Erreur lors de l\'enregistrement', 'danger');
+            }
+        }
+        
+        function afficherStatutSemestres() {
+            const container = document.getElementById('semestreConfigStatus');
+            if(!container) return;
+            
+            const premierNoms = (semestreConfig.premier || []).map(id => {
+                const fiche = allFiches.find(f => f.id === id);
+                return fiche ? fiche.nom : id;
+            });
+            const deuxiemeNoms = (semestreConfig.deuxieme || []).map(id => {
+                const fiche = allFiches.find(f => f.id === id);
+                return fiche ? fiche.nom : id;
+            });
+            
+            container.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong><span class="semester-badge premier">Premier Semestre</span></strong><br>
+                        ${premierNoms.length > 0 ? premierNoms.join(', ') : '<span class="text-muted">Aucune fiche configurée</span>'}
+                    </div>
+                    <div class="col-md-6">
+                        <strong><span class="semester-badge deuxieme">Deuxième Semestre</span></strong><br>
+                        ${deuxiemeNoms.length > 0 ? deuxiemeNoms.join(', ') : '<span class="text-muted">Aucune fiche configurée</span>'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        document.getElementById('savePremierSemestreBtn')?.addEventListener('click', () => {
+            const selectedFiches = [];
+            allFiches.forEach(fiche => {
+                const checkbox = document.getElementById(`premier_${fiche.id}`);
+                if(checkbox && checkbox.checked) selectedFiches.push(fiche.id);
+            });
+            sauvegarderSemestre('premier', selectedFiches);
+        });
+        
+        document.getElementById('saveDeuxiemeSemestreBtn')?.addEventListener('click', () => {
+            const selectedFiches = [];
+            allFiches.forEach(fiche => {
+                const checkbox = document.getElementById(`deuxieme_${fiche.id}`);
+                if(checkbox && checkbox.checked) selectedFiches.push(fiche.id);
+            });
+            sauvegarderSemestre('deuxieme', selectedFiches);
+        });
+        
+        // ========== FONCTIONS D'ACTUALISATION ==========
+        async function refreshAnnees() {
+            const btn = document.getElementById('refreshAnneesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allAnnees = await staticCache.refreshCollection('anneesAcademiques');
+                lastUpdates.annees = Date.now();
                 afficherAnneesListe();
-            });
-            
-            db.collection('promotions').onSnapshot(snapshot => {
-                allPromotions = [];
-                snapshot.forEach(doc => allPromotions.push({ id: doc.id, ...doc.data() }));
+                updateLastUpdateDisplay('annee');
+                showToast('✅ Années académiques actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshComptes() {
+            const btn = document.getElementById('refreshComptesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                const data = await staticCache.refreshCollection('utilisateurs');
+                allUtilisateurs = data.filter(u => u.role === 'comptabilite');
+                lastUpdates.comptes = Date.now();
+                afficherComptesListe();
+                updateLastUpdateDisplay('compte');
+                showToast('✅ Comptes actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshPromotions() {
+            const btn = document.getElementById('refreshPromotionsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allPromotions = await staticCache.refreshCollection('promotions');
+                lastUpdates.promotions = Date.now();
                 afficherPromotionsListe();
                 chargerPromotionsSelects();
                 chargerPromotionsCheckbox();
                 chargerPromotionsSelectsEtudiant();
                 afficherBoutonsPromotions();
                 chargerPromotionsTransfert();
-            });
-            
-            db.collection('etudiants').onSnapshot(snapshot => {
-                allEtudiants = [];
-                snapshot.forEach(doc => allEtudiants.push({ id: doc.id, ...doc.data() }));
-                afficherBoutonsPromotions();
-                afficherEtudiantsParPromotion(currentSelectedPromotion);
-                mettreAJourInfoTransfert();
-                afficherPromotionsListe();
-            });
-            
-            db.collection('fiches').onSnapshot(snapshot => {
-                allFiches = [];
-                snapshot.forEach(doc => allFiches.push({ id: doc.id, ...doc.data() }));
-                afficherFichesListe();
-            });
-            
-            db.collection('utilisateurs').where('role', '==', 'comptabilite').onSnapshot(snapshot => {
-                allUtilisateurs = [];
-                snapshot.forEach(doc => allUtilisateurs.push({ id: doc.id, ...doc.data() }));
-                afficherComptesListe();
-            });
+                updateLastUpdateDisplay('promotion');
+                showToast('✅ Promotions actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
         }
         
-        // === Fonctions d'affichage des listes ===
+        async function refreshFiches() {
+            const btn = document.getElementById('refreshFichesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allFiches = await staticCache.refreshCollection('fiches');
+                lastUpdates.fiches = Date.now();
+                afficherFichesListe();
+                chargerConfigurationSemestres();
+                updateLastUpdateDisplay('fiche');
+                showToast('✅ Fiches actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshEtudiants() {
+            const btn = document.getElementById('refreshEtudiantsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allEtudiants = await staticCache.refreshCollection('etudiants');
+                lastUpdates.etudiants = Date.now();
+                afficherBoutonsPromotions();
+                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion);
+                updateLastUpdateDisplay('etudiant');
+                showToast('✅ Étudiants actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        // ========== AFFICHAGE DES LISTES ==========
         function afficherAnneesListe() {
             const container = document.getElementById('anneesListe');
             if(!container) return;
@@ -707,33 +1016,18 @@
         function afficherPromotionsListe() {
             const container = document.getElementById('promotionsListe');
             if(!container) return;
-            
-            if(allPromotions.length === 0) { 
-                container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; 
-                return; 
-            }
+            if(allPromotions.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; return; }
             
             let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead>';
-            html += '<tr><th>Nom</th><th>Capacité</th><th>Étudiants</th><th>Actions</th></tr>';
-            html += '</thead><tbody>';
+            html += '<tr><th>Nom</th><th>Capacité</th><th>Étudiants</th><th>Actions</th></tr></thead><tbody>';
             
             allPromotions.forEach(p => {
-                let count = 0;
-                if(allEtudiants && allEtudiants.length > 0) {
-                    count = allEtudiants.filter(e => e.promotion === p.id || e.promotion === p.nom).length;
-                }
-                
-                html += `<tr id="promo-${p.id}">`;
-                html += `<td><strong>${escapeHtml(p.nom)}</strong></td>`;
-                html += `<td>${p.capacite || '-'}</td>`;
-                html += `<td><span class="badge ${count > 0 ? 'bg-primary' : 'bg-secondary'}">${count}</span></td>`;
-                html += `<td>
-                    <button class="btn btn-sm btn-warning-custom" onclick="modifierPromotion('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
-                    <button class="btn btn-sm btn-danger-custom" onclick="supprimerPromotion('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button>
-                </td>`;
-                html += `</tr>`;
+                let count = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<tr id="promo-${p.id}"><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td>
+                <td><span class="badge ${count > 0 ? 'bg-primary' : 'bg-secondary'}">${count}</span></td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierPromotion('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerPromotion('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
             });
-            
             html += '</tbody></table></div>';
             container.innerHTML = html;
         }
@@ -748,12 +1042,13 @@
             allFiches.forEach(f => {
                 let promotionsText = '';
                 if(f.promotions && Array.isArray(f.promotions)) {
-                    const promoNoms = f.promotions.map(pid => promoMap[pid] || pid).filter(p => p);
+                    const promoNoms = f.promotions.map(pid => promoMap[pid] || pid).filter(p => p && !p.includes('InRXQHXNqUeQV6CLEoW2'));
                     promotionsText = promoNoms.join(', ');
-                } else if(f.promotion) {
-                    promotionsText = promoMap[f.promotion] || f.promotion;
                 }
-                html += `<tr id="fiche-${f.id}"><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td><td>${escapeHtml(promotionsText) || '-'}</td>
+                if(!promotionsText || promotionsText === '') promotionsText = '-';
+                
+                html += `<tr id="fiche-${f.id}"><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td>
+                <td>${escapeHtml(promotionsText)}</td>
                 <td><button class="btn btn-sm btn-warning-custom" onclick="modifierFiche('${f.id}')"><i class="bi bi-pencil"></i> Modifier</button>
                 <button class="btn btn-sm btn-danger-custom" onclick="supprimerFiche('${f.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
             });
@@ -761,35 +1056,16 @@
             container.innerHTML = html;
         }
         
-        // === Fonctions de modification avec modals ===
+        // ========== MODIFICATIONS AVEC MODALS ==========
         window.modifierAnnee = (id) => {
             const annee = allAnnees.find(a => a.id === id);
             if(!annee) return;
-            
-            const contenu = `
-                <div class="mb-3">
-                    <label class="form-label">Nom de l'année académique</label>
-                    <input type="text" class="form-control" id="modalAnneeNom" value="${escapeHtml(annee.annee || annee.nom)}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Statut</label>
-                    <select class="form-select" id="modalAnneeStatut">
-                        <option value="active" ${annee.statut === 'active' ? 'selected' : ''}>Active</option>
-                        <option value="inactive" ${annee.statut === 'inactive' ? 'selected' : ''}>Inactive</option>
-                    </select>
-                </div>
-            `;
-            
-            ouvrirModal('<i class="bi bi-calendar-week"></i> Modifier l\'année académique', contenu, async () => {
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de l'année académique</label><input type="text" class="form-control" id="modalAnneeNom" value="${escapeHtml(annee.annee || annee.nom)}" required></div><div class="mb-3"><label class="form-label">Statut</label><select class="form-select" id="modalAnneeStatut"><option value="active" ${annee.statut === 'active' ? 'selected' : ''}>Active</option><option value="inactive" ${annee.statut === 'inactive' ? 'selected' : ''}>Inactive</option></select></div>`;
+            ouvrirModal('Modifier l\'année académique', contenu, async () => {
                 const nouveauNom = document.getElementById('modalAnneeNom').value.trim();
                 const nouveauStatut = document.getElementById('modalAnneeStatut').value;
                 if(!nouveauNom) throw new Error('Nom requis');
-                
-                await db.collection('anneesAcademiques').doc(id).update({ 
-                    annee: nouveauNom, 
-                    nom: nouveauNom,
-                    statut: nouveauStatut
-                });
+                await db.collection('anneesAcademiques').doc(id).update({ annee: nouveauNom, nom: nouveauNom, statut: nouveauStatut });
                 showToast('Année académique modifiée avec succès');
             });
         };
@@ -797,30 +1073,12 @@
         window.modifierCompte = (id) => {
             const compte = allUtilisateurs.find(c => c.id === id);
             if(!compte) return;
-            
-            const contenu = `
-                <div class="mb-3">
-                    <label class="form-label">Nom complet</label>
-                    <input type="text" class="form-control" id="modalCompteNom" value="${escapeHtml(compte.nomComplet)}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" id="modalCompteEmail" value="${escapeHtml(compte.email)}" required>
-                </div>
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici pour des raisons de sécurité.
-                </div>
-            `;
-            
-            ouvrirModal('<i class="bi bi-person-badge"></i> Modifier le compte comptabilité', contenu, async () => {
+            const contenu = `<div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalCompteNom" value="${escapeHtml(compte.nomComplet)}" required></div><div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalCompteEmail" value="${escapeHtml(compte.email)}" required></div><div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici.</div>`;
+            ouvrirModal('Modifier le compte comptabilité', contenu, async () => {
                 const nouveauNom = document.getElementById('modalCompteNom').value.trim();
                 const nouvelEmail = document.getElementById('modalCompteEmail').value.trim();
                 if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
-                
-                await db.collection('utilisateurs').doc(id).update({ 
-                    nomComplet: nouveauNom,
-                    email: nouvelEmail
-                });
+                await db.collection('utilisateurs').doc(id).update({ nomComplet: nouveauNom, email: nouvelEmail });
                 showToast('Compte modifié avec succès');
             });
         };
@@ -828,35 +1086,15 @@
         window.modifierPromotion = (id) => {
             const promotion = allPromotions.find(p => p.id === id);
             if(!promotion) return;
-            
-            const contenu = `
-                <div class="mb-3">
-                    <label class="form-label">Nom de la promotion</label>
-                    <input type="text" class="form-control" id="modalPromoNom" value="${escapeHtml(promotion.nom)}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Capacité</label>
-                    <input type="number" class="form-control" id="modalPromoCapacite" value="${promotion.capacite || ''}" min="0" required>
-                </div>
-            `;
-            
-            ouvrirModal('<i class="bi bi-trophy"></i> Modifier la promotion', contenu, async () => {
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de la promotion</label><input type="text" class="form-control" id="modalPromoNom" value="${escapeHtml(promotion.nom)}" required></div><div class="mb-3"><label class="form-label">Capacité</label><input type="number" class="form-control" id="modalPromoCapacite" value="${promotion.capacite || ''}" min="0" required></div>`;
+            ouvrirModal('Modifier la promotion', contenu, async () => {
                 const nouveauNom = document.getElementById('modalPromoNom').value.trim();
                 const nouvelleCapacite = parseInt(document.getElementById('modalPromoCapacite').value);
-                
                 if(!nouveauNom) throw new Error('Nom requis');
                 if(isNaN(nouvelleCapacite) || nouvelleCapacite < 0) throw new Error('Capacité invalide');
-                
                 const nomExiste = allPromotions.some(p => p.id !== id && p.nom.toLowerCase() === nouveauNom.toLowerCase());
-                if(nomExiste) {
-                    showToast('Ce nom de promotion existe déjà', 'danger');
-                    throw new Error('Nom dupliqué');
-                }
-                
-                await db.collection('promotions').doc(id).update({
-                    nom: nouveauNom,
-                    capacite: nouvelleCapacite
-                });
+                if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); throw new Error('Nom dupliqué'); }
+                await db.collection('promotions').doc(id).update({ nom: nouveauNom, capacite: nouvelleCapacite });
                 showToast('Promotion modifiée avec succès');
             });
         };
@@ -865,67 +1103,26 @@
             const fiche = allFiches.find(f => f.id === id);
             if(!fiche) return;
             
-            const promoMap = {};
-            allPromotions.forEach(p => promoMap[p.id] = p.nom);
-            
             let checkboxesHtml = '';
             allPromotions.forEach(p => {
                 const isChecked = (fiche.promotions && fiche.promotions.includes(p.id)) ? 'checked' : '';
-                checkboxesHtml += `
-                    <div class="promotion-checkbox-item">
-                        <input type="checkbox" class="form-check-input modal-promo-checkbox" value="${p.id}" id="modal_promo_${p.id}" ${isChecked}>
-                        <label for="modal_promo_${p.id}"><strong>${escapeHtml(p.nom)}</strong></label>
-                    </div>
-                `;
+                checkboxesHtml += `<div class="promotion-checkbox-item"><input type="checkbox" class="form-check-input modal-promo-checkbox" value="${p.id}" id="modal_promo_${p.id}" ${isChecked}><label for="modal_promo_${p.id}"><strong>${escapeHtml(p.nom)}</strong></label></div>`;
             });
             
-            const contenu = `
-                <div class="mb-3">
-                    <label class="form-label">Nom de la fiche</label>
-                    <input type="text" class="form-control" id="modalFicheNom" value="${escapeHtml(fiche.nom)}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Montant (FC)</label>
-                    <input type="number" class="form-control" id="modalFicheMontant" value="${fiche.montant || 0}" min="0" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Promotions concernées</label>
-                    <div class="promotions-checkbox-group" style="max-height: 250px;">
-                        <div class="checkbox-select-all">
-                            <input type="checkbox" id="modalSelectAllPromos"> 
-                            <label for="modalSelectAllPromos"><strong>Sélectionner toutes</strong></label>
-                        </div>
-                        <div id="modalPromosList">
-                            ${checkboxesHtml}
-                        </div>
-                    </div>
-                </div>
-            `;
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de la fiche</label><input type="text" class="form-control" id="modalFicheNom" value="${escapeHtml(fiche.nom)}" required></div><div class="mb-3"><label class="form-label">Montant (FC)</label><input type="number" class="form-control" id="modalFicheMontant" value="${fiche.montant || 0}" min="0" required></div><div class="mb-3"><label class="form-label">Promotions concernées</label><div class="promotions-checkbox-group" style="max-height: 250px;"><div class="checkbox-select-all"><input type="checkbox" id="modalSelectAllPromos"><label for="modalSelectAllPromos"><strong>Sélectionner toutes</strong></label></div><div id="modalPromosList">${checkboxesHtml}</div></div></div>`;
             
-            ouvrirModal('<i class="bi bi-file-text"></i> Modifier la fiche', contenu, async () => {
+            ouvrirModal('Modifier la fiche', contenu, async () => {
                 const nouveauNom = document.getElementById('modalFicheNom').value.trim();
                 const nouveauMontant = parseInt(document.getElementById('modalFicheMontant').value);
-                
                 if(!nouveauNom) throw new Error('Nom requis');
                 if(isNaN(nouveauMontant) || nouveauMontant < 0) throw new Error('Montant invalide');
-                
                 const selectedPromos = [];
                 document.querySelectorAll('.modal-promo-checkbox:checked').forEach(cb => selectedPromos.push(cb.value));
-                
-                if(selectedPromos.length === 0) {
-                    showToast('Sélectionnez au moins une promotion', 'danger');
-                    throw new Error('Aucune promotion sélectionnée');
-                }
-                
-                await db.collection('fiches').doc(id).update({
-                    nom: nouveauNom,
-                    montant: nouveauMontant,
-                    promotions: selectedPromos
-                });
+                if(selectedPromos.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); throw new Error('Aucune promotion sélectionnée'); }
+                await db.collection('fiches').doc(id).update({ nom: nouveauNom, montant: nouveauMontant, promotions: selectedPromos });
                 showToast('Fiche modifiée avec succès');
             });
             
-            // Activer le "Sélectionner toutes" dans le modal
             setTimeout(() => {
                 document.getElementById('modalSelectAllPromos')?.addEventListener('change', (e) => {
                     document.querySelectorAll('.modal-promo-checkbox').forEach(cb => cb.checked = e.target.checked);
@@ -936,97 +1133,38 @@
         window.modifierEtudiantAdmin = (id) => {
             const etudiant = allEtudiants.find(e => e.id === id);
             if(!etudiant) return;
-            
             let optionsHtml = '<option value="">Sélectionner une promotion</option>';
             allPromotions.forEach(p => {
                 const selected = (etudiant.promotion === p.id) ? 'selected' : '';
                 optionsHtml += `<option value="${p.id}" ${selected}>${escapeHtml(p.nom)}</option>`;
             });
-            
-            const contenu = `
-                <div class="mb-3">
-                    <label class="form-label">Nom complet</label>
-                    <input type="text" class="form-control" id="modalEtudiantNom" value="${escapeHtml(etudiant.nom)}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Matricule</label>
-                    <input type="text" class="form-control" value="${etudiant.matricule || etudiant.id.substring(0,8)}" disabled>
-                    <small class="text-muted">Le matricule ne peut pas être modifié</small>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Promotion</label>
-                    <select class="form-select" id="modalEtudiantPromo" required>
-                        ${optionsHtml}
-                    </select>
-                </div>
-            `;
-            
-            ouvrirModal('<i class="bi bi-mortarboard"></i> Modifier l\'étudiant', contenu, async () => {
+            const contenu = `<div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalEtudiantNom" value="${escapeHtml(etudiant.nom)}" required></div><div class="mb-3"><label class="form-label">Matricule</label><input type="text" class="form-control" value="${etudiant.matricule || etudiant.id.substring(0,8)}" disabled><small class="text-muted">Le matricule ne peut pas être modifié</small></div><div class="mb-3"><label class="form-label">Promotion</label><select class="form-select" id="modalEtudiantPromo" required>${optionsHtml}</select></div>`;
+            ouvrirModal('Modifier l\'étudiant', contenu, async () => {
                 const nouveauNom = document.getElementById('modalEtudiantNom').value.trim();
                 const nouvellePromo = document.getElementById('modalEtudiantPromo').value;
-                
                 if(!nouveauNom) throw new Error('Nom requis');
                 if(!nouvellePromo) throw new Error('Promotion requise');
-                
-                await db.collection('etudiants').doc(id).update({
-                    nom: nouveauNom,
-                    promotion: nouvellePromo
-                });
+                await db.collection('etudiants').doc(id).update({ nom: nouveauNom, promotion: nouvellePromo });
                 showToast('Étudiant modifié avec succès');
             });
         };
         
-        // === Fonctions de suppression ===
-        window.supprimerAnnee = async (id) => { 
-            if(confirm('Supprimer cette année académique ?')) {
-                await db.collection('anneesAcademiques').doc(id).delete(); 
-                showToast('Année supprimée', 'warning');
-            }
-        };
-        
-        window.supprimerCompte = async (id) => { 
-            if(confirm('Supprimer ce compte comptabilité ?')) {
-                await db.collection('utilisateurs').doc(id).delete(); 
-                showToast('Compte supprimé', 'warning');
-            }
-        };
-        
+        // ========== SUPPRESSIONS ==========
+        window.supprimerAnnee = async (id) => { if(confirm('Supprimer cette année académique ?')) { await db.collection('anneesAcademiques').doc(id).delete(); showToast('Année supprimée', 'warning'); } };
+        window.supprimerCompte = async (id) => { if(confirm('Supprimer ce compte comptabilité ?')) { await db.collection('utilisateurs').doc(id).delete(); showToast('Compte supprimé', 'warning'); } };
         window.supprimerPromotion = async (id) => {
             const nbEtudiants = allEtudiants.filter(e => e.promotion === id).length;
-            if(nbEtudiants > 0) { 
-                alert(`Impossible: ${nbEtudiants} étudiant(s) sont encore inscrits dans cette promotion.`); 
-                return; 
-            }
-            if(confirm('Supprimer cette promotion ?')) {
-                await db.collection('promotions').doc(id).delete();
-                showToast('Promotion supprimée', 'warning');
-            }
+            if(nbEtudiants > 0) { alert(`Impossible: ${nbEtudiants} étudiant(s) sont encore inscrits dans cette promotion.`); return; }
+            if(confirm('Supprimer cette promotion ?')) { await db.collection('promotions').doc(id).delete(); showToast('Promotion supprimée', 'warning'); }
         };
+        window.supprimerFiche = async (id) => { if(confirm('Supprimer cette fiche ?')) { await db.collection('fiches').doc(id).delete(); showToast('Fiche supprimée', 'warning'); } };
+        window.supprimerEtudiantAdmin = async (id) => { if(confirm('Supprimer cet étudiant ? Cette action est irréversible.')) { await db.collection('etudiants').doc(id).delete(); showToast('Étudiant supprimé', 'warning'); } };
         
-        window.supprimerFiche = async (id) => { 
-            if(confirm('Supprimer cette fiche ?')) {
-                await db.collection('fiches').doc(id).delete(); 
-                showToast('Fiche supprimée', 'warning');
-            }
-        };
-        
-        window.supprimerEtudiantAdmin = async (id) => { 
-            if(confirm('Supprimer cet étudiant ? Cette action est irréversible.')) { 
-                await db.collection('etudiants').doc(id).delete(); 
-                showToast('Étudiant supprimé', 'warning'); 
-            } 
-        };
-        
-        // === Formulaires de création ===
+        // ========== FORMULAIRES ==========
         document.getElementById('anneeForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const nom = document.getElementById('nomAnnee').value.trim();
-            await db.collection('anneesAcademiques').add({ 
-                annee: nom, 
-                nom: nom, 
-                statut: document.getElementById('statutAnnee').value, 
-                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
-            });
+            await db.collection('anneesAcademiques').add({ annee: nom, nom: nom, statut: document.getElementById('statutAnnee').value, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
             document.getElementById('anneeForm').reset();
             showToast('Année créée avec succès');
         });
@@ -1035,10 +1173,7 @@
             e.preventDefault();
             const pwd = document.getElementById('passwordCompta').value;
             const confirm = document.getElementById('confirmPasswordCompta').value;
-            if(pwd !== confirm) { 
-                showToast('Les mots de passe ne correspondent pas', 'danger');
-                return; 
-            }
+            if(pwd !== confirm) { showToast('Les mots de passe ne correspondent pas', 'danger'); return; }
             const matricule = 'COMPTA_' + Date.now();
             await db.collection('utilisateurs').doc(matricule).set({
                 nomComplet: document.getElementById('nomCompta').value.trim(),
@@ -1056,18 +1191,9 @@
             e.preventDefault();
             const nom = document.getElementById('nomPromotion').value.trim();
             const capacite = parseInt(document.getElementById('capacitePromotion').value);
-            
             const nomExiste = allPromotions.some(p => p.nom.toLowerCase() === nom.toLowerCase());
-            if(nomExiste) {
-                showToast('Ce nom de promotion existe déjà', 'danger');
-                return;
-            }
-            
-            await db.collection('promotions').add({ 
-                nom: nom, 
-                capacite: capacite, 
-                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
-            });
+            if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); return; }
+            await db.collection('promotions').add({ nom: nom, capacite: capacite, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
             document.getElementById('promotionForm').reset();
             showToast('Promotion créée avec succès');
         });
@@ -1076,16 +1202,8 @@
             e.preventDefault();
             const selectedPromotions = [];
             document.querySelectorAll('.promotion-checkbox:checked').forEach(cb => selectedPromotions.push(cb.value));
-            if(selectedPromotions.length === 0) { 
-                showToast('Sélectionnez au moins une promotion', 'danger');
-                return; 
-            }
-            await db.collection('fiches').add({ 
-                nom: document.getElementById('nomFiche').value.trim(), 
-                montant: parseInt(document.getElementById('montantFiche').value), 
-                promotions: selectedPromotions, 
-                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
-            });
+            if(selectedPromotions.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); return; }
+            await db.collection('fiches').add({ nom: document.getElementById('nomFiche').value.trim(), montant: parseInt(document.getElementById('montantFiche').value), promotions: selectedPromotions, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
             document.getElementById('ficheForm').reset();
             document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = false);
             document.getElementById('selectAllPromotions').checked = false;
@@ -1095,17 +1213,12 @@
         document.getElementById('etudiantForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const matricule = await genererMatriculeUnique();
-            await db.collection('etudiants').doc(matricule).set({ 
-                nom: document.getElementById('nomEtudiant').value.trim(), 
-                matricule: matricule, 
-                promotion: document.getElementById('promotionEtudiant').value, 
-                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
-            });
+            await db.collection('etudiants').doc(matricule).set({ nom: document.getElementById('nomEtudiant').value.trim(), matricule: matricule, promotion: document.getElementById('promotionEtudiant').value, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
             document.getElementById('etudiantForm').reset();
             showToast(`Étudiant créé - Matricule: ${matricule}`);
         });
         
-        // === Fonctions utilitaires pour les selects et checkboxes ===
+        // ========== FONCTIONS UTILITAIRES ==========
         function chargerPromotionsSelects() {
             ['promotionEtudiant', 'importPromotionSelect'].forEach(id => {
                 const select = document.getElementById(id);
@@ -1141,19 +1254,15 @@
         function chargerPromotionsTransfert() {
             const sourceSelect = document.getElementById('promotionSource');
             const destSelect = document.getElementById('promotionDestination');
-            
             if(sourceSelect && destSelect) {
                 const currentSource = sourceSelect.value;
                 const currentDest = destSelect.value;
-                
                 sourceSelect.innerHTML = '<option value="">Sélectionner promotion source</option>';
                 destSelect.innerHTML = '<option value="">Sélectionner promotion destination</option>';
-                
                 allPromotions.forEach(promo => {
                     sourceSelect.innerHTML += `<option value="${promo.id}">${escapeHtml(promo.nom)}</option>`;
                     destSelect.innerHTML += `<option value="${promo.id}">${escapeHtml(promo.nom)}</option>`;
                 });
-                
                 if(currentSource) sourceSelect.value = currentSource;
                 if(currentDest) destSelect.value = currentDest;
             }
@@ -1162,42 +1271,56 @@
         function afficherBoutonsPromotions() {
             const container = document.getElementById('promotionButtons');
             if(!container) return;
-            let html = '<button class="promotion-btn" data-promo="all">📋 Tous</button>';
+            let html = '';
             allPromotions.forEach(p => {
                 const count = allEtudiants.filter(e => e.promotion === p.id).length;
                 html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${count}</span></button>`;
             });
             container.innerHTML = html;
+            
             document.querySelectorAll('#promotionButtons .promotion-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    currentSelectedPromotion = btn.dataset.promo === 'all' ? null : btn.dataset.promo;
+                    document.querySelectorAll('#promotionButtons .promotion-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSelectedPromotion = btn.dataset.promo;
                     currentSearchTerm = '';
-                    if(document.getElementById('searchEtudiantList')) document.getElementById('searchEtudiantList').value = '';
+                    const searchInput = document.getElementById('searchEtudiantList');
+                    if(searchInput) searchInput.value = '';
+                    document.getElementById('clearSearchEtudiant').style.display = 'none';
                     afficherEtudiantsParPromotion(currentSelectedPromotion);
                 });
             });
         }
         
         function afficherEtudiantsParPromotion(promoId) {
-            let filtres = promoId === null ? [...allEtudiants] : allEtudiants.filter(e => e.promotion === promoId);
+            if(!promoId) {
+                document.getElementById('etudiantsListeAdmin').innerHTML = `<div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;"><i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i><h5 class="mt-3">Sélectionnez une promotion</h5><p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p></div>`;
+                return;
+            }
+            
+            let filtres = allEtudiants.filter(e => e.promotion === promoId);
             if(currentSearchTerm) filtres = filtres.filter(e => e.nom?.toLowerCase().includes(currentSearchTerm.toLowerCase()));
             const promoMap = {}; allPromotions.forEach(p => promoMap[p.id] = p.nom);
             
             if(filtres.length === 0) { 
-                document.getElementById('etudiantsListeAdmin').innerHTML = '<div class="alert alert-info">Aucun étudiant</div>'; 
+                document.getElementById('etudiantsListeAdmin').innerHTML = `<div class="alert alert-info">Aucun étudiant trouvé dans la promotion "${escapeHtml(promoMap[promoId] || promoId)}"${currentSearchTerm ? ' pour la recherche "' + escapeHtml(currentSearchTerm) + '"' : ''}</div>`; 
                 return; 
             }
             
             let html = `<div class="mb-2"><strong>${filtres.length}</strong> étudiant(s)</div>
-                        <div class="table-responsive"><table class="table table-bordered table-hover">
-                        <thead><tr><th>#</th><th>Matricule</th><th>Nom</th><th>Promotion</th><th>Actions</th></tr></thead><tbody>`;
+                        <div class="table-responsive"><table class="etudiants-table">
+                        <thead><tr><th>#</th><th>Matricule</th><th>Nom</th><th>Actions</th></tr></thead><tbody>`;
             
             filtres.forEach((e, idx) => {
-                html += `<tr><td>${idx+1}</td><td><code>${e.matricule || e.id.substring(0,8)}</code></td><td><strong>${escapeHtml(e.nom)}</strong></td><td>${escapeHtml(promoMap[e.promotion] || '-')}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning-custom" onclick="modifierEtudiantAdmin('${e.id}')" style="padding:4px 8px;"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-danger-custom" onclick="supprimerEtudiantAdmin('${e.id}')" style="padding:4px 8px;"><i class="bi bi-trash"></i></button>
-                </td></tr>`;
+                html += `<tr>
+                    <td>${idx+1}</td>
+                    <td><code>${escapeHtml(e.matricule || e.id.substring(0,8))}</code></td>
+                    <td><strong>${escapeHtml(e.nom)}</strong></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning-custom" onclick="modifierEtudiantAdmin('${e.id}')" style="padding:4px 8px;"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-danger-custom" onclick="supprimerEtudiantAdmin('${e.id}')" style="padding:4px 8px;"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
             });
             html += '</tbody></table></div>';
             document.getElementById('etudiantsListeAdmin').innerHTML = html;
@@ -1211,16 +1334,22 @@
                 if(sourceId && destId && sourceId !== destId) {
                     const nb = allEtudiants.filter(e => e.promotion === sourceId).length;
                     infoDiv.innerHTML = `<i class="bi bi-info-circle"></i> ${nb} étudiant(s) à transférer`;
-                } else { 
-                    infoDiv.innerHTML = ''; 
-                }
+                } else { infoDiv.innerHTML = ''; }
             }
         }
         
-        // === Events ===
+        // ========== EVENTS ==========
         document.getElementById('searchEtudiantList')?.addEventListener('input', (e) => { 
             currentSearchTerm = e.target.value; 
+            document.getElementById('clearSearchEtudiant').style.display = currentSearchTerm ? 'block' : 'none';
             afficherEtudiantsParPromotion(currentSelectedPromotion); 
+        });
+        
+        document.getElementById('clearSearchEtudiant')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('searchEtudiantList');
+            if(searchInput) { searchInput.value = ''; currentSearchTerm = ''; }
+            document.getElementById('clearSearchEtudiant').style.display = 'none';
+            afficherEtudiantsParPromotion(currentSelectedPromotion);
         });
         
         document.getElementById('promotionSource')?.addEventListener('change', mettreAJourInfoTransfert);
@@ -1229,30 +1358,18 @@
         document.getElementById('transfererEtudiantsBtn')?.addEventListener('click', async () => {
             const sourceId = document.getElementById('promotionSource').value;
             const destId = document.getElementById('promotionDestination').value;
-            if(!sourceId || !destId) { 
-                showToast('Veuillez sélectionner les deux promotions', 'danger');
-                return; 
-            }
-            if(sourceId === destId) { 
-                showToast('Les promotions source et destination doivent être différentes', 'danger');
-                return; 
-            }
-            
+            if(!sourceId || !destId) { showToast('Veuillez sélectionner les deux promotions', 'danger'); return; }
+            if(sourceId === destId) { showToast('Les promotions source et destination doivent être différentes', 'danger'); return; }
             const etudiants = allEtudiants.filter(e => e.promotion === sourceId);
-            if(!etudiants.length) { 
-                showToast('Aucun étudiant dans la promotion source', 'warning');
-                return; 
-            }
-            
+            if(!etudiants.length) { showToast('Aucun étudiant dans la promotion source', 'warning'); return; }
             if(!confirm(`Transférer ${etudiants.length} étudiant(s) ?`)) return;
-            
             const batch = db.batch();
             etudiants.forEach(e => batch.update(db.collection('etudiants').doc(e.id), { promotion: destId }));
             await batch.commit();
             showToast(`${etudiants.length} étudiant(s) transféré(s) avec succès`);
         });
         
-        // === Excel Import ===
+        // ========== EXCEL IMPORT ==========
         let excelDataToImport = [];
         async function lireExcel(file) { 
             return new Promise((res, rej) => { 
@@ -1276,7 +1393,6 @@
                 if(!promoSelect.value) showToast('Veuillez d\'abord sélectionner une promotion', 'warning');
                 return; 
             }
-            
             try {
                 const raw = await lireExcel(file);
                 excelDataToImport = [];
@@ -1285,75 +1401,43 @@
                         excelDataToImport.push({ nom: raw[i][1].toString().trim() }); 
                     }
                 }
-                
-                if(excelDataToImport.length === 0) {
-                    showToast('Aucune donnée valide trouvée dans le fichier', 'warning');
-                    return;
-                }
-                
+                if(excelDataToImport.length === 0) { showToast('Aucune donnée valide trouvée dans le fichier', 'warning'); return; }
                 document.getElementById('previewExcelBtn').disabled = false;
                 document.getElementById('importExcelBtn').disabled = false;
-                
                 let previewHtml = `<div class="table-responsive"><table class="table table-sm"><thead><tr><th>#</th><th>Nom</th></tr></thead><tbody>`;
                 excelDataToImport.slice(0, 10).forEach((item, idx) => {
                     previewHtml += `<tr><td>${idx+1}</td><td>${escapeHtml(item.nom)}</td></tr>`;
                 });
-                if(excelDataToImport.length > 10) {
-                    previewHtml += `<tr><td colspan="2" class="text-center text-muted">... et ${excelDataToImport.length - 10} autre(s)</td></tr>`;
-                }
+                if(excelDataToImport.length > 10) previewHtml += `<tr><td colspan="2" class="text-center text-muted">... et ${excelDataToImport.length - 10} autre(s)</td></tr>`;
                 previewHtml += `</tbody></table></div>`;
                 document.getElementById('previewTable').innerHTML = previewHtml;
                 document.getElementById('importPreview').style.display = 'block';
-                
-            } catch(err) {
-                showToast('Erreur lors de la lecture du fichier', 'danger');
-                console.error(err);
-            }
+            } catch(err) { showToast('Erreur lors de la lecture du fichier', 'danger'); console.error(err); }
         });
         
-        document.getElementById('previewExcelBtn')?.addEventListener('click', () => {
-            document.getElementById('importPreview').style.display = 'block';
-        });
+        document.getElementById('previewExcelBtn')?.addEventListener('click', () => { document.getElementById('importPreview').style.display = 'block'; });
         
         document.getElementById('importExcelBtn')?.addEventListener('click', async () => {
             const promoId = document.getElementById('importPromotionSelect').value;
             if(!excelDataToImport.length || !promoId) return;
-            
             const progressDiv = document.getElementById('importProgress');
             const progressFill = progressDiv.querySelector('.progress-fill');
             progressDiv.style.display = 'block';
-            
             let success = 0;
             const batch = db.batch();
             const batchSize = 500;
             let count = 0;
-            
             for(let item of excelDataToImport) {
                 const matricule = await genererMatriculeUnique();
                 const docRef = db.collection('etudiants').doc(matricule);
-                batch.set(docRef, { 
-                    nom: item.nom, 
-                    matricule: matricule, 
-                    promotion: promoId, 
-                    dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
-                });
+                batch.set(docRef, { nom: item.nom, matricule: matricule, promotion: promoId, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
                 success++;
                 count++;
-                
-                if(count % batchSize === 0) {
-                    await batch.commit();
-                    const percent = (success / excelDataToImport.length) * 100;
-                    progressFill.style.width = percent + '%';
-                }
+                if(count % batchSize === 0) { await batch.commit(); const percent = (success / excelDataToImport.length) * 100; progressFill.style.width = percent + '%'; }
             }
-            
-            if(count % batchSize !== 0) {
-                await batch.commit();
-            }
-            
+            if(count % batchSize !== 0) await batch.commit();
             progressFill.style.width = '100%';
             showToast(`${success} étudiant(s) importé(s) avec succès`);
-            
             setTimeout(() => {
                 document.getElementById('excelFileInput').value = '';
                 document.getElementById('importPreview').style.display = 'none';
@@ -1366,27 +1450,19 @@
         
         document.getElementById('downloadTemplateBtn')?.addEventListener('click', (e) => {
             e.preventDefault();
-            const ws = XLSX.utils.aoa_to_sheet([
-                ['MATRICULE (optionnel)', 'NOM COMPLET'],
-                ['', 'Jean MUKENDI'],
-                ['', 'Marie KASONGO']
-            ]);
-            const wb = XLSX.utils.book_new(); 
-            XLSX.utils.book_append_sheet(wb, ws, 'Modele');
+            const ws = XLSX.utils.aoa_to_sheet([['MATRICULE (optionnel)', 'NOM COMPLET'], ['', 'Jean MUKENDI'], ['', 'Marie KASONGO']]);
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Modele');
             XLSX.writeFile(wb, 'modele_import_etudiants.xlsx');
         });
         
-        // === Export ===
+        // ========== EXPORTS ==========
         document.getElementById('exportExcelListBtn')?.addEventListener('click', () => {
-            let filtres = currentSelectedPromotion === null ? [...allEtudiants] : allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
+            if(!currentSelectedPromotion) { showToast('Sélectionnez d\'abord une promotion', 'warning'); return; }
+            let filtres = allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
             if(currentSearchTerm) filtres = filtres.filter(e => e.nom?.toLowerCase().includes(currentSearchTerm.toLowerCase()));
-            
-            const promoMap = {}; 
-            allPromotions.forEach(p => promoMap[p.id] = p.nom);
-            
+            const promoMap = {}; allPromotions.forEach(p => promoMap[p.id] = p.nom);
             const data = [['Matricule', 'Nom', 'Promotion']];
             filtres.forEach(e => data.push([e.matricule || e.id, e.nom, promoMap[e.promotion] || '']));
-            
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Etudiants');
@@ -1395,15 +1471,12 @@
         });
         
         document.getElementById('exportCsvListBtn')?.addEventListener('click', () => {
-            let filtres = currentSelectedPromotion === null ? [...allEtudiants] : allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
+            if(!currentSelectedPromotion) { showToast('Sélectionnez d\'abord une promotion', 'warning'); return; }
+            let filtres = allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
             if(currentSearchTerm) filtres = filtres.filter(e => e.nom?.toLowerCase().includes(currentSearchTerm.toLowerCase()));
-            
-            const promoMap = {}; 
-            allPromotions.forEach(p => promoMap[p.id] = p.nom);
-            
+            const promoMap = {}; allPromotions.forEach(p => promoMap[p.id] = p.nom);
             let csv = 'Matricule,Nom,Promotion\n';
             filtres.forEach(e => csv += `"${e.matricule || e.id}","${e.nom}","${promoMap[e.promotion] || ''}"\n`);
-            
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -1411,6 +1484,41 @@
             link.click();
             showToast('Export CSV généré');
         });
+        
+        // ========== BOUTONS D'ACTUALISATION ==========
+        document.getElementById('refreshAnneesBtn')?.addEventListener('click', refreshAnnees);
+        document.getElementById('refreshComptesBtn')?.addEventListener('click', refreshComptes);
+        document.getElementById('refreshPromotionsBtn')?.addEventListener('click', refreshPromotions);
+        document.getElementById('refreshFichesBtn')?.addEventListener('click', refreshFiches);
+        document.getElementById('refreshEtudiantsBtn')?.addEventListener('click', refreshEtudiants);
+        
+        // ========== MENU NAVIGATION ==========
+        document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.form-section').forEach(section => section.classList.remove('active'));
+                const sectionId = `section-${btn.dataset.section}`;
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        // ========== CHARGEMENT DES DONNÉES ==========
+        function loadAppData() {
+            // Chargement initial depuis cache
+            staticCache.getCollection('anneesAcademiques').then(data => { allAnnees = data; lastUpdates.annees = Date.now(); afficherAnneesListe(); updateLastUpdateDisplay('annee'); });
+            staticCache.getCollection('promotions').then(data => { allPromotions = data; lastUpdates.promotions = Date.now(); afficherPromotionsListe(); chargerPromotionsSelects(); chargerPromotionsCheckbox(); chargerPromotionsSelectsEtudiant(); afficherBoutonsPromotions(); chargerPromotionsTransfert(); updateLastUpdateDisplay('promotion'); });
+            staticCache.getCollection('fiches').then(data => { allFiches = data; lastUpdates.fiches = Date.now(); afficherFichesListe(); chargerConfigurationSemestres(); updateLastUpdateDisplay('fiche'); });
+            staticCache.getCollection('etudiants').then(data => { allEtudiants = data; lastUpdates.etudiants = Date.now(); afficherBoutonsPromotions(); if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion); updateLastUpdateDisplay('etudiant'); });
+            staticCache.getCollection('utilisateurs').then(data => { allUtilisateurs = data.filter(u => u.role === 'comptabilite'); lastUpdates.comptes = Date.now(); afficherComptesListe(); updateLastUpdateDisplay('compte'); });
+            
+            // Écoute en temps réel pour les mises à jour
+            db.collection('anneesAcademiques').onSnapshot(() => refreshAnnees());
+            db.collection('promotions').onSnapshot(() => refreshPromotions());
+            db.collection('fiches').onSnapshot(() => refreshFiches());
+            db.collection('etudiants').onSnapshot(() => refreshEtudiants());
+            db.collection('utilisateurs').where('role', '==', 'comptabilite').onSnapshot(() => refreshComptes());
+        }
         
         // Service Worker
         if ('serviceWorker' in navigator) {
