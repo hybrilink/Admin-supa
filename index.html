@@ -29,12 +29,15 @@
         .btn-success-custom { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 10px; }
         .btn-success-custom:hover { background: #1e7e34; }
         .btn-warning-custom { background: var(--accent-yellow); color: var(--primary-blue); border: none; padding: 10px 20px; border-radius: 10px; }
+        .btn-info-custom { background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 10px; }
+        .btn-info-custom:hover { background: #138496; }
         .card { border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .card-header { background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); color: white; border-radius: 15px 15px 0 0; padding: 15px 20px; }
         .card-header.bg-success { background: linear-gradient(135deg, #28a745, #1e7e34); }
         .card-header.bg-warning { background: linear-gradient(135deg, #ffc107, #e0a800); color: var(--primary-blue); }
         .card-header.bg-info { background: linear-gradient(135deg, #17a2b8, #0f6b7a); }
         .card-header.bg-secondary { background: linear-gradient(135deg, #6c757d, #5a6268); }
+        .card-header.bg-professor { background: linear-gradient(135deg, #6f42c1, #5a379a); }
         .back-btn { background: var(--accent-yellow); color: var(--primary-blue); border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
         .back-btn:hover { background: #ff9800; transform: translateY(-2px); color: var(--primary-blue); }
         .toast-notification { position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; }
@@ -52,6 +55,8 @@
         .menu-buttons { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; justify-content: center; }
         .menu-btn { background: white; border: 2px solid var(--primary-blue); color: var(--primary-blue); padding: 12px 25px; border-radius: 50px; cursor: pointer; transition: all 0.3s; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; }
         .menu-btn:hover, .menu-btn.active { background: var(--primary-blue); color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .menu-btn.professor-btn { border-color: #6f42c1; color: #6f42c1; }
+        .menu-btn.professor-btn:hover, .menu-btn.professor-btn.active { background: #6f42c1; color: white; }
         .form-section { display: none; animation: fadeIn 0.3s ease; }
         .form-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -115,6 +120,8 @@
         .role-badge.admin { background: #dc3545; color: white; }
         .role-badge.comptabilite { background: #17a2b8; color: white; }
         .role-badge.academique { background: #28a745; color: white; }
+        .role-badge.professeur { background: #6f42c1; color: white; }
+        .professor-info-card { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 25px; margin-bottom: 20px; border-left: 5px solid #6f42c1; }
     </style>
 </head>
 <body>
@@ -165,6 +172,7 @@
                 <button class="menu-btn" data-section="annee"><i class="bi bi-calendar-week-fill"></i> Année Académique</button>
                 <button class="menu-btn" data-section="compta"><i class="bi bi-person-badge-fill"></i> Compte Comptabilité</button>
                 <button class="menu-btn" data-section="academique"><i class="bi bi-book-fill"></i> Compte Académique</button>
+                <button class="menu-btn professor-btn" data-section="professeur"><i class="bi bi-person-workspace"></i> Professeur</button>
                 <button class="menu-btn" data-section="promotion"><i class="bi bi-trophy-fill"></i> Promotion</button>
                 <button class="menu-btn" data-section="fiche"><i class="bi bi-file-text-fill"></i> Fiche</button>
                 <button class="menu-btn" data-section="etudiant"><i class="bi bi-mortarboard-fill"></i> Étudiant</button>
@@ -243,7 +251,7 @@
                 </div>
             </div>
             
-            <!-- SECTION COMPTE ACADÉMIQUE (NOUVELLE) -->
+            <!-- SECTION COMPTE ACADÉMIQUE -->
             <div id="section-academique" class="form-section">
                 <div class="card">
                     <div class="card-header bg-success">
@@ -277,6 +285,67 @@
                         <hr>
                         <h6>Liste des comptes académiques existants <span id="academiqueLastUpdate" class="last-update-badge"></span></h6>
                         <div id="academiquesListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECTION PROFESSEUR (NOUVELLE) -->
+            <div id="section-professeur" class="form-section">
+                <div class="card">
+                    <div class="card-header bg-professor">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-person-workspace"></i> Comptes Professeurs</h5>
+                            <button class="refresh-btn" id="refreshProfesseursBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="professor-info-card">
+                            <h6><i class="bi bi-info-circle-fill"></i> Informations sur le compte professeur</h6>
+                            <p class="mb-0">Les professeurs pourront accéder à leur espace dédié avec des fonctionnalités spécifiques à l'enseignement.</p>
+                        </div>
+                        
+                        <form id="professeurForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom complet du professeur</label>
+                                    <input type="text" class="form-control" id="nomProfesseur" required placeholder="Ex: Dr. Pierre LUMUMBA">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email professionnel</label>
+                                    <input type="email" class="form-control" id="emailProfesseur" required placeholder="professeur@fsa-unilu.com">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="passwordProfesseur" required placeholder="Minimum 6 caractères" minlength="6">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Confirmer mot de passe</label>
+                                    <input type="password" class="form-control" id="confirmPasswordProfesseur" required placeholder="Retaper le mot de passe" minlength="6">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Spécialité</label>
+                                    <input type="text" class="form-control" id="specialiteProfesseur" placeholder="Ex: Agronomie, Économie rurale..." required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Département</label>
+                                    <select class="form-select" id="departementProfesseur">
+                                        <option value="">Sélectionner un département</option>
+                                        <option value="Agronomie Générale">Agronomie Générale</option>
+                                        <option value="Économie Agricole">Économie Agricole</option>
+                                        <option value="Sciences du Sol">Sciences du Sol</option>
+                                        <option value="Protection des Végétaux">Protection des Végétaux</option>
+                                        <option value="Zootechnie">Zootechnie</option>
+                                        <option value="Génie Rural">Génie Rural</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action" style="background: #6f42c1; border-color: #6f42c1;">
+                                <i class="bi bi-person-plus-fill"></i> Créer compte professeur
+                            </button>
+                        </form>
+                        <hr>
+                        <h6>Liste des professeurs <span id="professeurLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="professeursListe" class="mt-2"></div>
                     </div>
                 </div>
             </div>
@@ -589,6 +658,7 @@
         let allFiches = [];
         let allUtilisateurs = [];
         let allAcademiques = [];
+        let allProfesseurs = [];
         let currentSelectedPromotion = null;
         let currentSearchTerm = '';
         let currentUser = null;
@@ -599,6 +669,7 @@
             annees: null,
             comptes: null,
             academiques: null,
+            professeurs: null,
             promotions: null,
             fiches: null,
             etudiants: null
@@ -835,6 +906,133 @@
             document.getElementById('academiqueForm').reset();
             showToast('Compte académique créé avec succès');
             refreshAcademiques();
+        });
+        
+        // ========== COMPTES PROFESSEURS (NOUVEAU) ==========
+        async function refreshProfesseurs() {
+            const btn = document.getElementById('refreshProfesseursBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                const data = await staticCache.refreshCollection('utilisateurs');
+                allProfesseurs = data.filter(u => u.role === 'professeur');
+                lastUpdates.professeurs = Date.now();
+                afficherProfesseursListe();
+                updateLastUpdateDisplay('professeur');
+                showToast('✅ Professeurs actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        function afficherProfesseursListe() {
+            const container = document.getElementById('professeursListe');
+            if(!container) return;
+            if(allProfesseurs.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun professeur enregistré</div>'; return; }
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>Spécialité</th><th>Département</th><th>Date création</th><th>Actions</th></tr></thead><tbody>';
+            allProfesseurs.forEach(p => {
+                html += `<tr id="professeur-${p.id}">
+                    <td><strong>${escapeHtml(p.nomComplet)}</strong></td>
+                    <td>${escapeHtml(p.email)}</td>
+                    <td>${escapeHtml(p.specialite || '-')}</td>
+                    <td>${escapeHtml(p.departement || '-')}</td>
+                    <td>${p.dateCreation ? new Date(p.dateCreation.toDate()).toLocaleDateString() : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning-custom" onclick="modifierProfesseur('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                        <button class="btn btn-sm btn-danger-custom" onclick="supprimerProfesseur('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        window.modifierProfesseur = (id) => {
+            const professeur = allProfesseurs.find(p => p.id === id);
+            if(!professeur) return;
+            const contenu = `
+                <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalProfesseurNom" value="${escapeHtml(professeur.nomComplet)}" required></div>
+                <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalProfesseurEmail" value="${escapeHtml(professeur.email)}" required></div>
+                <div class="mb-3"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="modalProfesseurSpecialite" value="${escapeHtml(professeur.specialite || '')}" required></div>
+                <div class="mb-3"><label class="form-label">Département</label>
+                    <select class="form-select" id="modalProfesseurDepartement">
+                        <option value="">Sélectionner un département</option>
+                        <option value="Agronomie Générale" ${professeur.departement === 'Agronomie Générale' ? 'selected' : ''}>Agronomie Générale</option>
+                        <option value="Économie Agricole" ${professeur.departement === 'Économie Agricole' ? 'selected' : ''}>Économie Agricole</option>
+                        <option value="Sciences du Sol" ${professeur.departement === 'Sciences du Sol' ? 'selected' : ''}>Sciences du Sol</option>
+                        <option value="Protection des Végétaux" ${professeur.departement === 'Protection des Végétaux' ? 'selected' : ''}>Protection des Végétaux</option>
+                        <option value="Zootechnie" ${professeur.departement === 'Zootechnie' ? 'selected' : ''}>Zootechnie</option>
+                        <option value="Génie Rural" ${professeur.departement === 'Génie Rural' ? 'selected' : ''}>Génie Rural</option>
+                    </select>
+                </div>
+                <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici.</div>
+            `;
+            ouvrirModal('Modifier le professeur', contenu, async () => {
+                const nouveauNom = document.getElementById('modalProfesseurNom').value.trim();
+                const nouvelEmail = document.getElementById('modalProfesseurEmail').value.trim();
+                const nouvelleSpecialite = document.getElementById('modalProfesseurSpecialite').value.trim();
+                const nouveauDepartement = document.getElementById('modalProfesseurDepartement').value;
+                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
+                await db.collection('utilisateurs').doc(id).update({ 
+                    nomComplet: nouveauNom, 
+                    email: nouvelEmail,
+                    specialite: nouvelleSpecialite,
+                    departement: nouveauDepartement
+                });
+                showToast('Professeur modifié avec succès');
+            });
+        };
+        
+        window.supprimerProfesseur = async (id) => {
+            if(confirm('Supprimer ce professeur définitivement ?')) {
+                await db.collection('utilisateurs').doc(id).delete();
+                showToast('Professeur supprimé', 'warning');
+            }
+        };
+        
+        document.getElementById('professeurForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pwd = document.getElementById('passwordProfesseur').value;
+            const confirm = document.getElementById('confirmPasswordProfesseur').value;
+            
+            if(pwd.length < 6) {
+                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
+                return;
+            }
+            
+            if(pwd !== confirm) {
+                showToast('Les mots de passe ne correspondent pas', 'danger');
+                return;
+            }
+            
+            const nom = document.getElementById('nomProfesseur').value.trim();
+            const email = document.getElementById('emailProfesseur').value.trim();
+            const specialite = document.getElementById('specialiteProfesseur').value.trim();
+            const departement = document.getElementById('departementProfesseur').value;
+            
+            if(!nom || !email || !specialite || !departement) {
+                showToast('Veuillez remplir tous les champs', 'danger');
+                return;
+            }
+            
+            try {
+                const id = 'PROF_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                await db.collection('utilisateurs').doc(id).set({
+                    nomComplet: nom,
+                    email: email,
+                    motDePasse: pwd,
+                    role: 'professeur',
+                    specialite: specialite,
+                    departement: departement,
+                    id: id,
+                    dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                document.getElementById('professeurForm').reset();
+                showToast('✅ Compte professeur créé avec succès', 'success');
+                refreshProfesseurs();
+            } catch(error) {
+                console.error('Erreur création professeur:', error);
+                showToast('Erreur lors de la création du compte professeur', 'danger');
+            }
         });
         
         // ========== CONFIGURATION SEMESTRES ==========
@@ -1531,6 +1729,7 @@
         document.getElementById('refreshAnneesBtn')?.addEventListener('click', refreshAnnees);
         document.getElementById('refreshComptesBtn')?.addEventListener('click', refreshComptes);
         document.getElementById('refreshAcademiquesBtn')?.addEventListener('click', refreshAcademiques);
+        document.getElementById('refreshProfesseursBtn')?.addEventListener('click', refreshProfesseurs);
         document.getElementById('refreshPromotionsBtn')?.addEventListener('click', refreshPromotions);
         document.getElementById('refreshFichesBtn')?.addEventListener('click', refreshFiches);
         document.getElementById('refreshEtudiantsBtn')?.addEventListener('click', refreshEtudiants);
@@ -1555,12 +1754,16 @@
             staticCache.getCollection('utilisateurs').then(data => { 
                 allUtilisateurs = data.filter(u => u.role === 'comptabilite'); 
                 allAcademiques = data.filter(u => u.role === 'academique');
+                allProfesseurs = data.filter(u => u.role === 'professeur');
                 lastUpdates.comptes = Date.now();
                 lastUpdates.academiques = Date.now();
+                lastUpdates.professeurs = Date.now();
                 afficherComptesListe(); 
                 afficherAcademiquesListe();
+                afficherProfesseursListe();
                 updateLastUpdateDisplay('compte');
                 updateLastUpdateDisplay('academique');
+                updateLastUpdateDisplay('professeur');
             });
             
             db.collection('anneesAcademiques').onSnapshot(() => refreshAnnees());
@@ -1570,6 +1773,7 @@
             db.collection('utilisateurs').onSnapshot(() => {
                 refreshComptes();
                 refreshAcademiques();
+                refreshProfesseurs();
             });
         }
         
