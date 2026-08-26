@@ -122,6 +122,131 @@
         .role-badge.academique { background: #28a745; color: white; }
         .role-badge.professeur { background: #6f42c1; color: white; }
         .professor-info-card { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 25px; margin-bottom: 20px; border-left: 5px solid #6f42c1; }
+
+        /* Nouveaux styles pour la configuration des semestres par promotion */
+        .promotion-semestre-config {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-blue);
+            transition: all 0.3s;
+        }
+        .promotion-semestre-config:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .promotion-semestre-config .promo-title {
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .promotion-semestre-config .fiche-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .promotion-semestre-config .fiche-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .promotion-semestre-config .fiche-item input[type="checkbox"] {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .promo-config-status {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .promo-config-status .badge-fiche {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 3px;
+        }
+        .promo-config-status .badge-fiche.premier {
+            background: #28a745;
+        }
+        .promo-config-status .badge-fiche.deuxieme {
+            background: #ff9800;
+        }
+        .save-promo-config-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .save-promo-config-btn:hover {
+            background: var(--dark-blue);
+            transform: translateY(-2px);
+        }
+        .config-progress {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .config-progress .progress-bar-fill {
+            height: 100%;
+            background: var(--success-green);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .promotion-selector-config {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .promotion-selector-config .promo-select-btn {
+            padding: 8px 20px;
+            border: 2px solid var(--primary-blue);
+            background: white;
+            color: var(--primary-blue);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .promotion-selector-config .promo-select-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .promotion-selector-config .promo-select-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .promotion-selector-config .promo-select-btn .promo-count {
+            background: rgba(255,255,255,0.3);
+            padding: 0 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        .promotion-selector-config .promo-select-btn.active .promo-count {
+            background: rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 <body>
@@ -289,7 +414,7 @@
                 </div>
             </div>
             
-            <!-- SECTION PROFESSEUR (NOUVELLE) -->
+            <!-- SECTION PROFESSEUR -->
             <div id="section-professeur" class="form-section">
                 <div class="card">
                     <div class="card-header bg-professor">
@@ -425,30 +550,44 @@
             <div id="section-semestre" class="form-section">
                 <div class="card">
                     <div class="card-header bg-info">
-                        <h5 class="mb-0"><i class="bi bi-calendar2-week-fill"></i> Configuration des semestres</h5>
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-calendar2-week-fill"></i> Configuration des semestres par promotion</h5>
+                            <button class="refresh-btn" id="refreshSemestreConfigBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle-fill"></i> 
-                            <strong>Configuration des fiches par semestre</strong><br>
-                            Sélectionnez les fiches qui seront exigées pour le premier semestre et celles pour le deuxième semestre.
+                            <strong>Configuration personnalisée par promotion</strong><br>
+                            Sélectionnez une promotion pour configurer les fiches requises pour chaque semestre.
                         </div>
                         
-                        <div class="semester-config-card">
-                            <h5><span class="semester-badge premier"><i class="bi bi-calendar-check"></i> Premier Semestre</span></h5>
-                            <div id="premierSemestreFiches" class="mt-3">Chargement...</div>
-                            <button class="btn-action mt-2" id="savePremierSemestreBtn"><i class="bi bi-save"></i> Enregistrer Premier Semestre</button>
+                        <!-- Sélecteur de promotion -->
+                        <div class="promotion-selector-config" id="promotionSelectorConfig">
+                            <button class="promo-select-btn active" data-promo="all">📋 Toutes les promotions <span class="promo-count" id="totalPromoCount">0</span></button>
                         </div>
                         
-                        <div class="semester-config-card">
-                            <h5><span class="semester-badge deuxieme"><i class="bi bi-calendar-week"></i> Deuxième Semestre</span></h5>
-                            <div id="deuxiemeSemestreFiches" class="mt-3">Chargement...</div>
-                            <button class="btn-action mt-2" id="saveDeuxiemeSemestreBtn"><i class="bi bi-save"></i> Enregistrer Deuxième Semestre</button>
+                        <!-- Zone de configuration -->
+                        <div id="promotionConfigContainer">
+                            <div class="text-center py-4">
+                                <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.3;"></i>
+                                <p class="text-muted mt-3">Sélectionnez une promotion ci-dessus pour configurer ses semestres</p>
+                            </div>
                         </div>
                         
                         <hr>
-                        <h6>Configuration actuelle</h6>
-                        <div id="semestreConfigStatus" class="alert alert-secondary">Chargement...</div>
+                        
+                        <!-- Résumé des configurations -->
+                        <div class="card mt-3">
+                            <div class="card-header bg-secondary">
+                                <h6 class="mb-0"><i class="bi bi-list-check"></i> Résumé des configurations</h6>
+                            </div>
+                            <div class="card-body" id="configSummaryContainer">
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-hourglass-split"></i> Chargement des configurations...
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -662,8 +801,11 @@
         let currentSelectedPromotion = null;
         let currentSearchTerm = '';
         let currentUser = null;
-        let semestreConfig = { premier: [], deuxieme: [] };
         let isOnline = navigator.onLine;
+        
+        // Variables pour la configuration des semestres par promotion
+        let promoConfigs = {};
+        let currentSelectedPromoForConfig = null;
         
         let lastUpdates = {
             annees: null,
@@ -908,7 +1050,7 @@
             refreshAcademiques();
         });
         
-        // ========== COMPTES PROFESSEURS (NOUVEAU) ==========
+        // ========== COMPTES PROFESSEURS ==========
         async function refreshProfesseurs() {
             const btn = document.getElementById('refreshProfesseursBtn');
             if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
@@ -1035,116 +1177,276 @@
             }
         });
         
-        // ========== CONFIGURATION SEMESTRES ==========
-        async function chargerConfigurationSemestres() {
-            const configDoc = await db.collection('configurations').doc('semestres').get();
-            if(configDoc.exists) {
-                semestreConfig = configDoc.data();
-            } else {
-                semestreConfig = { premier: [], deuxieme: [] };
-            }
-            afficherConfigurationSemestres();
-            afficherStatutSemestres();
-        }
+        // ========== CONFIGURATION DES SEMESTRES PAR PROMOTION ==========
         
-        function afficherConfigurationSemestres() {
-            const premierContainer = document.getElementById('premierSemestreFiches');
-            const deuxiemeContainer = document.getElementById('deuxiemeSemestreFiches');
-            if(!premierContainer || !deuxiemeContainer) return;
-            
-            if(allFiches.length === 0) {
-                premierContainer.innerHTML = '<div class="alert alert-warning">Aucune fiche disponible. Créez des fiches d\'abord.</div>';
-                deuxiemeContainer.innerHTML = '<div class="alert alert-warning">Aucune fiche disponible. Créez des fiches d\'abord.</div>';
-                return;
-            }
-            
-            let premierHtml = '', deuxiemeHtml = '';
-            allFiches.forEach(fiche => {
-                const isPremierChecked = semestreConfig.premier?.includes(fiche.id) || false;
-                const isDeuxiemeChecked = semestreConfig.deuxieme?.includes(fiche.id) || false;
-                
-                premierHtml += `
-                    <div class="fiche-selector-item">
-                        <input type="checkbox" class="form-check-input me-2" id="premier_${fiche.id}" value="${fiche.id}" ${isPremierChecked ? 'checked' : ''}>
-                        <label for="premier_${fiche.id}">
-                            <strong>${escapeHtml(fiche.nom)}</strong> - ${(fiche.montant || 0).toLocaleString()} FC
-                        </label>
-                    </div>
-                `;
-                
-                deuxiemeHtml += `
-                    <div class="fiche-selector-item">
-                        <input type="checkbox" class="form-check-input me-2" id="deuxieme_${fiche.id}" value="${fiche.id}" ${isDeuxiemeChecked ? 'checked' : ''}>
-                        <label for="deuxieme_${fiche.id}">
-                            <strong>${escapeHtml(fiche.nom)}</strong> - ${(fiche.montant || 0).toLocaleString()} FC
-                        </label>
-                    </div>
-                `;
-            });
-            
-            premierContainer.innerHTML = premierHtml;
-            deuxiemeContainer.innerHTML = deuxiemeHtml;
-        }
-        
-        async function sauvegarderSemestre(semestre, fichesIds) {
+        // Fonction pour récupérer les configurations de toutes les promotions
+        async function chargerConfigurationsPromotions() {
             try {
-                const config = { ...semestreConfig };
-                config[semestre] = fichesIds;
-                await db.collection('configurations').doc('semestres').set(config);
-                semestreConfig = config;
-                showToast(`Configuration du ${semestre === 'premier' ? 'premier' : 'deuxième'} semestre enregistrée`, 'success');
-                afficherStatutSemestres();
+                const configDoc = await db.collection('configurations').doc('promotionsSemestres').get();
+                if(configDoc.exists) {
+                    promoConfigs = configDoc.data();
+                } else {
+                    promoConfigs = {};
+                }
+                return promoConfigs;
             } catch(err) {
-                console.error(err);
+                console.error('Erreur chargement configurations promotions:', err);
+                return {};
+            }
+        }
+
+        // Fonction pour sauvegarder la configuration d'une promotion
+        async function sauvegarderConfigPromotion(promoId, config) {
+            try {
+                promoConfigs[promoId] = config;
+                await db.collection('configurations').doc('promotionsSemestres').set(promoConfigs);
+                showToast(`Configuration enregistrée pour la promotion`, 'success');
+                afficherResumeConfigurations();
+                chargerPromotionSelector();
+                // Mettre à jour la liste des promotions dans le sélecteur
+                if(currentSelectedPromoForConfig === promoId) {
+                    afficherConfigPromotion(promoId);
+                }
+            } catch(err) {
+                console.error('Erreur sauvegarde config promotion:', err);
                 showToast('Erreur lors de l\'enregistrement', 'danger');
             }
         }
-        
-        function afficherStatutSemestres() {
-            const container = document.getElementById('semestreConfigStatus');
-            if(!container) return;
+
+        // Fonction pour afficher la configuration d'une promotion spécifique
+        function afficherConfigPromotion(promoId) {
+            const container = document.getElementById('promotionConfigContainer');
+            const promotion = allPromotions.find(p => p.id === promoId);
+            if(!promotion) {
+                container.innerHTML = `<div class="alert alert-warning">Promotion non trouvée</div>`;
+                return;
+            }
             
-            const premierNoms = (semestreConfig.premier || []).map(id => {
-                const fiche = allFiches.find(f => f.id === id);
-                return fiche ? fiche.nom : id;
-            });
-            const deuxiemeNoms = (semestreConfig.deuxieme || []).map(id => {
-                const fiche = allFiches.find(f => f.id === id);
-                return fiche ? fiche.nom : id;
+            const config = promoConfigs[promoId] || { premier: [], deuxieme: [] };
+            const premierFichesIds = config.premier || [];
+            const deuxiemeFichesIds = config.deuxieme || [];
+            
+            // Filtrer les fiches disponibles pour cette promotion
+            const fichesDisponibles = allFiches.filter(f => {
+                const promos = f.promotions || (f.promotion ? [f.promotion] : []);
+                return promos.includes(promoId);
             });
             
-            container.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong><span class="semester-badge premier">Premier Semestre</span></strong><br>
-                        ${premierNoms.length > 0 ? premierNoms.join(', ') : '<span class="text-muted">Aucune fiche configurée</span>'}
+            if(fichesDisponibles.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i> 
+                        Aucune fiche n'est associée à cette promotion. 
+                        <a href="#" onclick="document.querySelector('[data-section=\\'fiche\\']').click(); return false;" class="alert-link">Créez des fiches</a> pour cette promotion d'abord.
                     </div>
-                    <div class="col-md-6">
-                        <strong><span class="semester-badge deuxieme">Deuxième Semestre</span></strong><br>
-                        ${deuxiemeNoms.length > 0 ? deuxiemeNoms.join(', ') : '<span class="text-muted">Aucune fiche configurée</span>'}
+                `;
+                return;
+            }
+            
+            let html = `
+                <div class="promotion-semestre-config">
+                    <div class="promo-title">
+                        <span><i class="bi bi-trophy-fill"></i> ${escapeHtml(promotion.nom)}</span>
+                        <span class="badge bg-secondary">${fichesDisponibles.length} fiche(s) disponible(s)</span>
                     </div>
+                    
+                    <div class="row">
+                        <!-- Premier Semestre -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header" style="background: #28a745; color: white; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0"><i class="bi bi-calendar-check"></i> Premier Semestre</h6>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="fiche-items">
+                                        ${fichesDisponibles.map(f => `
+                                            <div class="fiche-item">
+                                                <input type="checkbox" class="form-check-input promo-semestre-checkbox" 
+                                                       data-promo="${promoId}" data-semestre="premier" 
+                                                       value="${f.id}" id="premier_${promoId}_${f.id}"
+                                                       ${premierFichesIds.includes(f.id) ? 'checked' : ''}>
+                                                <label for="premier_${promoId}_${f.id}" style="font-size: 14px; margin: 0;">
+                                                    ${escapeHtml(f.nom)} <small class="text-muted">(${(f.montant || 0).toLocaleString()} FC)</small>
+                                                </label>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="btn btn-sm btn-success-custom mt-2" onclick="sauvegarderConfigPromotion('${promoId}', { premier: getSelectedFichesForPromotion('${promoId}', 'premier'), deuxieme: getSelectedFichesForPromotion('${promoId}', 'deuxieme') })">
+                                        <i class="bi bi-save"></i> Enregistrer Premier Semestre
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Deuxième Semestre -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header" style="background: #ff9800; color: white; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0"><i class="bi bi-calendar-week"></i> Deuxième Semestre</h6>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="fiche-items">
+                                        ${fichesDisponibles.map(f => `
+                                            <div class="fiche-item">
+                                                <input type="checkbox" class="form-check-input promo-semestre-checkbox" 
+                                                       data-promo="${promoId}" data-semestre="deuxieme" 
+                                                       value="${f.id}" id="deuxieme_${promoId}_${f.id}"
+                                                       ${deuxiemeFichesIds.includes(f.id) ? 'checked' : ''}>
+                                                <label for="deuxieme_${promoId}_${f.id}" style="font-size: 14px; margin: 0;">
+                                                    ${escapeHtml(f.nom)} <small class="text-muted">(${(f.montant || 0).toLocaleString()} FC)</small>
+                                                </label>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="btn btn-sm btn-warning-custom mt-2" onclick="sauvegarderConfigPromotion('${promoId}', { premier: getSelectedFichesForPromotion('${promoId}', 'premier'), deuxieme: getSelectedFichesForPromotion('${promoId}', 'deuxieme') })">
+                                        <i class="bi bi-save"></i> Enregistrer Deuxième Semestre
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-progress mt-3">
+                        <div class="progress-bar-fill" style="width: ${calculateConfigProgress(promoId)}%"></div>
+                    </div>
+                    <small class="text-muted">Configuration: ${calculateConfigProgress(promoId)}% complétée</small>
                 </div>
             `;
+            
+            container.innerHTML = html;
         }
-        
-        document.getElementById('savePremierSemestreBtn')?.addEventListener('click', () => {
-            const selectedFiches = [];
-            allFiches.forEach(fiche => {
-                const checkbox = document.getElementById(`premier_${fiche.id}`);
-                if(checkbox && checkbox.checked) selectedFiches.push(fiche.id);
+
+        // Fonction pour obtenir les fiches sélectionnées pour une promotion et un semestre
+        window.getSelectedFichesForPromotion = function(promoId, semestre) {
+            const checkboxes = document.querySelectorAll(`.promo-semestre-checkbox[data-promo="${promoId}"][data-semestre="${semestre}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        };
+
+        // Fonction pour calculer la progression de la configuration d'une promotion
+        function calculateConfigProgress(promoId) {
+            const fichesDisponibles = allFiches.filter(f => {
+                const promos = f.promotions || (f.promotion ? [f.promotion] : []);
+                return promos.includes(promoId);
             });
-            sauvegarderSemestre('premier', selectedFiches);
-        });
-        
-        document.getElementById('saveDeuxiemeSemestreBtn')?.addEventListener('click', () => {
-            const selectedFiches = [];
-            allFiches.forEach(fiche => {
-                const checkbox = document.getElementById(`deuxieme_${fiche.id}`);
-                if(checkbox && checkbox.checked) selectedFiches.push(fiche.id);
+            
+            if(fichesDisponibles.length === 0) return 0;
+            
+            const config = promoConfigs[promoId] || { premier: [], deuxieme: [] };
+            const totalFiches = fichesDisponibles.length;
+            const totalConfigured = (config.premier || []).length + (config.deuxieme || []).length;
+            
+            // Une fiche peut être configurée pour les deux semestres, donc on compte chaque sélection
+            const maxPossible = totalFiches * 2;
+            return Math.round((totalConfigured / maxPossible) * 100);
+        }
+
+        // Fonction pour afficher le résumé des configurations
+        function afficherResumeConfigurations() {
+            const container = document.getElementById('configSummaryContainer');
+            if(!container) return;
+            
+            if(allPromotions.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">Aucune promotion disponible</div>';
+                return;
+            }
+            
+            let html = '<div class="row">';
+            allPromotions.forEach(promo => {
+                const config = promoConfigs[promo.id] || { premier: [], deuxieme: [] };
+                const premierFiches = (config.premier || []).map(id => allFiches.find(f => f.id === id)).filter(f => f);
+                const deuxiemeFiches = (config.deuxieme || []).map(id => allFiches.find(f => f.id === id)).filter(f => f);
+                
+                html += `
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header" style="background: var(--primary-blue); color: white;">
+                                <h6 class="mb-0">${escapeHtml(promo.nom)}</h6>
+                            </div>
+                            <div class="card-body" style="font-size: 13px;">
+                                <div class="mb-2">
+                                    <span class="badge badge-premier" style="background: #28a745;">1er Semestre</span>
+                                    ${premierFiches.length > 0 ? 
+                                        premierFiches.map(f => `<span class="badge-fiche premier">${escapeHtml(f.nom)}</span>`).join(' ') : 
+                                        '<span class="text-muted">Aucune fiche</span>'}
+                                </div>
+                                <div>
+                                    <span class="badge badge-deuxieme" style="background: #ff9800;">2ème Semestre</span>
+                                    ${deuxiemeFiches.length > 0 ? 
+                                        deuxiemeFiches.map(f => `<span class="badge-fiche deuxieme">${escapeHtml(f.nom)}</span>`).join(' ') : 
+                                        '<span class="text-muted">Aucune fiche</span>'}
+                                </div>
+                                <div class="config-progress mt-2">
+                                    <div class="progress-bar-fill" style="width: ${calculateConfigProgress(promo.id)}%"></div>
+                                </div>
+                                <small class="text-muted">${calculateConfigProgress(promo.id)}% configuré</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
-            sauvegarderSemestre('deuxieme', selectedFiches);
-        });
-        
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Fonction pour charger le sélecteur de promotions
+        function chargerPromotionSelector() {
+            const container = document.getElementById('promotionSelectorConfig');
+            if(!container) return;
+            
+            // Garder le bouton "Toutes" et ajouter les promotions
+            const allBtn = container.querySelector('[data-promo="all"]');
+            if(allBtn) {
+                document.getElementById('totalPromoCount').textContent = allPromotions.length;
+            }
+            
+            // Supprimer les anciens boutons de promotion (sauf "Toutes")
+            container.querySelectorAll('[data-promo]:not([data-promo="all"])').forEach(el => el.remove());
+            
+            allPromotions.forEach(promo => {
+                const config = promoConfigs[promo.id] || { premier: [], deuxieme: [] };
+                const totalFiches = (config.premier || []).length + (config.deuxieme || []).length;
+                const btn = document.createElement('button');
+                btn.className = `promo-select-btn ${currentSelectedPromoForConfig === promo.id ? 'active' : ''}`;
+                btn.dataset.promo = promo.id;
+                btn.innerHTML = `${escapeHtml(promo.nom)} <span class="promo-count">${totalFiches > 0 ? '✅' : '⚪'}</span>`;
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.promo-select-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSelectedPromoForConfig = promo.id;
+                    afficherConfigPromotion(promo.id);
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        // Fonction pour rafraîchir toutes les configurations
+        async function refreshAllConfigs() {
+            const btn = document.getElementById('refreshSemestreConfigBtn');
+            if(btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>';
+            }
+            
+            try {
+                await chargerConfigurationsPromotions();
+                chargerPromotionSelector();
+                afficherResumeConfigurations();
+                
+                if(currentSelectedPromoForConfig) {
+                    afficherConfigPromotion(currentSelectedPromoForConfig);
+                }
+                
+                showToast('✅ Configurations actualisées', 'success');
+            } catch(err) {
+                showToast('Erreur lors de l\'actualisation', 'danger');
+            } finally {
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser';
+                }
+            }
+        }
+
         // ========== FONCTIONS D'ACTUALISATION ==========
         async function refreshAnnees() {
             const btn = document.getElementById('refreshAnneesBtn');
@@ -1198,7 +1500,13 @@
                 allFiches = await staticCache.refreshCollection('fiches');
                 lastUpdates.fiches = Date.now();
                 afficherFichesListe();
-                chargerConfigurationSemestres();
+                // Mettre à jour les configurations
+                await chargerConfigurationsPromotions();
+                chargerPromotionSelector();
+                afficherResumeConfigurations();
+                if(currentSelectedPromoForConfig) {
+                    afficherConfigPromotion(currentSelectedPromoForConfig);
+                }
                 updateLastUpdateDisplay('fiche');
                 showToast('✅ Fiches actualisées', 'success');
             } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
@@ -1733,6 +2041,7 @@
         document.getElementById('refreshPromotionsBtn')?.addEventListener('click', refreshPromotions);
         document.getElementById('refreshFichesBtn')?.addEventListener('click', refreshFiches);
         document.getElementById('refreshEtudiantsBtn')?.addEventListener('click', refreshEtudiants);
+        document.getElementById('refreshSemestreConfigBtn')?.addEventListener('click', refreshAllConfigs);
         
         // ========== MENU NAVIGATION ==========
         document.querySelectorAll('.menu-btn').forEach(btn => {
@@ -1748,9 +2057,43 @@
         // ========== CHARGEMENT DES DONNÉES ==========
         function loadAppData() {
             staticCache.getCollection('anneesAcademiques').then(data => { allAnnees = data; lastUpdates.annees = Date.now(); afficherAnneesListe(); updateLastUpdateDisplay('annee'); });
-            staticCache.getCollection('promotions').then(data => { allPromotions = data; lastUpdates.promotions = Date.now(); afficherPromotionsListe(); chargerPromotionsSelects(); chargerPromotionsCheckbox(); chargerPromotionsSelectsEtudiant(); afficherBoutonsPromotions(); chargerPromotionsTransfert(); updateLastUpdateDisplay('promotion'); });
-            staticCache.getCollection('fiches').then(data => { allFiches = data; lastUpdates.fiches = Date.now(); afficherFichesListe(); chargerConfigurationSemestres(); updateLastUpdateDisplay('fiche'); });
-            staticCache.getCollection('etudiants').then(data => { allEtudiants = data; lastUpdates.etudiants = Date.now(); afficherBoutonsPromotions(); if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion); updateLastUpdateDisplay('etudiant'); });
+            staticCache.getCollection('promotions').then(data => { 
+                allPromotions = data; 
+                lastUpdates.promotions = Date.now(); 
+                afficherPromotionsListe(); 
+                chargerPromotionsSelects(); 
+                chargerPromotionsCheckbox(); 
+                chargerPromotionsSelectsEtudiant(); 
+                afficherBoutonsPromotions(); 
+                chargerPromotionsTransfert(); 
+                updateLastUpdateDisplay('promotion');
+                // Charger les configurations après avoir chargé les promotions
+                chargerConfigurationsPromotions().then(() => {
+                    chargerPromotionSelector();
+                    afficherResumeConfigurations();
+                    if(allPromotions.length > 0) {
+                        currentSelectedPromoForConfig = allPromotions[0].id;
+                        const btns = document.querySelectorAll('.promo-select-btn');
+                        btns.forEach(b => b.classList.remove('active'));
+                        const firstPromoBtn = document.querySelector(`.promo-select-btn[data-promo="${allPromotions[0].id}"]`);
+                        if(firstPromoBtn) firstPromoBtn.classList.add('active');
+                        afficherConfigPromotion(allPromotions[0].id);
+                    }
+                });
+            });
+            staticCache.getCollection('fiches').then(data => { 
+                allFiches = data; 
+                lastUpdates.fiches = Date.now(); 
+                afficherFichesListe(); 
+                updateLastUpdateDisplay('fiche');
+            });
+            staticCache.getCollection('etudiants').then(data => { 
+                allEtudiants = data; 
+                lastUpdates.etudiants = Date.now(); 
+                afficherBoutonsPromotions(); 
+                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion); 
+                updateLastUpdateDisplay('etudiant'); 
+            });
             staticCache.getCollection('utilisateurs').then(data => { 
                 allUtilisateurs = data.filter(u => u.role === 'comptabilite'); 
                 allAcademiques = data.filter(u => u.role === 'academique');
