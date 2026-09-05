@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Connexion Administration - Faculté Agronomique</title>
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Hybrilink Super Admin">
     <meta name="description" content="Gestion administrative complète">
     <meta name="theme-color" content="#003366">
-    
+
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192x192.png">
     <link rel="icon" type="image/png" href="icon-96x96.png">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
@@ -31,11 +32,20 @@
     }
 </script>
     
+
     <style>
-        /* ... (même CSS que précédemment) ... */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --primary-blue: #003366; --dark-blue: #002244; --accent-yellow: #ffb347; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #003366;
+            --dark-blue: #002244;
+            --accent-yellow: #ffb347;
+        }
+
         body {
             background: linear-gradient(135deg, #003366 0%, #001a33 100%);
             font-family: 'Segoe UI', sans-serif;
@@ -45,12 +55,12 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
         .login-container {
             width: 100%;
             max-width: 450px;
         }
-        
+
         .login-card {
             background: white;
             border-radius: 20px;
@@ -60,7 +70,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .login-card::before {
             content: '';
             position: absolute;
@@ -70,17 +80,24 @@
             height: 5px;
             background: linear-gradient(90deg, #003366, #ffb347, #003366);
         }
-        
+
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         .login-logo {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .login-logo i {
             font-size: 60px;
             color: var(--primary-blue);
@@ -88,21 +105,21 @@
             padding: 20px;
             border-radius: 50%;
         }
-        
+
         .login-title {
             text-align: center;
             color: var(--primary-blue);
             margin-bottom: 5px;
             font-weight: bold;
         }
-        
+
         .login-subtitle {
             text-align: center;
             color: #6c757d;
             font-size: 14px;
             margin-bottom: 30px;
         }
-        
+
         .auth-badge {
             display: inline-block;
             background: #28a745;
@@ -123,13 +140,15 @@
             font-weight: bold;
             margin-left: 5px;
         }
-        
-        .form-group { margin-bottom: 20px; }
-        
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
         .input-group-custom {
             position: relative;
         }
-        
+
         .input-group-custom i {
             position: absolute;
             left: 15px;
@@ -139,7 +158,7 @@
             font-size: 18px;
             z-index: 1;
         }
-        
+
         .input-group-custom input {
             width: 100%;
             padding: 14px 15px 14px 50px;
@@ -149,14 +168,14 @@
             transition: all 0.3s;
             background: #f8f9fa;
         }
-        
+
         .input-group-custom input:focus {
             outline: none;
             border-color: var(--primary-blue);
             background: white;
             box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
         }
-        
+
         .login-btn {
             background: var(--primary-blue);
             color: white;
@@ -169,36 +188,43 @@
             transition: all 0.3s;
             margin-top: 10px;
         }
-        
+
         .login-btn:hover {
             background: var(--dark-blue);
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        
+
         .login-btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         .toast-notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 9999;
+            z-index: 99999;
             min-width: 300px;
         }
-        
+
         .notification-toast {
             animation: slideInRight 0.3s ease-out;
         }
-        
+
         @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
-        
+
         .footer {
             text-align: center;
             margin-top: 25px;
@@ -207,12 +233,12 @@
             font-size: 12px;
             color: #888;
         }
-        
+
         .footer a {
             color: var(--primary-blue);
             text-decoration: none;
         }
-        
+
         .footer a:hover {
             text-decoration: underline;
         }
@@ -221,11 +247,29 @@
             display: none;
             animation: fadeInUp 0.5s ease-out;
         }
-        .verification-container.active { display: block; }
 
-        .verification-icon { font-size: 60px; color: #003366; margin-bottom: 15px; }
-        .verification-title { font-size: 20px; font-weight: bold; color: #003366; margin-bottom: 10px; }
-        .verification-subtitle { font-size: 14px; color: #666; margin-bottom: 20px; }
+        .verification-container.active {
+            display: block;
+        }
+
+        .verification-icon {
+            font-size: 60px;
+            color: #003366;
+            margin-bottom: 15px;
+        }
+
+        .verification-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        .verification-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
 
         .verification-device {
             background: #f0f7ff;
@@ -237,10 +281,25 @@
             align-items: center;
             gap: 15px;
         }
-        .verification-device i { font-size: 30px; color: #003366; }
-        .verification-device .device-info { flex: 1; }
-        .verification-device .device-info .device-name { font-weight: bold; color: #003366; }
-        .verification-device .device-info .device-detail { font-size: 12px; color: #888; }
+
+        .verification-device i {
+            font-size: 30px;
+            color: #003366;
+        }
+
+        .verification-device .device-info {
+            flex: 1;
+        }
+
+        .verification-device .device-info .device-name {
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .verification-device .device-info .device-detail {
+            font-size: 12px;
+            color: #888;
+        }
 
         .verification-code-input {
             display: flex;
@@ -248,6 +307,7 @@
             justify-content: center;
             margin: 20px 0;
         }
+
         .verification-code-input input {
             width: 50px;
             height: 60px;
@@ -259,16 +319,19 @@
             background: #f8f9fa;
             transition: all 0.3s;
         }
+
         .verification-code-input input:focus {
             outline: none;
             border-color: #003366;
             background: white;
             box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
         }
+
         .verification-code-input input.correct {
             border-color: #28a745;
             background: #d4edda;
         }
+
         .verification-code-input input.error {
             border-color: #dc3545;
             background: #f8d7da;
@@ -276,9 +339,17 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
 
         .verification-actions {
@@ -286,6 +357,7 @@
             gap: 15px;
             margin-top: 20px;
         }
+
         .verification-actions .btn-verify {
             flex: 2;
             padding: 14px;
@@ -298,10 +370,12 @@
             cursor: pointer;
             transition: all 0.3s;
         }
+
         .verification-actions .btn-verify:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
+
         .verification-actions .btn-cancel {
             flex: 1;
             padding: 14px;
@@ -314,6 +388,7 @@
             cursor: pointer;
             transition: all 0.3s;
         }
+
         .verification-actions .btn-cancel:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
@@ -324,14 +399,22 @@
             color: #888;
             margin-top: 15px;
         }
-        .verification-timer span { font-weight: bold; color: #dc3545; }
+
+        .verification-timer span {
+            font-weight: bold;
+            color: #dc3545;
+        }
+
         .resend-link {
             color: #003366;
             cursor: pointer;
             font-weight: 600;
             text-decoration: underline;
         }
-        .resend-link:hover { color: #ffb347; }
+
+        .resend-link:hover {
+            color: #ffb347;
+        }
 
         .code-sent-info {
             background: #e8f4fd;
@@ -340,10 +423,12 @@
             margin: 15px 0;
             border-left: 4px solid #003366;
             font-size: 13px;
-            display: none;
         }
-        .code-sent-info.show { display: block; }
-        .code-sent-info i { color: #003366; margin-right: 8px; }
+
+        .code-sent-info i {
+            color: #003366;
+            margin-right: 8px;
+        }
 
         .loading-overlay {
             display: none;
@@ -353,11 +438,14 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 9999;
+            z-index: 99999;
             justify-content: center;
             align-items: center;
         }
-        .loading-overlay.active { display: flex; }
+
+        .loading-overlay.active {
+            display: flex;
+        }
 
         .loading-spinner {
             background: white;
@@ -365,6 +453,7 @@
             border-radius: 20px;
             text-align: center;
         }
+
         .loading-spinner .spinner {
             width: 50px;
             height: 50px;
@@ -374,11 +463,22 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        .loading-spinner p { color: #003366; font-weight: bold; margin: 0; }
+
+        .loading-spinner p {
+            color: #003366;
+            font-weight: bold;
+            margin: 0;
+        }
 
         .role-badge {
             background: #003366;
@@ -389,128 +489,305 @@
             display: inline-block;
             margin-top: 5px;
         }
+
+        @media (max-width: 420px) {
+            .login-card {
+                padding: 28px 20px;
+            }
+
+            .verification-code-input {
+                gap: 6px;
+            }
+
+            .verification-code-input input {
+                width: 43px;
+                height: 55px;
+                font-size: 22px;
+            }
+
+            .verification-actions {
+                flex-direction: column;
+            }
+
+            .verification-actions .btn-verify,
+            .verification-actions .btn-cancel {
+                width: 100%;
+            }
+
+            .toast-notification {
+                left: 15px;
+                right: 15px;
+                min-width: auto;
+            }
+        }
     </style>
 </head>
+
 <body>
+
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner">
             <div class="spinner"></div>
-            <p>⏳ Envoi du code en cours...</p>
+            <p id="loadingMessage">⏳ Traitement en cours...</p>
         </div>
     </div>
 
     <div id="toastContainer" class="toast-notification"></div>
 
     <div class="login-container">
+
         <div class="login-card">
+
             <div class="login-logo">
                 <i class="bi bi-shield-lock-fill"></i>
             </div>
-            <h3 class="login-title">Super Administration <span class="auth-badge"><i class="bi bi-shield-lock-fill"></i> Sécurisé</span></h3>
-            <p class="login-subtitle">Faculté Agronomique <span class="twofa-badge"><i class="bi bi-shield-check"></i> 2FA</span></p>
-            
+
+            <h3 class="login-title">
+                Super Administration
+
+                <span class="auth-badge">
+                    <i class="bi bi-shield-lock-fill"></i>
+                    Sécurisé
+                </span>
+            </h3>
+
+            <p class="login-subtitle">
+                Faculté Agronomique
+
+                <span class="twofa-badge">
+                    <i class="bi bi-shield-check"></i>
+                    2FA
+                </span>
+            </p>
+
             <div class="text-center mb-3">
-                <span class="role-badge"><i class="bi bi-shield-fill-check"></i> Rôle : Administrateur</span>
+                <span class="role-badge">
+                    <i class="bi bi-shield-fill-check"></i>
+                    Rôle : Administrateur
+                </span>
             </div>
-            
+
+            <!-- ======================================================
+                 FORMULAIRE LOGIN
+            ======================================================= -->
+
             <div id="loginFormContainer">
+
                 <form id="loginForm">
+
                     <div class="form-group">
                         <div class="input-group-custom">
+
                             <i class="bi bi-envelope-fill"></i>
-                            <input type="email" class="form-control" id="email" required placeholder="admin@fsa-unilu.com">
+
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="email"
+                                required
+                                autocomplete="username"
+                                placeholder="admin@fsa-unilu.com"
+                            >
+
                         </div>
                     </div>
+
                     <div class="form-group">
                         <div class="input-group-custom">
+
                             <i class="bi bi-lock-fill"></i>
-                            <input type="password" class="form-control" id="password" required placeholder="••••••••">
+
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="password"
+                                required
+                                autocomplete="current-password"
+                                placeholder="••••••••"
+                            >
+
                         </div>
                     </div>
-                    <button type="submit" class="login-btn" id="loginBtn">
-                        <i class="bi bi-box-arrow-in-right"></i> Se connecter
+
+                    <button
+                        type="submit"
+                        class="login-btn"
+                        id="loginBtn"
+                    >
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Se connecter
                     </button>
+
                 </form>
+
                 <div class="text-center mt-3">
-                    <small class="text-muted">Compte super administrateur - Contactez le développeur</small>
+                    <small class="text-muted">
+                        Compte super administrateur - Contactez le développeur
+                    </small>
                 </div>
+
             </div>
-            
+
+            <!-- ======================================================
+                 VERIFICATION 2FA
+            ======================================================= -->
+
             <div id="verificationContainer" class="verification-container">
+
                 <div class="text-center">
+
                     <div class="verification-icon">
                         <i class="bi bi-shield-lock-fill"></i>
                     </div>
-                    <div class="verification-title">Validation en deux étapes</div>
+
+                    <div class="verification-title">
+                        Validation en deux étapes
+                    </div>
+
                     <div class="verification-subtitle">
-                        Afin de protéger votre compte, nous avons envoyé un code de vérification sur votre email.
+                        Afin de protéger votre compte, nous avons envoyé
+                        un code de vérification sur votre email.
                     </div>
-                    
-                    <div class="code-sent-info show" id="codeSentInfo">
+
+                    <div class="code-sent-info" id="codeSentInfo">
+
                         <i class="bi bi-envelope-check-fill"></i>
-                        <strong>Code envoyé à :</strong> <span id="verifEmail">---</span>
-                        <br><small>Vérifiez votre boîte mail (y compris les spams).</small>
+
+                        <strong>Code envoyé à :</strong>
+
+                        <span id="verifEmail">---</span>
+
+                        <br>
+
+                        <small>
+                            Vérifiez votre boîte mail, y compris les spams.
+                        </small>
+
                     </div>
-                    
+
                     <div class="verification-device">
+
                         <i class="bi bi-envelope-fill"></i>
+
                         <div class="device-info">
-                            <div class="device-name"><i class="bi bi-key"></i> Code de sécurité</div>
+
+                            <div class="device-name">
+                                <i class="bi bi-key"></i>
+                                Code de sécurité
+                            </div>
+
                             <div class="device-detail">
                                 Entrez le code à 6 chiffres reçu par email
                             </div>
+
                         </div>
+
                     </div>
-                    
+
                     <div class="verification-code-input">
-                        <input type="text" id="code1" maxlength="1" autofocus>
-                        <input type="text" id="code2" maxlength="1">
-                        <input type="text" id="code3" maxlength="1">
-                        <input type="text" id="code4" maxlength="1">
-                        <input type="text" id="code5" maxlength="1">
-                        <input type="text" id="code6" maxlength="1">
+
+                        <input type="text" id="code1" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+                        <input type="text" id="code2" maxlength="1" inputmode="numeric">
+                        <input type="text" id="code3" maxlength="1" inputmode="numeric">
+                        <input type="text" id="code4" maxlength="1" inputmode="numeric">
+                        <input type="text" id="code5" maxlength="1" inputmode="numeric">
+                        <input type="text" id="code6" maxlength="1" inputmode="numeric">
+
                     </div>
-                    
-                    <div id="codeError" style="display: none; color: #dc3545; font-size: 14px; margin-bottom: 10px;">
-                        <i class="bi bi-exclamation-circle"></i> Code invalide. Veuillez réessayer.
+
+                    <div
+                        id="codeError"
+                        style="display:none;color:#dc3545;font-size:14px;margin-bottom:10px;"
+                    >
+                        <i class="bi bi-exclamation-circle"></i>
+                        Code invalide.
                     </div>
-                    
+
                     <div class="verification-actions">
-                        <button class="btn-verify" id="btnVerifyCode" onclick="verifierCode()">
-                            <i class="bi bi-check-circle-fill"></i> Vérifier le code
+
+                        <button
+                            class="btn-verify"
+                            id="btnVerifyCode"
+                            type="button"
+                            onclick="verifierCode()"
+                        >
+                            <i class="bi bi-check-circle-fill"></i>
+                            Vérifier le code
                         </button>
-                        <button class="btn-cancel" onclick="annulerConnexion()">
-                            <i class="bi bi-x-circle"></i> Annuler
+
+                        <button
+                            class="btn-cancel"
+                            type="button"
+                            onclick="annulerConnexion()"
+                        >
+                            <i class="bi bi-x-circle"></i>
+                            Annuler
                         </button>
+
                     </div>
-                    
+
                     <div class="verification-timer">
-                        <i class="bi bi-clock"></i> Code valable pendant <span id="timerCount">120</span> secondes
+
+                        <i class="bi bi-clock"></i>
+
+                        Code valable pendant
+                        <span id="timerCount">120</span>
+                        secondes
+
                         <br>
-                        <a class="resend-link" onclick="renvoyerCode()">Renvoyer le code</a>
+
+                        <a
+                            class="resend-link"
+                            id="resendLink"
+                            onclick="renvoyerCode()"
+                        >
+                            Renvoyer le code
+                        </a>
+
                     </div>
+
                 </div>
+
             </div>
-            
+
             <div class="footer">
-                <i class="bi bi-shield-check"></i> HYBRILINK-TECH | Votre partenaire tech de A à Z
+
+                <i class="bi bi-shield-check"></i>
+
+                HYBRILINK-TECH | Votre partenaire tech de A à Z
+
                 <br>
-                <a href="creation-admin.html">Créer un compte administrateur</a>
+
+                <a href="creation-admin.html">
+                    Créer un compte administrateur
+                </a>
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- ===== SCRIPTS ===== -->
+    <!-- ============================================================
+         SCRIPTS
+    ============================================================= -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
-    
+
     <script>
+
         // ============================================================
-        // ⭐ CONFIGURATION FIREBASE
+        // CONFIGURATION FIREBASE
         // ============================================================
+
         const firebaseConfig = {
             apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
             authDomain: "fsa-unilu.firebaseapp.com",
@@ -519,575 +796,1470 @@
             messagingSenderId: "36551990738",
             appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
+
         const db = firebase.firestore();
         const auth = firebase.auth();
-        
+        const functions = firebase.functions();
+
         // ============================================================
-        // ⭐ CONFIGURATION DES CLOUD FUNCTIONS
+        // CLOUD FUNCTIONS
         // ============================================================
-        const functions = firebase.functions('us-central1');
-        
-        console.log('📡 Cloud Functions région: us-central1');
-        
+
+        const sendCodeFunction =
+            functions.httpsCallable('sendVerificationCode');
+
+        const verifyCodeFunction =
+            functions.httpsCallable('verifyCode');
+
+        const resendCodeFunction =
+            functions.httpsCallable('resendVerificationCode');
+
+        const verifySessionFunction =
+            functions.httpsCallable('verifyAdminSession');
+
         // ============================================================
-        // ⭐ RÉFÉRENCES AUX CLOUD FUNCTIONS
+        // VARIABLES
         // ============================================================
-        const sendCodeFunction = functions.httpsCallable('sendVerificationCode');
-        const verifyCodeFunction = functions.httpsCallable('verifyCode');
-        const resendCodeFunction = functions.httpsCallable('resendVerificationCode');
-        const verifyAdminFunction = functions.httpsCallable('verifyAdminSession');
-        
-        // ============================================================
-        // ⭐ VARIABLES GLOBALES
-        // ============================================================
+
         let currentEmail = '';
-        let currentPassword = '';
+
         let currentUserData = null;
-        let currentCode = '';
+
         let codeExpireTimer = null;
+
         let timerSeconds = 120;
+
         let isVerifying = false;
+
         let loginInProgress = false;
-        
+
+        let resendInProgress = false;
+
         // ============================================================
-        // ⭐ FONCTIONS 2FA AVEC CLOUD FUNCTIONS
+        // LOADING
         // ============================================================
-        
-        function genererCode() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-        
-        function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
+
+        function showLoading(show, message = '⏳ Traitement en cours...') {
+
+            const overlay =
+                document.getElementById('loadingOverlay');
+
+            const loadingMessage =
+                document.getElementById('loadingMessage');
+
+            loadingMessage.textContent = message;
+
             if (show) {
                 overlay.classList.add('active');
             } else {
                 overlay.classList.remove('active');
             }
         }
-        
-        async function envoyerCodeParEmail(email, code, nom, role) {
-            try {
-                showLoading(true);
-                
-                console.log('📧 Envoi du code via Cloud Function...');
-                console.log('📧 Email:', email);
-                console.log('🔐 Code:', code);
-                
-                const result = await sendCodeFunction({
-                    email: email,
-                    code: code,
-                    nom: nom || 'Administrateur',
-                    role: role || 'admin'
-                });
-                
-                console.log('✅ Réponse:', result.data);
-                showLoading(false);
-                return true;
-                
-            } catch (error) {
-                console.error('❌ Erreur envoi email:', error);
-                console.error('❌ Code erreur:', error.code);
-                console.error('❌ Message:', error.message);
-                
-                showLoading(false);
-                
-                let errorMessage = 'Erreur lors de l\'envoi du code';
-                if (error.code === 'unauthenticated') {
-                    errorMessage = 'Vous devez être authentifié';
-                } else if (error.code === 'invalid-argument') {
-                    errorMessage = 'Données invalides';
-                } else if (error.code === 'resource-exhausted') {
-                    errorMessage = 'Trop de tentatives. Attendez 5 minutes.';
-                }
-                
-                showToast('❌ ' + errorMessage, 'danger');
-                return false;
-            }
-        }
-        
-        async function verifierCodeAvecFirebase(email, code) {
-            try {
-                const result = await verifyCodeFunction({
-                    email: email,
-                    code: code
-                });
-                return { success: true, data: result.data };
-            } catch (error) {
-                console.error('❌ Erreur vérification:', error);
-                let errorMessage = 'Code invalide';
-                if (error.code === 'not-found') {
-                    errorMessage = 'Code invalide ou expiré';
-                } else if (error.code === 'deadline-exceeded') {
-                    errorMessage = 'Le code a expiré';
-                }
-                return { success: false, message: errorMessage };
-            }
-        }
-        
-        async function renvoyerCodeAvecFirebase(email, nom, role) {
-            try {
-                const result = await resendCodeFunction({
-                    email: email,
-                    nom: nom || 'Administrateur',
-                    role: role || 'admin'
-                });
-                return { success: true, data: result.data };
-            } catch (error) {
-                console.error('❌ Erreur renvoi:', error);
-                return { success: false, message: error.message };
-            }
-        }
-        
-        async function envoyerCode() {
-            if (!currentEmail) return false;
-            
-            currentCode = genererCode();
-            showToast('📧 Envoi du code en cours...', 'info');
-            
-            const success = await envoyerCodeParEmail(
-                currentEmail, 
-                currentCode, 
-                currentUserData?.nomComplet || 'Administrateur',
-                'admin'
-            );
-            
-            if (success) {
-                document.getElementById('verifEmail').textContent = currentEmail;
-                document.getElementById('codeSentInfo').classList.add('show');
-                showToast('✅ Code envoyé sur votre email', 'success');
-                return true;
-            } else {
-                showToast('❌ Erreur lors de l\'envoi du code', 'danger');
-                return false;
-            }
-        }
-        
-        function afficherVerification() {
-            document.getElementById('loginFormContainer').style.display = 'none';
-            document.getElementById('verificationContainer').classList.add('active');
-            
-            document.querySelectorAll('.verification-code-input input').forEach(input => {
-                input.value = '';
-                input.className = '';
-            });
-            document.getElementById('codeError').style.display = 'none';
-            
-            setTimeout(() => {
-                document.getElementById('code1').focus();
-            }, 300);
-            
-            timerSeconds = 120;
-            document.getElementById('timerCount').textContent = timerSeconds;
-            
-            if (codeExpireTimer) clearInterval(codeExpireTimer);
-            codeExpireTimer = setInterval(() => {
-                timerSeconds--;
-                document.getElementById('timerCount').textContent = timerSeconds;
-                if (timerSeconds <= 0) {
-                    clearInterval(codeExpireTimer);
-                    document.getElementById('timerCount').textContent = '0';
-                    document.getElementById('btnVerifyCode').disabled = true;
-                    showToast('⏰ Le code a expiré. Cliquez sur "Renvoyer".', 'warning');
-                }
-            }, 1000);
-        }
-        
-        function annulerConnexion() {
-            clearInterval(codeExpireTimer);
-            document.getElementById('loginFormContainer').style.display = 'block';
-            document.getElementById('verificationContainer').classList.remove('active');
-            document.getElementById('btnVerifyCode').disabled = false;
-            document.getElementById('btnVerifyCode').innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
-            isVerifying = false;
-            currentEmail = '';
-            currentPassword = '';
-            currentCode = '';
-            document.getElementById('codeSentInfo').classList.remove('show');
-        }
-        
-        function renvoyerCode() {
-            if (isVerifying) return;
-            if (!currentEmail) return;
-            
-            showToast('📧 Envoi d\'un nouveau code...', 'info');
-            
-            renvoyerCodeAvecFirebase(currentEmail, currentUserData?.nomComplet, 'admin')
-                .then(result => {
-                    if (result.success) {
-                        timerSeconds = 120;
-                        document.getElementById('timerCount').textContent = timerSeconds;
-                        document.getElementById('btnVerifyCode').disabled = false;
-                        
-                        if (codeExpireTimer) clearInterval(codeExpireTimer);
-                        codeExpireTimer = setInterval(() => {
-                            timerSeconds--;
-                            document.getElementById('timerCount').textContent = timerSeconds;
-                            if (timerSeconds <= 0) {
-                                clearInterval(codeExpireTimer);
-                                document.getElementById('timerCount').textContent = '0';
-                                document.getElementById('btnVerifyCode').disabled = true;
-                                showToast('⏰ Le code a expiré. Cliquez sur "Renvoyer".', 'warning');
-                            }
-                        }, 1000);
-                        
-                        document.querySelectorAll('.verification-code-input input').forEach(input => {
-                            input.value = '';
-                            input.className = '';
-                        });
-                        document.getElementById('codeError').style.display = 'none';
-                        document.getElementById('code1').focus();
-                        
-                        showToast('📧 Nouveau code envoyé', 'success');
-                    } else {
-                        showToast('❌ ' + (result.message || 'Erreur lors du renvoi'), 'danger');
-                    }
-                })
-                .catch(error => {
-                    showToast('❌ Erreur: ' + error.message, 'danger');
-                });
-        }
-        
-        function getCodeFromInputs() {
-            let code = '';
-            for (let i = 1; i <= 6; i++) {
-                const input = document.getElementById(`code${i}`);
-                if (input) code += input.value;
-            }
-            return code;
-        }
-        
-        async function verifierCode() {
-            if (isVerifying) return;
-            if (timerSeconds <= 0) {
-                showToast('⏰ Le code a expiré. Cliquez sur "Renvoyer".', 'warning');
-                return;
-            }
-            
-            const codeSaisi = getCodeFromInputs();
-            
-            if (codeSaisi.length !== 6) {
-                document.getElementById('codeError').style.display = 'block';
-                document.getElementById('codeError').innerHTML = '<i class="bi bi-exclamation-circle"></i> Veuillez entrer les 6 chiffres du code.';
-                return;
-            }
-            
-            isVerifying = true;
-            const btn = document.getElementById('btnVerifyCode');
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Vérification...';
-            btn.disabled = true;
-            
-            try {
-                const result = await verifierCodeAvecFirebase(currentEmail, codeSaisi);
-                
-                if (!result.success) {
-                    document.getElementById('codeError').style.display = 'block';
-                    document.getElementById('codeError').innerHTML = `<i class="bi bi-exclamation-circle"></i> ${result.message}`;
-                    
-                    document.querySelectorAll('.verification-code-input input').forEach(input => {
-                        input.classList.add('error');
-                        setTimeout(() => input.classList.remove('error'), 500);
-                    });
-                    
-                    isVerifying = false;
-                    btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
-                    btn.disabled = false;
-                    return;
-                }
-                
-                document.querySelectorAll('.verification-code-input input').forEach(input => {
-                    input.classList.add('correct');
-                });
-                
-                document.getElementById('codeError').style.display = 'none';
-                clearInterval(codeExpireTimer);
-                await finaliserConnexion();
-                
-            } catch (error) {
-                console.error('Erreur vérification:', error);
-                showToast('❌ Erreur: ' + error.message, 'danger');
-                isVerifying = false;
-                btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
-                btn.disabled = false;
-            }
-        }
-        
-        async function finaliserConnexion() {
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(currentEmail, currentPassword);
-                const uid = userCredential.user.uid;
-                
-                const userDoc = await db.collection('utilisateurs').doc(uid).get();
-                
-                if (!userDoc.exists) {
-                    showToast('❌ Compte non trouvé', 'danger');
-                    await auth.signOut();
-                    annulerConnexion();
-                    return;
-                }
-                
-                const userData = userDoc.data();
-                
-                if (userData.role !== 'admin') {
-                    showToast('❌ Accès non autorisé', 'danger');
-                    await auth.signOut();
-                    annulerConnexion();
-                    return;
-                }
-                
-                const sessionData = {
-                    uid: uid,
-                    id: uid,
-                    nomComplet: userData.nomComplet,
-                    email: userData.email,
-                    role: userData.role,
-                    verified2FA: true,
-                    expires: Date.now() + (8 * 60 * 60 * 1000)
-                };
-                
-                localStorage.setItem('admin_user', JSON.stringify(sessionData));
-                
-                await db.collection('utilisateurs').doc(uid).update({
-                    derniereConnexion: firebase.firestore.FieldValue.serverTimestamp()
-                }).catch(() => {});
-                
-                showToast('✅ Connexion réussie ! Bienvenue Administrateur', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-                
-            } catch (error) {
-                console.error('Erreur finalisation:', error);
-                showToast('❌ Erreur: ' + error.message, 'danger');
-                annulerConnexion();
-            }
-        }
-        
+
         // ============================================================
-        // ⭐ AUTO-COMPLÉTION DES CHAMPS DE CODE
+        // TOAST
         // ============================================================
-        document.querySelectorAll('.verification-code-input input').forEach((input, index) => {
-            input.addEventListener('input', function(e) {
-                this.value = this.value.replace(/\D/g, '');
-                
-                if (this.value.length === 1) {
-                    if (index < 5) {
-                        document.getElementById(`code${index + 2}`).focus();
-                    } else {
-                        document.getElementById('btnVerifyCode').click();
-                    }
-                }
-                
-                document.getElementById('codeError').style.display = 'none';
-                this.classList.remove('error', 'correct');
-            });
-            
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && this.value === '' && index > 0) {
-                    document.getElementById(`code${index}`).focus();
-                }
-                if (e.key === 'Enter') {
-                    document.getElementById('btnVerifyCode').click();
-                }
-            });
-            
-            input.addEventListener('paste', function(e) {
-                e.preventDefault();
-                const paste = (e.clipboardData || window.clipboardData).getData('text');
-                const digits = paste.replace(/\D/g, '').slice(0, 6);
-                for (let i = 0; i < digits.length && i < 6; i++) {
-                    const field = document.getElementById(`code${i + 1}`);
-                    if (field) {
-                        field.value = digits[i];
-                    }
-                }
-                const lastIndex = Math.min(digits.length, 5);
-                if (lastIndex < 5) {
-                    document.getElementById(`code${lastIndex + 1}`).focus();
-                }
-                if (digits.length === 6) {
-                    document.getElementById('btnVerifyCode').click();
-                }
-            });
-        });
-        
-        // ============================================================
-        // ⭐ FONCTIONS UTILITAIRES
-        // ============================================================
-        
+
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : (type === 'info' ? '#17a2b8' : '#dc3545'));
-            const textColor = type === 'warning' ? '#333' : 'white';
-            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : (type === 'info' ? 'info-circle-fill' : 'x-circle-fill'));
-            
+
+            const container =
+                document.getElementById('toastContainer');
+
+            const bgColor =
+                type === 'success'
+                    ? '#28a745'
+                    : type === 'warning'
+                        ? '#ffc107'
+                        : type === 'info'
+                            ? '#17a2b8'
+                            : '#dc3545';
+
+            const textColor =
+                type === 'warning'
+                    ? '#333'
+                    : 'white';
+
+            const icon =
+                type === 'success'
+                    ? 'check-circle-fill'
+                    : type === 'warning'
+                        ? 'exclamation-triangle-fill'
+                        : type === 'info'
+                            ? 'info-circle-fill'
+                            : 'x-circle-fill';
+
             const toastHtml = `
-                <div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
+                <div
+                    class="toast notification-toast show"
+                    style="
+                        background:${bgColor};
+                        color:${textColor};
+                        border-radius:10px;
+                        margin-bottom:10px;
+                        border:none;
+                    "
+                >
                     <div class="toast-body">
                         <i class="bi bi-${icon} me-2"></i>
-                        ${message}
+                        ${escapeHtml(message)}
                     </div>
                 </div>
             `;
-            container.insertAdjacentHTML('afterbegin', toastHtml);
-            setTimeout(() => container.firstElementChild?.remove(), 5000);
+
+            container.insertAdjacentHTML(
+                'afterbegin',
+                toastHtml
+            );
+
+            setTimeout(() => {
+
+                const first =
+                    container.firstElementChild;
+
+                if (first) {
+                    first.remove();
+                }
+
+            }, 5000);
         }
-        
+
+        function escapeHtml(value) {
+
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         // ============================================================
-        // ⭐ FORMULAIRE DE CONNEXION
+        // ERREUR FIREBASE
         // ============================================================
-        
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (isVerifying || loginInProgress) return;
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                showToast('Veuillez remplir tous les champs', 'warning');
+
+        function getFirebaseErrorMessage(error) {
+
+            if (!error) {
+                return 'Une erreur est survenue.';
+            }
+
+            switch (error.code) {
+
+                case 'functions/unauthenticated':
+                    return 'Votre session Firebase n’est plus valide.';
+
+                case 'functions/permission-denied':
+                    return 'Accès réservé à l’administrateur.';
+
+                case 'functions/invalid-argument':
+                    return 'Les informations fournies sont invalides.';
+
+                case 'functions/not-found':
+                    return 'Code invalide ou expiré.';
+
+                case 'functions/deadline-exceeded':
+                    return 'Le code de vérification a expiré.';
+
+                case 'functions/resource-exhausted':
+                    return 'Trop de tentatives. Veuillez patienter.';
+
+                case 'functions/failed-precondition':
+                    return error.message || 'La vérification préalable a échoué.';
+
+                case 'functions/internal':
+                    return 'Une erreur serveur est survenue.';
+
+                case 'auth/invalid-credential':
+                    return 'Email ou mot de passe incorrect.';
+
+                case 'auth/invalid-email':
+                    return 'Adresse email invalide.';
+
+                case 'auth/user-disabled':
+                    return 'Ce compte est désactivé.';
+
+                case 'auth/too-many-requests':
+                    return 'Trop de tentatives. Veuillez patienter.';
+
+                default:
+                    return error.message || 'Une erreur est survenue.';
+            }
+        }
+
+        // ============================================================
+        // AFFICHER 2FA
+        // ============================================================
+
+        function afficherVerification() {
+
+            document
+                .getElementById('loginFormContainer')
+                .style.display = 'none';
+
+            document
+                .getElementById('verificationContainer')
+                .classList.add('active');
+
+            document
+                .getElementById('verifEmail')
+                .textContent = currentEmail;
+
+            document
+                .querySelectorAll('.verification-code-input input')
+                .forEach(input => {
+
+                    input.value = '';
+
+                    input.classList.remove(
+                        'error',
+                        'correct'
+                    );
+                });
+
+            document
+                .getElementById('codeError')
+                .style.display = 'none';
+
+            document
+                .getElementById('btnVerifyCode')
+                .disabled = false;
+
+            document
+                .getElementById('btnVerifyCode')
+                .innerHTML =
+                    '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+
+            timerSeconds = 120;
+
+            document
+                .getElementById('timerCount')
+                .textContent = timerSeconds;
+
+            if (codeExpireTimer) {
+                clearInterval(codeExpireTimer);
+            }
+
+            codeExpireTimer = setInterval(() => {
+
+                timerSeconds--;
+
+                document
+                    .getElementById('timerCount')
+                    .textContent =
+                    Math.max(timerSeconds, 0);
+
+                if (timerSeconds <= 0) {
+
+                    clearInterval(codeExpireTimer);
+
+                    document
+                        .getElementById('btnVerifyCode')
+                        .disabled = true;
+
+                    showToast(
+                        '⏰ Le code a expiré. Cliquez sur « Renvoyer le code ». ',
+                        'warning'
+                    );
+                }
+
+            }, 1000);
+
+            setTimeout(() => {
+
+                const first =
+                    document.getElementById('code1');
+
+                if (first) {
+                    first.focus();
+                }
+
+            }, 300);
+        }
+
+        // ============================================================
+        // ENVOYER LE CODE
+        // ============================================================
+
+        async function envoyerCode() {
+
+            try {
+
+                showLoading(
+                    true,
+                    '📧 Génération et envoi du code...'
+                );
+
+                /*
+                 * IMPORTANT :
+                 * Aucun code n'est généré ici.
+                 *
+                 * La Cloud Function génère elle-même
+                 * le code 6 chiffres.
+                 */
+
+                const result =
+                    await sendCodeFunction({});
+
+                console.log(
+                    '✅ Code 2FA envoyé:',
+                    result.data
+                );
+
+                showLoading(false);
+
+                document
+                    .getElementById('codeSentInfo')
+                    .style.display = 'block';
+
+                showToast(
+                    '✅ Code de sécurité envoyé sur votre email.',
+                    'success'
+                );
+
+                return true;
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Erreur envoi 2FA:',
+                    error
+                );
+
+                showLoading(false);
+
+                showToast(
+                    '❌ ' + getFirebaseErrorMessage(error),
+                    'danger'
+                );
+
+                return false;
+            }
+        }
+
+        // ============================================================
+        // VERIFIER CODE
+        // ============================================================
+
+        async function verifierCodeAvecFirebase(code) {
+
+            try {
+
+                /*
+                 * Le serveur connaît déjà l'utilisateur
+                 * grâce à context.auth.uid.
+                 *
+                 * On n'envoie donc pas l'email.
+                 */
+
+                const result =
+                    await verifyCodeFunction({
+                        code: code
+                    });
+
+                return {
+                    success: true,
+                    data: result.data
+                };
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Erreur vérification:',
+                    error
+                );
+
+                return {
+                    success: false,
+                    code: error.code,
+                    message: getFirebaseErrorMessage(error)
+                };
+            }
+        }
+
+        // ============================================================
+        // RENVOYER CODE
+        // ============================================================
+
+        async function renvoyerCode() {
+
+            if (resendInProgress) {
                 return;
             }
-            
-            loginInProgress = true;
-            const btn = document.getElementById('loginBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connexion...';
-            
+
+            if (!currentEmail) {
+                return;
+            }
+
+            resendInProgress = true;
+
             try {
-                const usersRef = db.collection('utilisateurs');
-                const q = await usersRef.where('email', '==', email).where('role', '==', 'admin').get();
-                
-                if (q.empty) {
-                    showToast('❌ Email ou mot de passe incorrect', 'danger');
-                    loginInProgress = false;
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
+
+                showLoading(
+                    true,
+                    '📧 Envoi d’un nouveau code...'
+                );
+
+                const result =
+                    await resendCodeFunction({});
+
+                console.log(
+                    '✅ Nouveau code envoyé:',
+                    result.data
+                );
+
+                timerSeconds = 120;
+
+                document
+                    .getElementById('timerCount')
+                    .textContent = timerSeconds;
+
+                document
+                    .getElementById('btnVerifyCode')
+                    .disabled = false;
+
+                if (codeExpireTimer) {
+                    clearInterval(codeExpireTimer);
+                }
+
+                codeExpireTimer = setInterval(() => {
+
+                    timerSeconds--;
+
+                    document
+                        .getElementById('timerCount')
+                        .textContent =
+                        Math.max(timerSeconds, 0);
+
+                    if (timerSeconds <= 0) {
+
+                        clearInterval(codeExpireTimer);
+
+                        document
+                            .getElementById('btnVerifyCode')
+                            .disabled = true;
+                    }
+
+                }, 1000);
+
+                document
+                    .querySelectorAll('.verification-code-input input')
+                    .forEach(input => {
+
+                        input.value = '';
+
+                        input.classList.remove(
+                            'error',
+                            'correct'
+                        );
+                    });
+
+                document
+                    .getElementById('codeError')
+                    .style.display = 'none';
+
+                document
+                    .getElementById('code1')
+                    .focus();
+
+                showLoading(false);
+
+                showToast(
+                    '📧 Nouveau code envoyé.',
+                    'success'
+                );
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Erreur renvoi:',
+                    error
+                );
+
+                showLoading(false);
+
+                showToast(
+                    '❌ ' + getFirebaseErrorMessage(error),
+                    'danger'
+                );
+
+            } finally {
+
+                resendInProgress = false;
+            }
+        }
+
+        // ============================================================
+        // RECUPERER CODE
+        // ============================================================
+
+        function getCodeFromInputs() {
+
+            let code = '';
+
+            for (let i = 1; i <= 6; i++) {
+
+                const input =
+                    document.getElementById(
+                        `code${i}`
+                    );
+
+                if (input) {
+                    code += input.value;
+                }
+            }
+
+            return code;
+        }
+
+        // ============================================================
+        // VERIFIER CODE
+        // ============================================================
+
+        async function verifierCode() {
+
+            if (isVerifying) {
+                return;
+            }
+
+            if (!auth.currentUser) {
+
+                showToast(
+                    '❌ Votre session a expiré. Recommencez la connexion.',
+                    'danger'
+                );
+
+                await annulerConnexion();
+
+                return;
+            }
+
+            if (timerSeconds <= 0) {
+
+                showToast(
+                    '⏰ Le code a expiré. Cliquez sur « Renvoyer le code ». ',
+                    'warning'
+                );
+
+                return;
+            }
+
+            const codeSaisi =
+                getCodeFromInputs();
+
+            if (!/^\d{6}$/.test(codeSaisi)) {
+
+                const errorElement =
+                    document.getElementById('codeError');
+
+                errorElement.style.display = 'block';
+
+                errorElement.innerHTML =
+                    '<i class="bi bi-exclamation-circle"></i> Veuillez entrer les 6 chiffres du code.';
+
+                return;
+            }
+
+            isVerifying = true;
+
+            const btn =
+                document.getElementById('btnVerifyCode');
+
+            btn.innerHTML =
+                '<i class="bi bi-hourglass-split"></i> Vérification...';
+
+            btn.disabled = true;
+
+            try {
+
+                const result =
+                    await verifierCodeAvecFirebase(
+                        codeSaisi
+                    );
+
+                if (!result.success) {
+
+                    const errorElement =
+                        document.getElementById('codeError');
+
+                    errorElement.style.display = 'block';
+
+                    errorElement.innerHTML =
+                        '<i class="bi bi-exclamation-circle"></i> ' +
+                        escapeHtml(result.message);
+
+                    document
+                        .querySelectorAll('.verification-code-input input')
+                        .forEach(input => {
+
+                            input.classList.add('error');
+
+                            setTimeout(() => {
+                                input.classList.remove('error');
+                            }, 500);
+
+                        });
+
+                    /*
+                     * Après 5 erreurs, le serveur invalide
+                     * automatiquement le code.
+                     */
+
+                    isVerifying = false;
+
+                    btn.innerHTML =
+                        '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+
+                    /*
+                     * Si le code est bloqué, il faut demander
+                     * un nouveau code.
+                     */
+
+                    if (
+                        result.code ===
+                        'functions/resource-exhausted'
+                    ) {
+
+                        btn.disabled = true;
+
+                        showToast(
+                            '🔒 Trop de tentatives. Demandez un nouveau code.',
+                            'warning'
+                        );
+
+                    } else {
+
+                        btn.disabled = false;
+                    }
+
                     return;
                 }
-                
-                let userFound = null;
-                q.forEach(doc => {
-                    userFound = { id: doc.id, ...doc.data() };
-                });
-                
-                if (!userFound) {
-                    showToast('❌ Compte non trouvé', 'danger');
-                    loginInProgress = false;
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                    return;
+
+                document
+                    .querySelectorAll('.verification-code-input input')
+                    .forEach(input => {
+                        input.classList.add('correct');
+                    });
+
+                document
+                    .getElementById('codeError')
+                    .style.display = 'none';
+
+                clearInterval(codeExpireTimer);
+
+                showLoading(
+                    true,
+                    '🔐 Finalisation de la connexion...'
+                );
+
+                await finaliserConnexion();
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Erreur vérification:',
+                    error
+                );
+
+                showLoading(false);
+
+                showToast(
+                    '❌ ' + getFirebaseErrorMessage(error),
+                    'danger'
+                );
+
+                isVerifying = false;
+
+                btn.innerHTML =
+                    '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+
+                btn.disabled = false;
+            }
+        }
+
+        // ============================================================
+        // FINALISER CONNEXION
+        // ============================================================
+
+        async function finaliserConnexion() {
+
+            try {
+
+                const user =
+                    auth.currentUser;
+
+                if (!user) {
+
+                    throw new Error(
+                        'Session Firebase absente.'
+                    );
                 }
-                
+
+                /*
+                 * La Cloud Function verifyCode a déjà :
+                 *
+                 * - vérifié le code
+                 * - vérifié l'identité
+                 * - vérifié le rôle admin
+                 * - créé la session 2FA serveur
+                 */
+
+                const sessionResult =
+                    await verifySessionFunction({});
+
+                if (
+                    !sessionResult.data ||
+                    sessionResult.data.isValid !== true
+                ) {
+
+                    throw new Error(
+                        'La session administrateur n’a pas pu être validée.'
+                    );
+                }
+
+                const data =
+                    sessionResult.data;
+
+                const sessionData = {
+
+                    uid: data.uid,
+
+                    id: data.uid,
+
+                    nomComplet:
+                        data.nomComplet ||
+                        currentUserData?.nomComplet ||
+                        'Administrateur',
+
+                    email:
+                        data.email ||
+                        user.email,
+
+                    role: 'admin',
+
+                    verified2FA: true,
+
+                    expires:
+                        Date.now() +
+                        (8 * 60 * 60 * 1000)
+                };
+
+                /*
+                 * Cette donnée sert principalement à l'interface.
+                 *
+                 * La véritable validation de sécurité
+                 * reste côté serveur.
+                 */
+
+                localStorage.setItem(
+                    'admin_user',
+                    JSON.stringify(sessionData)
+                );
+
                 try {
-                    const tempUser = await auth.signInWithEmailAndPassword(email, password);
+
+                    await db
+                        .collection('utilisateurs')
+                        .doc(user.uid)
+                        .update({
+                            derniereConnexion:
+                                firebase.firestore.FieldValue
+                                    .serverTimestamp()
+                        });
+
+                } catch (updateError) {
+
+                    console.warn(
+                        '⚠️ Mise à jour derniereConnexion impossible:',
+                        updateError
+                    );
+                }
+
+                showLoading(false);
+
+                showToast(
+                    '✅ Connexion réussie ! Bienvenue Administrateur.',
+                    'success'
+                );
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        'index.html';
+
+                }, 800);
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Erreur finalisation:',
+                    error
+                );
+
+                showLoading(false);
+
+                showToast(
+                    '❌ ' + getFirebaseErrorMessage(error),
+                    'danger'
+                );
+
+                await annulerConnexion();
+            }
+        }
+
+        // ============================================================
+        // ANNULER CONNEXION
+        // ============================================================
+
+        async function annulerConnexion() {
+
+            clearInterval(codeExpireTimer);
+
+            try {
+
+                if (auth.currentUser) {
                     await auth.signOut();
-                } catch (authError) {
-                    if (authError.code === 'auth/user-not-found') {
-                        try {
-                            const newUser = await auth.createUserWithEmailAndPassword(email, password);
-                            await newUser.user.delete();
-                            await auth.signOut();
-                        } catch (createError) {
-                            if (createError.code !== 'auth/email-already-in-use') {
-                                showToast('❌ Email ou mot de passe incorrect', 'danger');
-                                loginInProgress = false;
-                                btn.disabled = false;
-                                btn.innerHTML = originalText;
-                                return;
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Erreur déconnexion:',
+                    error
+                );
+            }
+
+            currentEmail = '';
+
+            currentUserData = null;
+
+            isVerifying = false;
+
+            loginInProgress = false;
+
+            resendInProgress = false;
+
+            document
+                .getElementById('loginFormContainer')
+                .style.display = 'block';
+
+            document
+                .getElementById('verificationContainer')
+                .classList.remove('active');
+
+            document
+                .getElementById('codeSentInfo')
+                .style.display = 'none';
+
+            document
+                .getElementById('btnVerifyCode')
+                .disabled = false;
+
+            document
+                .getElementById('btnVerifyCode')
+                .innerHTML =
+                    '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+
+            document
+                .getElementById('loginForm')
+                .reset();
+
+            document
+                .querySelectorAll('.verification-code-input input')
+                .forEach(input => {
+
+                    input.value = '';
+
+                    input.classList.remove(
+                        'error',
+                        'correct'
+                    );
+                });
+
+            document
+                .getElementById('codeError')
+                .style.display = 'none';
+
+            setTimeout(() => {
+
+                document
+                    .getElementById('email')
+                    .focus();
+
+            }, 200);
+        }
+
+        // ============================================================
+        // AUTO COMPLETION CODE
+        // ============================================================
+
+        document
+            .querySelectorAll(
+                '.verification-code-input input'
+            )
+            .forEach((input, index) => {
+
+                input.addEventListener(
+                    'input',
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(/\D/g, '')
+                                .slice(0, 1);
+
+                        this.classList.remove(
+                            'error',
+                            'correct'
+                        );
+
+                        document
+                            .getElementById('codeError')
+                            .style.display = 'none';
+
+                        if (this.value.length === 1) {
+
+                            if (index < 5) {
+
+                                document
+                                    .getElementById(
+                                        `code${index + 2}`
+                                    )
+                                    .focus();
+
+                            } else {
+
+                                const code =
+                                    getCodeFromInputs();
+
+                                if (
+                                    code.length === 6 &&
+                                    !isVerifying &&
+                                    timerSeconds > 0
+                                ) {
+
+                                    document
+                                        .getElementById(
+                                            'btnVerifyCode'
+                                        )
+                                        .click();
+                                }
                             }
                         }
-                    } else if (authError.code === 'auth/wrong-password') {
-                        showToast('❌ Email ou mot de passe incorrect', 'danger');
-                        loginInProgress = false;
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
-                        return;
-                    } else {
-                        showToast('❌ Erreur: ' + authError.message, 'danger');
-                        loginInProgress = false;
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
-                        return;
                     }
-                }
-                
-                currentEmail = email;
-                currentPassword = password;
-                currentUserData = userFound;
-                
-                const codeEnvoye = await envoyerCode();
-                
-                if (!codeEnvoye) {
-                    showToast('❌ Erreur lors de l\'envoi du code de vérification', 'danger');
-                    loginInProgress = false;
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                    return;
-                }
-                
-                afficherVerification();
-                document.getElementById('loginForm').reset();
-                loginInProgress = false;
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                
-            } catch (error) {
-                console.error('Erreur de connexion:', error);
-                showToast('❌ Erreur: ' + error.message, 'danger');
-                loginInProgress = false;
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        });
-        
-        // ============================================================
-        // ⭐ VÉRIFICATION DE SESSION EXISTANTE
-        // ============================================================
-        
-        function checkExistingSession() {
-            const session = localStorage.getItem('admin_user');
-            if (session) {
-                try {
-                    const sessionData = JSON.parse(session);
-                    if (Date.now() < sessionData.expires && sessionData.verified2FA === true) {
-                        window.location.href = 'index.html';
-                        return true;
-                    } else {
-                        localStorage.removeItem('admin_user');
+                );
+
+                input.addEventListener(
+                    'keydown',
+                    function (event) {
+
+                        if (
+                            event.key === 'Backspace' &&
+                            this.value === '' &&
+                            index > 0
+                        ) {
+
+                            document
+                                .getElementById(
+                                    `code${index}`
+                                )
+                                .focus();
+                        }
+
+                        if (event.key === 'Enter') {
+
+                            event.preventDefault();
+
+                            document
+                                .getElementById(
+                                    'btnVerifyCode'
+                                )
+                                .click();
+                        }
                     }
-                } catch (e) {
-                    localStorage.removeItem('admin_user');
-                }
-            }
-            return false;
-        }
-        
-        // ============================================================
-        // ⭐ INITIALISATION
-        // ============================================================
-        
-        if (!checkExistingSession()) {
-            document.getElementById('email').focus();
-        }
-        
-        window.verifierCode = verifierCode;
-        window.annulerConnexion = annulerConnexion;
-        window.renvoyerCode = renvoyerCode;
-        
-        console.log('✅ Page de connexion Administration - Sécurisée avec Cloud Functions');
-        console.log('📡 Région: us-central1');
-        
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
+                );
+
+                input.addEventListener(
+                    'paste',
+                    function (event) {
+
+                        event.preventDefault();
+
+                        const paste =
+                            (
+                                event.clipboardData ||
+                                window.clipboardData
+                            )
+                                .getData('text')
+                                .replace(/\D/g, '')
+                                .slice(0, 6);
+
+                        for (
+                            let i = 0;
+                            i < paste.length;
+                            i++
+                        ) {
+
+                            const field =
+                                document.getElementById(
+                                    `code${i + 1}`
+                                );
+
+                            if (field) {
+                                field.value =
+                                    paste[i];
+
+                                field.classList.remove(
+                                    'error',
+                                    'correct'
+                                );
+                            }
+                        }
+
+                        if (paste.length < 6) {
+
+                            document
+                                .getElementById(
+                                    `code${paste.length + 1}`
+                                )
+                                ?.focus();
+
+                        } else {
+
+                            document
+                                .getElementById(
+                                    'btnVerifyCode'
+                                )
+                                .click();
+                        }
+                    }
+                );
             });
+
+        // ============================================================
+        // FORMULAIRE LOGIN
+        // ============================================================
+
+        document
+            .getElementById('loginForm')
+            .addEventListener(
+                'submit',
+                async function (event) {
+
+                    event.preventDefault();
+
+                    if (
+                        loginInProgress ||
+                        isVerifying
+                    ) {
+                        return;
+                    }
+
+                    const email =
+                        document
+                            .getElementById('email')
+                            .value
+                            .trim()
+                            .toLowerCase();
+
+                    const password =
+                        document
+                            .getElementById('password')
+                            .value;
+
+                    if (!email || !password) {
+
+                        showToast(
+                            'Veuillez remplir tous les champs.',
+                            'warning'
+                        );
+
+                        return;
+                    }
+
+                    loginInProgress = true;
+
+                    const btn =
+                        document.getElementById(
+                            'loginBtn'
+                        );
+
+                    const originalText =
+                        btn.innerHTML;
+
+                    btn.disabled = true;
+
+                    btn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm me-2"></span>Connexion...';
+
+                    try {
+
+                        /*
+                         * ETAPE 1
+                         * Firebase Authentication.
+                         *
+                         * IMPORTANT :
+                         * On NE fait PAS signOut() ici.
+                         */
+
+                        const credential =
+                            await auth
+                                .signInWithEmailAndPassword(
+                                    email,
+                                    password
+                                );
+
+                        const user =
+                            credential.user;
+
+                        if (!user) {
+
+                            throw new Error(
+                                'Utilisateur Firebase introuvable.'
+                            );
+                        }
+
+                        /*
+                         * ETAPE 2
+                         * Vérification du document utilisateur.
+                         */
+
+                        const userDoc =
+                            await db
+                                .collection('utilisateurs')
+                                .doc(user.uid)
+                                .get();
+
+                        if (!userDoc.exists) {
+
+                            await auth.signOut();
+
+                            showToast(
+                                '❌ Compte administrateur introuvable.',
+                                'danger'
+                            );
+
+                            return;
+                        }
+
+                        const userData =
+                            userDoc.data();
+
+                        /*
+                         * ETAPE 3
+                         * Ce login est exclusivement ADMIN.
+                         */
+
+                        if (
+                            userData.role !== 'admin'
+                        ) {
+
+                            await auth.signOut();
+
+                            showToast(
+                                '❌ Accès refusé. Ce compte n’est pas administrateur.',
+                                'danger'
+                            );
+
+                            return;
+                        }
+
+                        /*
+                         * ETAPE 4
+                         * Mémorisation uniquement de données
+                         * d'affichage.
+                         */
+
+                        currentEmail =
+                            user.email ||
+                            email;
+
+                        currentUserData =
+                            userData;
+
+                        /*
+                         * ETAPE 5
+                         * Le serveur génère le code.
+                         */
+
+                        const codeEnvoye =
+                            await envoyerCode();
+
+                        if (!codeEnvoye) {
+
+                            await auth.signOut();
+
+                            return;
+                        }
+
+                        /*
+                         * ETAPE 6
+                         * Afficher 2FA.
+                         */
+
+                        afficherVerification();
+
+                        document
+                            .getElementById(
+                                'loginForm'
+                            )
+                            .reset();
+
+                    } catch (error) {
+
+                        console.error(
+                            '❌ Erreur connexion:',
+                            error
+                        );
+
+                        try {
+
+                            if (auth.currentUser) {
+                                await auth.signOut();
+                            }
+
+                        } catch (signOutError) {
+                            console.warn(
+                                signOutError
+                            );
+                        }
+
+                        showToast(
+                            '❌ ' +
+                            getFirebaseErrorMessage(error),
+                            'danger'
+                        );
+
+                    } finally {
+
+                        loginInProgress = false;
+
+                        btn.disabled = false;
+
+                        btn.innerHTML =
+                            originalText;
+                    }
+                }
+            );
+
+        // ============================================================
+        // SESSION EXISTANTE
+        // ============================================================
+
+        async function checkExistingSession() {
+
+            const session =
+                localStorage.getItem(
+                    'admin_user'
+                );
+
+            /*
+             * Si aucune session locale :
+             * on s'assure également que Firebase
+             * ne conserve pas une ancienne session
+             * partiellement authentifiée.
+             */
+
+            if (!session) {
+
+                if (auth.currentUser) {
+
+                    try {
+                        await auth.signOut();
+                    } catch (error) {
+                        console.warn(error);
+                    }
+                }
+
+                return false;
+            }
+
+            try {
+
+                const sessionData =
+                    JSON.parse(session);
+
+                if (
+                    !sessionData ||
+                    sessionData.role !== 'admin' ||
+                    sessionData.verified2FA !== true ||
+                    !sessionData.expires ||
+                    Date.now() >= sessionData.expires
+                ) {
+
+                    localStorage.removeItem(
+                        'admin_user'
+                    );
+
+                    if (auth.currentUser) {
+                        await auth.signOut();
+                    }
+
+                    return false;
+                }
+
+                /*
+                 * La validation réelle est faite
+                 * par Cloud Functions.
+                 */
+
+                if (!auth.currentUser) {
+
+                    localStorage.removeItem(
+                        'admin_user'
+                    );
+
+                    return false;
+                }
+
+                const result =
+                    await verifierSessionAvecFirebase();
+
+                if (
+                    result &&
+                    result.isValid === true &&
+                    result.role === 'admin'
+                ) {
+
+                    window.location.href =
+                        'index.html';
+
+                    return true;
+                }
+
+                localStorage.removeItem(
+                    'admin_user'
+                );
+
+                await auth.signOut();
+
+                return false;
+
+            } catch (error) {
+
+                console.error(
+                    'Erreur session:',
+                    error
+                );
+
+                localStorage.removeItem(
+                    'admin_user'
+                );
+
+                try {
+                    await auth.signOut();
+                } catch (_) {}
+
+                return false;
+            }
         }
+
+        // ============================================================
+        // VERIFICATION SESSION CLOUD FUNCTION
+        // ============================================================
+
+        async function verifierSessionAvecFirebase() {
+
+            try {
+
+                const result =
+                    await verifySessionFunction({});
+
+                return result.data;
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Erreur session serveur:',
+                    error
+                );
+
+                return {
+                    isValid: false,
+                    message:
+                        getFirebaseErrorMessage(
+                            error
+                        )
+                };
+            }
+        }
+
+        // ============================================================
+        // INITIALISATION
+        // ============================================================
+
+        checkExistingSession()
+            .then(hasSession => {
+
+                if (!hasSession) {
+
+                    setTimeout(() => {
+
+                        document
+                            .getElementById(
+                                'email'
+                            )
+                            .focus();
+
+                    }, 300);
+                }
+            });
+
+        // ============================================================
+        // EXPOSER FONCTIONS
+        // ============================================================
+
+        window.verifierCode =
+            verifierCode;
+
+        window.annulerConnexion =
+            annulerConnexion;
+
+        window.renvoyerCode =
+            renvoyerCode;
+
+        // ============================================================
+        // SERVICE WORKER
+        // ============================================================
+
+        if ('serviceWorker' in navigator) {
+
+            window.addEventListener(
+                'load',
+                () => {
+
+                    navigator.serviceWorker
+                        .register('sw.js')
+                        .then(registration => {
+
+                            console.log(
+                                '✅ Service Worker enregistré:',
+                                registration.scope
+                            );
+
+                        })
+                        .catch(error => {
+
+                            console.warn(
+                                '⚠️ Service Worker:',
+                                error
+                            );
+
+                        });
+                }
+            );
+        }
+
+        console.log(
+            '✅ Login Administration chargé.'
+        );
+
+        console.log(
+            '🔐 2FA générée et vérifiée côté serveur.'
+        );
+
     </script>
+
 </body>
 </html>
