@@ -17,23 +17,22 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-    // Activer Eruda
-    if (window.eruda) {
-        eruda.init();
-        console.log('✅ Eruda console activée');
-    } else {
-        // Attendre le chargement
-        document.addEventListener('DOMContentLoaded', function() {
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+        // Activer Eruda
+        if (window.eruda) {
             eruda.init();
             console.log('✅ Eruda console activée');
-        });
-    }
-</script>
-    
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                eruda.init();
+                console.log('✅ Eruda console activée');
+            });
+        }
+    </script>
 
     <style>
+        /* ... votre CSS existant ... */
         * {
             margin: 0;
             padding: 0;
@@ -86,7 +85,6 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -218,7 +216,6 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
-
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -342,11 +339,9 @@
             0%, 100% {
                 transform: translateX(0);
             }
-
             25% {
                 transform: translateX(-5px);
             }
-
             75% {
                 transform: translateX(5px);
             }
@@ -468,7 +463,6 @@
             0% {
                 transform: rotate(0deg);
             }
-
             100% {
                 transform: rotate(360deg);
             }
@@ -494,26 +488,21 @@
             .login-card {
                 padding: 28px 20px;
             }
-
             .verification-code-input {
                 gap: 6px;
             }
-
             .verification-code-input input {
                 width: 43px;
                 height: 55px;
                 font-size: 22px;
             }
-
             .verification-actions {
                 flex-direction: column;
             }
-
             .verification-actions .btn-verify,
             .verification-actions .btn-cancel {
                 width: 100%;
             }
-
             .toast-notification {
                 left: 15px;
                 right: 15px;
@@ -544,7 +533,6 @@
 
             <h3 class="login-title">
                 Super Administration
-
                 <span class="auth-badge">
                     <i class="bi bi-shield-lock-fill"></i>
                     Sécurisé
@@ -553,7 +541,6 @@
 
             <p class="login-subtitle">
                 Faculté Agronomique
-
                 <span class="twofa-badge">
                     <i class="bi bi-shield-check"></i>
                     2FA
@@ -567,19 +554,12 @@
                 </span>
             </div>
 
-            <!-- ======================================================
-                 FORMULAIRE LOGIN
-            ======================================================= -->
-
+            <!-- FORMULAIRE LOGIN -->
             <div id="loginFormContainer">
-
                 <form id="loginForm">
-
                     <div class="form-group">
                         <div class="input-group-custom">
-
                             <i class="bi bi-envelope-fill"></i>
-
                             <input
                                 type="email"
                                 class="form-control"
@@ -588,15 +568,12 @@
                                 autocomplete="username"
                                 placeholder="admin@fsa-unilu.com"
                             >
-
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="input-group-custom">
-
                             <i class="bi bi-lock-fill"></i>
-
                             <input
                                 type="password"
                                 class="form-control"
@@ -605,19 +582,13 @@
                                 autocomplete="current-password"
                                 placeholder="••••••••"
                             >
-
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        class="login-btn"
-                        id="loginBtn"
-                    >
+                    <button type="submit" class="login-btn" id="loginBtn">
                         <i class="bi bi-box-arrow-in-right"></i>
                         Se connecter
                     </button>
-
                 </form>
 
                 <div class="text-center mt-3">
@@ -625,17 +596,11 @@
                         Compte super administrateur - Contactez le développeur
                     </small>
                 </div>
-
             </div>
 
-            <!-- ======================================================
-                 VERIFICATION 2FA
-            ======================================================= -->
-
+            <!-- VERIFICATION 2FA -->
             <div id="verificationContainer" class="verification-container">
-
                 <div class="text-center">
-
                     <div class="verification-icon">
                         <i class="bi bi-shield-lock-fill"></i>
                     </div>
@@ -650,154 +615,111 @@
                     </div>
 
                     <div class="code-sent-info" id="codeSentInfo">
-
                         <i class="bi bi-envelope-check-fill"></i>
-
                         <strong>Code envoyé à :</strong>
-
                         <span id="verifEmail">---</span>
-
                         <br>
-
                         <small>
                             Vérifiez votre boîte mail, y compris les spams.
                         </small>
-
                     </div>
 
                     <div class="verification-device">
-
                         <i class="bi bi-envelope-fill"></i>
-
                         <div class="device-info">
-
                             <div class="device-name">
                                 <i class="bi bi-key"></i>
                                 Code de sécurité
                             </div>
-
                             <div class="device-detail">
                                 Entrez le code à 6 chiffres reçu par email
                             </div>
-
                         </div>
-
                     </div>
 
                     <div class="verification-code-input">
-
                         <input type="text" id="code1" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
                         <input type="text" id="code2" maxlength="1" inputmode="numeric">
                         <input type="text" id="code3" maxlength="1" inputmode="numeric">
                         <input type="text" id="code4" maxlength="1" inputmode="numeric">
                         <input type="text" id="code5" maxlength="1" inputmode="numeric">
                         <input type="text" id="code6" maxlength="1" inputmode="numeric">
-
                     </div>
 
-                    <div
-                        id="codeError"
-                        style="display:none;color:#dc3545;font-size:14px;margin-bottom:10px;"
-                    >
+                    <div id="codeError" style="display:none;color:#dc3545;font-size:14px;margin-bottom:10px;">
                         <i class="bi bi-exclamation-circle"></i>
                         Code invalide.
                     </div>
 
                     <div class="verification-actions">
-
-                        <button
-                            class="btn-verify"
-                            id="btnVerifyCode"
-                            type="button"
-                            onclick="verifierCode()"
-                        >
+                        <button class="btn-verify" id="btnVerifyCode" type="button" onclick="verifierCode()">
                             <i class="bi bi-check-circle-fill"></i>
                             Vérifier le code
                         </button>
-
-                        <button
-                            class="btn-cancel"
-                            type="button"
-                            onclick="annulerConnexion()"
-                        >
+                        <button class="btn-cancel" type="button" onclick="annulerConnexion()">
                             <i class="bi bi-x-circle"></i>
                             Annuler
                         </button>
-
                     </div>
 
                     <div class="verification-timer">
-
                         <i class="bi bi-clock"></i>
-
                         Code valable pendant
                         <span id="timerCount">120</span>
                         secondes
-
                         <br>
-
-                        <a
-                            class="resend-link"
-                            id="resendLink"
-                            onclick="renvoyerCode()"
-                        >
+                        <a class="resend-link" id="resendLink" onclick="renvoyerCode()">
                             Renvoyer le code
                         </a>
-
                     </div>
-
                 </div>
-
             </div>
 
             <div class="footer">
-
                 <i class="bi bi-shield-check"></i>
-
                 HYBRILINK-TECH | Votre partenaire tech de A à Z
-
                 <br>
-
                 <a href="creation-admin.html">
                     Créer un compte administrateur
                 </a>
-
             </div>
 
         </div>
 
     </div>
 
-    <!-- ============================================================
-         SCRIPTS
-    ============================================================= -->
-
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
 
     <script>
-
         // ============================================================
-        // CONFIGURATION FIREBASE
+        // CONFIGURATION FIREBASE - VERSION CORRIGÉE AVEC measurementId
         // ============================================================
-
         const firebaseConfig = {
             apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
             authDomain: "fsa-unilu.firebaseapp.com",
             projectId: "fsa-unilu",
             storageBucket: "fsa-unilu.firebasestorage.app",
             messagingSenderId: "36551990738",
-            appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b"
+            appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b",
+            measurementId: "G-ZSCC3LJN4Q"  // <-- AJOUTÉ
         };
 
         firebase.initializeApp(firebaseConfig);
+
+        // ============================================================
+        // ATTENDRE QUE L'AUTHENTIFICATION SOIT PRÊTE
+        // ============================================================
+        let authReady = false;
+        
+        firebase.auth().onAuthStateChanged(function(user) {
+            authReady = true;
+            console.log('✅ Auth state changed:', user ? 'User connected' : 'No user');
+        });
 
         const db = firebase.firestore();
         const auth = firebase.auth();
@@ -806,51 +728,29 @@
         // ============================================================
         // CLOUD FUNCTIONS
         // ============================================================
-
-        const sendCodeFunction =
-            functions.httpsCallable('sendVerificationCode');
-
-        const verifyCodeFunction =
-            functions.httpsCallable('verifyCode');
-
-        const resendCodeFunction =
-            functions.httpsCallable('resendVerificationCode');
-
-        const verifySessionFunction =
-            functions.httpsCallable('verifyAdminSession');
+        const sendCodeFunction = functions.httpsCallable('sendVerificationCode');
+        const verifyCodeFunction = functions.httpsCallable('verifyCode');
+        const resendCodeFunction = functions.httpsCallable('resendVerificationCode');
+        const verifySessionFunction = functions.httpsCallable('verifyAdminSession');
 
         // ============================================================
         // VARIABLES
         // ============================================================
-
         let currentEmail = '';
-
         let currentUserData = null;
-
         let codeExpireTimer = null;
-
         let timerSeconds = 120;
-
         let isVerifying = false;
-
         let loginInProgress = false;
-
         let resendInProgress = false;
 
         // ============================================================
         // LOADING
         // ============================================================
-
         function showLoading(show, message = '⏳ Traitement en cours...') {
-
-            const overlay =
-                document.getElementById('loadingOverlay');
-
-            const loadingMessage =
-                document.getElementById('loadingMessage');
-
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingMessage = document.getElementById('loadingMessage');
             loadingMessage.textContent = message;
-
             if (show) {
                 overlay.classList.add('active');
             } else {
@@ -861,72 +761,34 @@
         // ============================================================
         // TOAST
         // ============================================================
-
         function showToast(message, type = 'success') {
-
-            const container =
-                document.getElementById('toastContainer');
-
-            const bgColor =
-                type === 'success'
-                    ? '#28a745'
-                    : type === 'warning'
-                        ? '#ffc107'
-                        : type === 'info'
-                            ? '#17a2b8'
-                            : '#dc3545';
-
-            const textColor =
-                type === 'warning'
-                    ? '#333'
-                    : 'white';
-
-            const icon =
-                type === 'success'
-                    ? 'check-circle-fill'
-                    : type === 'warning'
-                        ? 'exclamation-triangle-fill'
-                        : type === 'info'
-                            ? 'info-circle-fill'
-                            : 'x-circle-fill';
+            const container = document.getElementById('toastContainer');
+            const bgColor = type === 'success' ? '#28a745'
+                : type === 'warning' ? '#ffc107'
+                : type === 'info' ? '#17a2b8'
+                : '#dc3545';
+            const textColor = type === 'warning' ? '#333' : 'white';
+            const icon = type === 'success' ? 'check-circle-fill'
+                : type === 'warning' ? 'exclamation-triangle-fill'
+                : type === 'info' ? 'info-circle-fill'
+                : 'x-circle-fill';
 
             const toastHtml = `
-                <div
-                    class="toast notification-toast show"
-                    style="
-                        background:${bgColor};
-                        color:${textColor};
-                        border-radius:10px;
-                        margin-bottom:10px;
-                        border:none;
-                    "
-                >
+                <div class="toast notification-toast show" style="background:${bgColor};color:${textColor};border-radius:10px;margin-bottom:10px;border:none;">
                     <div class="toast-body">
                         <i class="bi bi-${icon} me-2"></i>
                         ${escapeHtml(message)}
                     </div>
                 </div>
             `;
-
-            container.insertAdjacentHTML(
-                'afterbegin',
-                toastHtml
-            );
-
+            container.insertAdjacentHTML('afterbegin', toastHtml);
             setTimeout(() => {
-
-                const first =
-                    container.firstElementChild;
-
-                if (first) {
-                    first.remove();
-                }
-
+                const first = container.firstElementChild;
+                if (first) first.remove();
             }, 5000);
         }
 
         function escapeHtml(value) {
-
             return String(value)
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
@@ -938,51 +800,41 @@
         // ============================================================
         // ERREUR FIREBASE
         // ============================================================
-
         function getFirebaseErrorMessage(error) {
+            if (!error) return 'Une erreur est survenue.';
 
-            if (!error) {
-                return 'Une erreur est survenue.';
+            // Gestion spéciale pour auth/invalid-credential
+            if (error.code === 'auth/invalid-credential') {
+                return '❌ Email ou mot de passe incorrect. Veuillez vérifier vos identifiants.';
             }
 
             switch (error.code) {
-
                 case 'functions/unauthenticated':
-                    return 'Votre session Firebase n’est plus valide.';
-
+                    return 'Votre session Firebase n\'est plus valide.';
                 case 'functions/permission-denied':
-                    return 'Accès réservé à l’administrateur.';
-
+                    return 'Accès réservé à l\'administrateur.';
                 case 'functions/invalid-argument':
                     return 'Les informations fournies sont invalides.';
-
                 case 'functions/not-found':
                     return 'Code invalide ou expiré.';
-
                 case 'functions/deadline-exceeded':
                     return 'Le code de vérification a expiré.';
-
                 case 'functions/resource-exhausted':
                     return 'Trop de tentatives. Veuillez patienter.';
-
                 case 'functions/failed-precondition':
                     return error.message || 'La vérification préalable a échoué.';
-
                 case 'functions/internal':
-                    return 'Une erreur serveur est survenue.';
-
-                case 'auth/invalid-credential':
-                    return 'Email ou mot de passe incorrect.';
-
+                    return 'Une erreur serveur est survenue. Veuillez réessayer.';
                 case 'auth/invalid-email':
                     return 'Adresse email invalide.';
-
                 case 'auth/user-disabled':
                     return 'Ce compte est désactivé.';
-
                 case 'auth/too-many-requests':
                     return 'Trop de tentatives. Veuillez patienter.';
-
+                case 'auth/user-not-found':
+                    return 'Aucun compte associé à cet email.';
+                case 'auth/wrong-password':
+                    return 'Mot de passe incorrect.';
                 default:
                     return error.message || 'Une erreur est survenue.';
             }
@@ -991,154 +843,74 @@
         // ============================================================
         // AFFICHER 2FA
         // ============================================================
-
         function afficherVerification() {
+            document.getElementById('loginFormContainer').style.display = 'none';
+            document.getElementById('verificationContainer').classList.add('active');
+            document.getElementById('verifEmail').textContent = currentEmail;
 
-            document
-                .getElementById('loginFormContainer')
-                .style.display = 'none';
+            document.querySelectorAll('.verification-code-input input').forEach(input => {
+                input.value = '';
+                input.classList.remove('error', 'correct');
+            });
 
-            document
-                .getElementById('verificationContainer')
-                .classList.add('active');
-
-            document
-                .getElementById('verifEmail')
-                .textContent = currentEmail;
-
-            document
-                .querySelectorAll('.verification-code-input input')
-                .forEach(input => {
-
-                    input.value = '';
-
-                    input.classList.remove(
-                        'error',
-                        'correct'
-                    );
-                });
-
-            document
-                .getElementById('codeError')
-                .style.display = 'none';
-
-            document
-                .getElementById('btnVerifyCode')
-                .disabled = false;
-
-            document
-                .getElementById('btnVerifyCode')
-                .innerHTML =
-                    '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+            document.getElementById('codeError').style.display = 'none';
+            document.getElementById('btnVerifyCode').disabled = false;
+            document.getElementById('btnVerifyCode').innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
 
             timerSeconds = 120;
+            document.getElementById('timerCount').textContent = timerSeconds;
 
-            document
-                .getElementById('timerCount')
-                .textContent = timerSeconds;
-
-            if (codeExpireTimer) {
-                clearInterval(codeExpireTimer);
-            }
-
+            if (codeExpireTimer) clearInterval(codeExpireTimer);
             codeExpireTimer = setInterval(() => {
-
                 timerSeconds--;
-
-                document
-                    .getElementById('timerCount')
-                    .textContent =
-                    Math.max(timerSeconds, 0);
-
+                document.getElementById('timerCount').textContent = Math.max(timerSeconds, 0);
                 if (timerSeconds <= 0) {
-
                     clearInterval(codeExpireTimer);
-
-                    document
-                        .getElementById('btnVerifyCode')
-                        .disabled = true;
-
-                    showToast(
-                        '⏰ Le code a expiré. Cliquez sur « Renvoyer le code ». ',
-                        'warning'
-                    );
+                    document.getElementById('btnVerifyCode').disabled = true;
+                    showToast('⏰ Le code a expiré. Cliquez sur « Renvoyer le code ».', 'warning');
                 }
-
             }, 1000);
 
             setTimeout(() => {
-
-                const first =
-                    document.getElementById('code1');
-
-                if (first) {
-                    first.focus();
-                }
-
+                const first = document.getElementById('code1');
+                if (first) first.focus();
             }, 300);
         }
 
         // ============================================================
-        // ENVOYER LE CODE (CORRIGÉ)
+        // ENVOYER LE CODE
         // ============================================================
-
         async function envoyerCode() {
-
             try {
+                showLoading(true, '📧 Génération et envoi du code...');
 
-                showLoading(
-                    true,
-                    '📧 Génération et envoi du code...'
-                );
-
-                // ============================================================
-                // FIX: Forcer le rafraîchissement du token ID
-                // Cela garantit que le token est valide et sera transmis
-                // à la Cloud Function.
-                // ============================================================
-                if (auth.currentUser) {
-                    await auth.currentUser.getIdToken(true);
-                } else {
+                // Vérifier que l'utilisateur est authentifié
+                if (!auth.currentUser) {
                     showToast('❌ Utilisateur non authentifié.', 'danger');
                     return false;
                 }
-                // ============================================================
 
-                const result =
-                    await sendCodeFunction({});
+                // Forcer le rafraîchissement du token ID
+                await auth.currentUser.getIdToken(true);
 
-                console.log(
-                    '✅ Code 2FA envoyé:',
-                    result.data
-                );
+                const result = await sendCodeFunction({});
+                console.log('✅ Code 2FA envoyé:', result.data);
 
                 showLoading(false);
-
-                document
-                    .getElementById('codeSentInfo')
-                    .style.display = 'block';
-
-                showToast(
-                    '✅ Code de sécurité envoyé sur votre email.',
-                    'success'
-                );
-
+                document.getElementById('codeSentInfo').style.display = 'block';
+                showToast('✅ Code de sécurité envoyé sur votre email.', 'success');
                 return true;
 
             } catch (error) {
-
-                console.error(
-                    '❌ Erreur envoi 2FA:',
-                    error
-                );
-
+                console.error('❌ Erreur envoi 2FA:', error);
                 showLoading(false);
-
-                showToast(
-                    '❌ ' + getFirebaseErrorMessage(error),
-                    'danger'
-                );
-
+                
+                // Message d'erreur plus explicite
+                let errorMsg = getFirebaseErrorMessage(error);
+                if (error.code === 'functions/internal') {
+                    errorMsg = '❌ Erreur serveur. Vérifiez que votre compte administrateur existe dans Firestore.';
+                }
+                showToast(errorMsg, 'danger');
                 return false;
             }
         }
@@ -1146,151 +918,74 @@
         // ============================================================
         // VERIFIER CODE
         // ============================================================
-
         async function verifierCode() {
-
-            if (isVerifying) {
-                return;
-            }
+            if (isVerifying) return;
 
             if (!auth.currentUser) {
-
-                showToast(
-                    '❌ Votre session a expiré. Recommencez la connexion.',
-                    'danger'
-                );
-
+                showToast('❌ Votre session a expiré. Recommencez la connexion.', 'danger');
                 await annulerConnexion();
-
                 return;
             }
 
             if (timerSeconds <= 0) {
-
-                showToast(
-                    '⏰ Le code a expiré. Cliquez sur « Renvoyer le code ». ',
-                    'warning'
-                );
-
+                showToast('⏰ Le code a expiré. Cliquez sur « Renvoyer le code ».', 'warning');
                 return;
             }
 
-            const codeSaisi =
-                getCodeFromInputs();
-
+            const codeSaisi = getCodeFromInputs();
             if (!/^\d{6}$/.test(codeSaisi)) {
-
-                const errorElement =
-                    document.getElementById('codeError');
-
+                const errorElement = document.getElementById('codeError');
                 errorElement.style.display = 'block';
-
-                errorElement.innerHTML =
-                    '<i class="bi bi-exclamation-circle"></i> Veuillez entrer les 6 chiffres du code.';
-
+                errorElement.innerHTML = '<i class="bi bi-exclamation-circle"></i> Veuillez entrer les 6 chiffres du code.';
                 return;
             }
 
             isVerifying = true;
-
-            const btn =
-                document.getElementById('btnVerifyCode');
-
-            btn.innerHTML =
-                '<i class="bi bi-hourglass-split"></i> Vérification...';
-
+            const btn = document.getElementById('btnVerifyCode');
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Vérification...';
             btn.disabled = true;
 
             try {
+                // Forcer le rafraîchissement du token ID
+                await auth.currentUser.getIdToken(true);
 
-                // ============================================================
-                // FIX: Forcer le rafraîchissement du token ID avant la vérification
-                // ============================================================
-                if (auth.currentUser) {
-                    await auth.currentUser.getIdToken(true);
-                }
-                // ============================================================
-
-                const result =
-                    await verifyCodeFunction({
-                        code: codeSaisi
-                    });
+                const result = await verifyCodeFunction({ code: codeSaisi });
 
                 if (!result || !result.data || !result.data.success) {
-
-                    const errorElement =
-                        document.getElementById('codeError');
-
+                    const errorElement = document.getElementById('codeError');
                     errorElement.style.display = 'block';
-
-                    errorElement.innerHTML =
-                        '<i class="bi bi-exclamation-circle"></i> ' +
+                    errorElement.innerHTML = '<i class="bi bi-exclamation-circle"></i> ' + 
                         (result?.data?.message || 'Code invalide.');
 
-                    document
-                        .querySelectorAll('.verification-code-input input')
-                        .forEach(input => {
-
-                            input.classList.add('error');
-
-                            setTimeout(() => {
-                                input.classList.remove('error');
-                            }, 500);
-
-                        });
+                    document.querySelectorAll('.verification-code-input input').forEach(input => {
+                        input.classList.add('error');
+                        setTimeout(() => input.classList.remove('error'), 500);
+                    });
 
                     isVerifying = false;
-
-                    btn.innerHTML =
-                        '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
-
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
                     btn.disabled = false;
-
                     return;
                 }
 
-                document
-                    .querySelectorAll('.verification-code-input input')
-                    .forEach(input => {
-                        input.classList.add('correct');
-                    });
+                document.querySelectorAll('.verification-code-input input').forEach(input => {
+                    input.classList.add('correct');
+                });
 
-                document
-                    .getElementById('codeError')
-                    .style.display = 'none';
-
+                document.getElementById('codeError').style.display = 'none';
                 clearInterval(codeExpireTimer);
-
-                showLoading(
-                    true,
-                    '🔐 Finalisation de la connexion...'
-                );
-
+                showLoading(true, '🔐 Finalisation de la connexion...');
                 await finaliserConnexion();
 
             } catch (error) {
-
-                console.error(
-                    '❌ Erreur vérification:',
-                    error
-                );
-
+                console.error('❌ Erreur vérification:', error);
                 showLoading(false);
-
-                const errorElement =
-                    document.getElementById('codeError');
-
+                const errorElement = document.getElementById('codeError');
                 errorElement.style.display = 'block';
-
-                errorElement.innerHTML =
-                    '<i class="bi bi-exclamation-circle"></i> ' +
-                    getFirebaseErrorMessage(error);
+                errorElement.innerHTML = '<i class="bi bi-exclamation-circle"></i> ' + getFirebaseErrorMessage(error);
 
                 isVerifying = false;
-
-                btn.innerHTML =
-                    '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
-
+                btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
                 btn.disabled = false;
             }
         }
@@ -1298,119 +993,51 @@
         // ============================================================
         // FINALISER CONNEXION
         // ============================================================
-
         async function finaliserConnexion() {
-
             try {
-
-                const user =
-                    auth.currentUser;
-
+                const user = auth.currentUser;
                 if (!user) {
-
-                    throw new Error(
-                        'Session Firebase absente.'
-                    );
+                    throw new Error('Session Firebase absente.');
                 }
 
-                // ============================================================
-                // FIX: Forcer le rafraîchissement du token ID avant la vérification de session
-                // ============================================================
                 await user.getIdToken(true);
-                // ============================================================
+                const sessionResult = await verifySessionFunction({});
 
-                const sessionResult =
-                    await verifySessionFunction({});
-
-                if (
-                    !sessionResult.data ||
-                    sessionResult.data.isValid !== true
-                ) {
-
-                    throw new Error(
-                        'La session administrateur n’a pas pu être validée.'
-                    );
+                if (!sessionResult.data || sessionResult.data.isValid !== true) {
+                    throw new Error('La session administrateur n\'a pas pu être validée.');
                 }
 
-                const data =
-                    sessionResult.data;
-
+                const data = sessionResult.data;
                 const sessionData = {
-
                     uid: data.uid,
-
                     id: data.uid,
-
-                    nomComplet:
-                        data.nomComplet ||
-                        currentUserData?.nomComplet ||
-                        'Administrateur',
-
-                    email:
-                        data.email ||
-                        user.email,
-
+                    nomComplet: data.nomComplet || currentUserData?.nomComplet || 'Administrateur',
+                    email: data.email || user.email,
                     role: 'admin',
-
                     verified2FA: true,
-
-                    expires:
-                        Date.now() +
-                        (8 * 60 * 60 * 1000)
+                    expires: Date.now() + (8 * 60 * 60 * 1000)
                 };
 
-                localStorage.setItem(
-                    'admin_user',
-                    JSON.stringify(sessionData)
-                );
+                localStorage.setItem('admin_user', JSON.stringify(sessionData));
 
                 try {
-
-                    await db
-                        .collection('utilisateurs')
-                        .doc(user.uid)
-                        .update({
-                            derniereConnexion:
-                                firebase.firestore.FieldValue
-                                    .serverTimestamp()
-                        });
-
+                    await db.collection('utilisateurs').doc(user.uid).update({
+                        derniereConnexion: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                 } catch (updateError) {
-
-                    console.warn(
-                        '⚠️ Mise à jour derniereConnexion impossible:',
-                        updateError
-                    );
+                    console.warn('⚠️ Mise à jour derniereConnexion impossible:', updateError);
                 }
 
                 showLoading(false);
-
-                showToast(
-                    '✅ Connexion réussie ! Bienvenue Administrateur.',
-                    'success'
-                );
-
+                showToast('✅ Connexion réussie ! Bienvenue Administrateur.', 'success');
                 setTimeout(() => {
-
-                    window.location.href =
-                        'index.html';
-
+                    window.location.href = 'index.html';
                 }, 800);
 
             } catch (error) {
-
-                console.error(
-                    '❌ Erreur finalisation:',
-                    error
-                );
-
+                console.error('❌ Erreur finalisation:', error);
                 showLoading(false);
-
-                showToast(
-                    '❌ ' + getFirebaseErrorMessage(error),
-                    'danger'
-                );
-
+                showToast('❌ ' + getFirebaseErrorMessage(error), 'danger');
                 await annulerConnexion();
             }
         }
@@ -1418,370 +1045,145 @@
         // ============================================================
         // ANNULER CONNEXION
         // ============================================================
-
         async function annulerConnexion() {
-
             clearInterval(codeExpireTimer);
-
             try {
-
-                if (auth.currentUser) {
-                    await auth.signOut();
-                }
-
+                if (auth.currentUser) await auth.signOut();
             } catch (error) {
-
-                console.error(
-                    'Erreur déconnexion:',
-                    error
-                );
+                console.error('Erreur déconnexion:', error);
             }
 
             currentEmail = '';
-
             currentUserData = null;
-
             isVerifying = false;
-
             loginInProgress = false;
-
             resendInProgress = false;
 
-            document
-                .getElementById('loginFormContainer')
-                .style.display = 'block';
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('verificationContainer').classList.remove('active');
+            document.getElementById('codeSentInfo').style.display = 'none';
+            document.getElementById('btnVerifyCode').disabled = false;
+            document.getElementById('btnVerifyCode').innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+            document.getElementById('loginForm').reset();
 
-            document
-                .getElementById('verificationContainer')
-                .classList.remove('active');
-
-            document
-                .getElementById('codeSentInfo')
-                .style.display = 'none';
-
-            document
-                .getElementById('btnVerifyCode')
-                .disabled = false;
-
-            document
-                .getElementById('btnVerifyCode')
-                .innerHTML =
-                    '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
-
-            document
-                .getElementById('loginForm')
-                .reset();
-
-            document
-                .querySelectorAll('.verification-code-input input')
-                .forEach(input => {
-
-                    input.value = '';
-
-                    input.classList.remove(
-                        'error',
-                        'correct'
-                    );
-                });
-
-            document
-                .getElementById('codeError')
-                .style.display = 'none';
+            document.querySelectorAll('.verification-code-input input').forEach(input => {
+                input.value = '';
+                input.classList.remove('error', 'correct');
+            });
+            document.getElementById('codeError').style.display = 'none';
 
             setTimeout(() => {
-
-                document
-                    .getElementById('email')
-                    .focus();
-
+                document.getElementById('email').focus();
             }, 200);
         }
 
         // ============================================================
         // AUTO COMPLETION CODE
         // ============================================================
-
         function getCodeFromInputs() {
-
             let code = '';
-
             for (let i = 1; i <= 6; i++) {
-
-                const input =
-                    document.getElementById(
-                        `code${i}`
-                    );
-
-                if (input) {
-                    code += input.value;
-                }
+                const input = document.getElementById(`code${i}`);
+                if (input) code += input.value;
             }
-
             return code;
         }
 
-        document
-            .querySelectorAll(
-                '.verification-code-input input'
-            )
-            .forEach((input, index) => {
+        document.querySelectorAll('.verification-code-input input').forEach((input, index) => {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 1);
+                this.classList.remove('error', 'correct');
+                document.getElementById('codeError').style.display = 'none';
 
-                input.addEventListener(
-                    'input',
-                    function () {
-
-                        this.value =
-                            this.value
-                                .replace(/\D/g, '')
-                                .slice(0, 1);
-
-                        this.classList.remove(
-                            'error',
-                            'correct'
-                        );
-
-                        document
-                            .getElementById('codeError')
-                            .style.display = 'none';
-
-                        if (this.value.length === 1) {
-
-                            if (index < 5) {
-
-                                document
-                                    .getElementById(
-                                        `code${index + 2}`
-                                    )
-                                    .focus();
-
-                            } else {
-
-                                const code =
-                                    getCodeFromInputs();
-
-                                if (
-                                    code.length === 6 &&
-                                    !isVerifying &&
-                                    timerSeconds > 0
-                                ) {
-
-                                    document
-                                        .getElementById(
-                                            'btnVerifyCode'
-                                        )
-                                        .click();
-                                }
-                            }
+                if (this.value.length === 1) {
+                    if (index < 5) {
+                        document.getElementById(`code${index + 2}`).focus();
+                    } else {
+                        const code = getCodeFromInputs();
+                        if (code.length === 6 && !isVerifying && timerSeconds > 0) {
+                            document.getElementById('btnVerifyCode').click();
                         }
                     }
-                );
-
-                input.addEventListener(
-                    'keydown',
-                    function (event) {
-
-                        if (
-                            event.key === 'Backspace' &&
-                            this.value === '' &&
-                            index > 0
-                        ) {
-
-                            document
-                                .getElementById(
-                                    `code${index}`
-                                )
-                                .focus();
-                        }
-
-                        if (event.key === 'Enter') {
-
-                            event.preventDefault();
-
-                            document
-                                .getElementById(
-                                    'btnVerifyCode'
-                                )
-                                .click();
-                        }
-                    }
-                );
-
-                input.addEventListener(
-                    'paste',
-                    function (event) {
-
-                        event.preventDefault();
-
-                        const paste =
-                            (
-                                event.clipboardData ||
-                                window.clipboardData
-                            )
-                                .getData('text')
-                                .replace(/\D/g, '')
-                                .slice(0, 6);
-
-                        for (
-                            let i = 0;
-                            i < paste.length;
-                            i++
-                        ) {
-
-                            const field =
-                                document.getElementById(
-                                    `code${i + 1}`
-                                );
-
-                            if (field) {
-                                field.value =
-                                    paste[i];
-
-                                field.classList.remove(
-                                    'error',
-                                    'correct'
-                                );
-                            }
-                        }
-
-                        if (paste.length < 6) {
-
-                            document
-                                .getElementById(
-                                    `code${paste.length + 1}`
-                                )
-                                ?.focus();
-
-                        } else {
-
-                            document
-                                .getElementById(
-                                    'btnVerifyCode'
-                                )
-                                .click();
-                        }
-                    }
-                );
+                }
             });
+
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'Backspace' && this.value === '' && index > 0) {
+                    document.getElementById(`code${index}`).focus();
+                }
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    document.getElementById('btnVerifyCode').click();
+                }
+            });
+
+            input.addEventListener('paste', function(event) {
+                event.preventDefault();
+                const paste = (event.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+                for (let i = 0; i < paste.length; i++) {
+                    const field = document.getElementById(`code${i + 1}`);
+                    if (field) {
+                        field.value = paste[i];
+                        field.classList.remove('error', 'correct');
+                    }
+                }
+                if (paste.length < 6) {
+                    document.getElementById(`code${paste.length + 1}`)?.focus();
+                } else {
+                    document.getElementById('btnVerifyCode').click();
+                }
+            });
+        });
 
         // ============================================================
         // RENVOYER CODE
         // ============================================================
-
         async function renvoyerCode() {
-
-            if (resendInProgress) {
-                return;
-            }
-
-            if (!currentEmail) {
-                return;
-            }
+            if (resendInProgress) return;
+            if (!currentEmail) return;
 
             resendInProgress = true;
-
             try {
+                showLoading(true, '📧 Envoi d\'un nouveau code...');
 
-                showLoading(
-                    true,
-                    '📧 Envoi d’un nouveau code...'
-                );
-
-                // ============================================================
-                // FIX: Forcer le rafraîchissement du token ID avant le renvoi
-                // ============================================================
-                if (auth.currentUser) {
-                    await auth.currentUser.getIdToken(true);
-                } else {
+                if (!auth.currentUser) {
                     showToast('❌ Utilisateur non authentifié.', 'danger');
                     return;
                 }
-                // ============================================================
 
-                const result =
-                    await resendCodeFunction({});
-
-                console.log(
-                    '✅ Nouveau code envoyé:',
-                    result.data
-                );
+                await auth.currentUser.getIdToken(true);
+                const result = await resendCodeFunction({});
+                console.log('✅ Nouveau code envoyé:', result.data);
 
                 timerSeconds = 120;
+                document.getElementById('timerCount').textContent = timerSeconds;
+                document.getElementById('btnVerifyCode').disabled = false;
 
-                document
-                    .getElementById('timerCount')
-                    .textContent = timerSeconds;
-
-                document
-                    .getElementById('btnVerifyCode')
-                    .disabled = false;
-
-                if (codeExpireTimer) {
-                    clearInterval(codeExpireTimer);
-                }
-
+                if (codeExpireTimer) clearInterval(codeExpireTimer);
                 codeExpireTimer = setInterval(() => {
-
                     timerSeconds--;
-
-                    document
-                        .getElementById('timerCount')
-                        .textContent =
-                        Math.max(timerSeconds, 0);
-
+                    document.getElementById('timerCount').textContent = Math.max(timerSeconds, 0);
                     if (timerSeconds <= 0) {
-
                         clearInterval(codeExpireTimer);
-
-                        document
-                            .getElementById('btnVerifyCode')
-                            .disabled = true;
+                        document.getElementById('btnVerifyCode').disabled = true;
                     }
-
                 }, 1000);
 
-                document
-                    .querySelectorAll('.verification-code-input input')
-                    .forEach(input => {
-
-                        input.value = '';
-
-                        input.classList.remove(
-                            'error',
-                            'correct'
-                        );
-                    });
-
-                document
-                    .getElementById('codeError')
-                    .style.display = 'none';
-
-                document
-                    .getElementById('code1')
-                    .focus();
+                document.querySelectorAll('.verification-code-input input').forEach(input => {
+                    input.value = '';
+                    input.classList.remove('error', 'correct');
+                });
+                document.getElementById('codeError').style.display = 'none';
+                document.getElementById('code1').focus();
 
                 showLoading(false);
-
-                showToast(
-                    '📧 Nouveau code envoyé.',
-                    'success'
-                );
+                showToast('📧 Nouveau code envoyé.', 'success');
 
             } catch (error) {
-
-                console.error(
-                    '❌ Erreur renvoi:',
-                    error
-                );
-
+                console.error('❌ Erreur renvoi:', error);
                 showLoading(false);
-
-                showToast(
-                    '❌ ' + getFirebaseErrorMessage(error),
-                    'danger'
-                );
-
+                showToast('❌ ' + getFirebaseErrorMessage(error), 'danger');
             } finally {
-
                 resendInProgress = false;
             }
         }
@@ -1789,284 +1191,132 @@
         // ============================================================
         // FORMULAIRE LOGIN
         // ============================================================
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
 
-        document
-            .getElementById('loginForm')
-            .addEventListener(
-                'submit',
-                async function (event) {
+            if (loginInProgress || isVerifying) return;
 
-                    event.preventDefault();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
 
-                    if (
-                        loginInProgress ||
-                        isVerifying
-                    ) {
-                        return;
-                    }
+            if (!email || !password) {
+                showToast('Veuillez remplir tous les champs.', 'warning');
+                return;
+            }
 
-                    const email =
-                        document
-                            .getElementById('email')
-                            .value
-                            .trim()
-                            .toLowerCase();
+            loginInProgress = true;
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connexion...';
 
-                    const password =
-                        document
-                            .getElementById('password')
-                            .value;
-
-                    if (!email || !password) {
-
-                        showToast(
-                            'Veuillez remplir tous les champs.',
-                            'warning'
-                        );
-
-                        return;
-                    }
-
-                    loginInProgress = true;
-
-                    const btn =
-                        document.getElementById(
-                            'loginBtn'
-                        );
-
-                    const originalText =
-                        btn.innerHTML;
-
-                    btn.disabled = true;
-
-                    btn.innerHTML =
-                        '<span class="spinner-border spinner-border-sm me-2"></span>Connexion...';
-
-                    try {
-
-                        const credential =
-                            await auth
-                                .signInWithEmailAndPassword(
-                                    email,
-                                    password
-                                );
-
-                        const user =
-                            credential.user;
-
-                        if (!user) {
-
-                            throw new Error(
-                                'Utilisateur Firebase introuvable.'
-                            );
-                        }
-
-                        // ============================================================
-                        // FIX: Forcer le rafraîchissement du token ID après connexion
-                        // ============================================================
-                        await user.getIdToken(true);
-                        // ============================================================
-
-                        const userDoc =
-                            await db
-                                .collection('utilisateurs')
-                                .doc(user.uid)
-                                .get();
-
-                        if (!userDoc.exists) {
-
-                            await auth.signOut();
-
-                            showToast(
-                                '❌ Compte administrateur introuvable.',
-                                'danger'
-                            );
-
-                            return;
-                        }
-
-                        const userData =
-                            userDoc.data();
-
-                        if (
-                            userData.role !== 'admin'
-                        ) {
-
-                            await auth.signOut();
-
-                            showToast(
-                                '❌ Accès refusé. Ce compte n’est pas administrateur.',
-                                'danger'
-                            );
-
-                            return;
-                        }
-
-                        currentEmail =
-                            user.email ||
-                            email;
-
-                        currentUserData =
-                            userData;
-
-                        const codeEnvoye =
-                            await envoyerCode();
-
-                        if (!codeEnvoye) {
-
-                            await auth.signOut();
-
-                            return;
-                        }
-
-                        afficherVerification();
-
-                        document
-                            .getElementById(
-                                'loginForm'
-                            )
-                            .reset();
-
-                    } catch (error) {
-
-                        console.error(
-                            '❌ Erreur connexion:',
-                            error
-                        );
-
-                        try {
-
-                            if (auth.currentUser) {
-                                await auth.signOut();
+            try {
+                // Attendre que l'auth soit prêt
+                if (!authReady) {
+                    await new Promise(resolve => {
+                        const checkAuth = setInterval(() => {
+                            if (authReady) {
+                                clearInterval(checkAuth);
+                                resolve();
                             }
-
-                        } catch (signOutError) {
-                            console.warn(
-                                signOutError
-                            );
-                        }
-
-                        showToast(
-                            '❌ ' +
-                            getFirebaseErrorMessage(error),
-                            'danger'
-                        );
-
-                    } finally {
-
-                        loginInProgress = false;
-
-                        btn.disabled = false;
-
-                        btn.innerHTML =
-                            originalText;
-                    }
+                        }, 100);
+                    });
                 }
-            );
+
+                const credential = await auth.signInWithEmailAndPassword(email, password);
+                const user = credential.user;
+
+                if (!user) {
+                    throw new Error('Utilisateur Firebase introuvable.');
+                }
+
+                await user.getIdToken(true);
+
+                // Vérifier le document utilisateur
+                const userDoc = await db.collection('utilisateurs').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    await auth.signOut();
+                    showToast('❌ Compte administrateur introuvable dans Firestore.', 'danger');
+                    return;
+                }
+
+                const userData = userDoc.data();
+                if (userData.role !== 'admin') {
+                    await auth.signOut();
+                    showToast('❌ Accès refusé. Ce compte n\'est pas administrateur.', 'danger');
+                    return;
+                }
+
+                currentEmail = user.email || email;
+                currentUserData = userData;
+
+                const codeEnvoye = await envoyerCode();
+                if (!codeEnvoye) {
+                    await auth.signOut();
+                    return;
+                }
+
+                afficherVerification();
+                document.getElementById('loginForm').reset();
+
+            } catch (error) {
+                console.error('❌ Erreur connexion:', error);
+                try {
+                    if (auth.currentUser) await auth.signOut();
+                } catch (signOutError) {
+                    console.warn(signOutError);
+                }
+                showToast('❌ ' + getFirebaseErrorMessage(error), 'danger');
+            } finally {
+                loginInProgress = false;
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
 
         // ============================================================
         // SESSION EXISTANTE
         // ============================================================
-
         async function checkExistingSession() {
-
-            const session =
-                localStorage.getItem(
-                    'admin_user'
-                );
-
+            const session = localStorage.getItem('admin_user');
             if (!session) {
-
                 if (auth.currentUser) {
-
-                    try {
-                        await auth.signOut();
-                    } catch (error) {
-                        console.warn(error);
-                    }
+                    try { await auth.signOut(); } catch (error) { console.warn(error); }
                 }
-
                 return false;
             }
 
             try {
-
-                const sessionData =
-                    JSON.parse(session);
-
-                if (
-                    !sessionData ||
-                    sessionData.role !== 'admin' ||
-                    sessionData.verified2FA !== true ||
-                    !sessionData.expires ||
-                    Date.now() >= sessionData.expires
-                ) {
-
-                    localStorage.removeItem(
-                        'admin_user'
-                    );
-
-                    if (auth.currentUser) {
-                        await auth.signOut();
-                    }
-
+                const sessionData = JSON.parse(session);
+                if (!sessionData || sessionData.role !== 'admin' || 
+                    sessionData.verified2FA !== true || !sessionData.expires || 
+                    Date.now() >= sessionData.expires) {
+                    localStorage.removeItem('admin_user');
+                    if (auth.currentUser) await auth.signOut();
                     return false;
                 }
 
                 if (!auth.currentUser) {
-
-                    localStorage.removeItem(
-                        'admin_user'
-                    );
-
+                    localStorage.removeItem('admin_user');
                     return false;
                 }
 
-                // ============================================================
-                // FIX: Forcer le rafraîchissement du token ID avant la vérification de session
-                // ============================================================
                 await auth.currentUser.getIdToken(true);
-                // ============================================================
+                const result = await verifySessionFunction({});
 
-                const result =
-                    await verifySessionFunction({});
-
-                if (
-                    result &&
-                    result.data &&
-                    result.data.isValid === true &&
-                    result.data.role === 'admin'
-                ) {
-
-                    window.location.href =
-                        'index.html';
-
+                if (result && result.data && result.data.isValid === true && result.data.role === 'admin') {
+                    window.location.href = 'index.html';
                     return true;
                 }
 
-                localStorage.removeItem(
-                    'admin_user'
-                );
-
+                localStorage.removeItem('admin_user');
                 await auth.signOut();
-
                 return false;
 
             } catch (error) {
-
-                console.error(
-                    'Erreur session:',
-                    error
-                );
-
-                localStorage.removeItem(
-                    'admin_user'
-                );
-
-                try {
-                    await auth.signOut();
-                } catch (_) {}
-
+                console.error('Erreur session:', error);
+                localStorage.removeItem('admin_user');
+                try { await auth.signOut(); } catch (_) {}
                 return false;
             }
         }
@@ -2074,77 +1324,38 @@
         // ============================================================
         // INITIALISATION
         // ============================================================
-
-        checkExistingSession()
-            .then(hasSession => {
-
-                if (!hasSession) {
-
-                    setTimeout(() => {
-
-                        document
-                            .getElementById(
-                                'email'
-                            )
-                            .focus();
-
-                    }, 300);
-                }
-            });
+        checkExistingSession().then(hasSession => {
+            if (!hasSession) {
+                setTimeout(() => {
+                    document.getElementById('email').focus();
+                }, 300);
+            }
+        });
 
         // ============================================================
         // EXPOSER FONCTIONS
         // ============================================================
-
-        window.verifierCode =
-            verifierCode;
-
-        window.annulerConnexion =
-            annulerConnexion;
-
-        window.renvoyerCode =
-            renvoyerCode;
+        window.verifierCode = verifierCode;
+        window.annulerConnexion = annulerConnexion;
+        window.renvoyerCode = renvoyerCode;
 
         // ============================================================
         // SERVICE WORKER
         // ============================================================
-
         if ('serviceWorker' in navigator) {
-
-            window.addEventListener(
-                'load',
-                () => {
-
-                    navigator.serviceWorker
-                        .register('sw.js')
-                        .then(registration => {
-
-                            console.log(
-                                '✅ Service Worker enregistré:',
-                                registration.scope
-                            );
-
-                        })
-                        .catch(error => {
-
-                            console.warn(
-                                '⚠️ Service Worker:',
-                                error
-                            );
-
-                        });
-                }
-            );
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker enregistré:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.warn('⚠️ Service Worker:', error);
+                    });
+            });
         }
 
-        console.log(
-            '✅ Login Administration chargé.'
-        );
-
-        console.log(
-            '🔐 2FA générée et vérifiée côté serveur.'
-        );
-
+        console.log('✅ Login Administration chargé.');
+        console.log('🔐 2FA générée et vérifiée côté serveur.');
     </script>
 
 </body>
