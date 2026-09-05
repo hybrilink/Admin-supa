@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Connexion Administration - Faculté Agronomique</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Hybrilink Super Admin">
+    <meta name="description" content="Gestion administrative complète">
+    <meta name="theme-color" content="#003366">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <link rel="icon" type="image/png" href="icon-96x96.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <script>
+    // Activer Eruda
+    if (window.eruda) {
+        eruda.init();
+        console.log('✅ Eruda console activée');
+    } else {
+        // Attendre le chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            eruda.init();
+            console.log('✅ Eruda console activée');
+        });
+    }
+</script>
+    <style>
+        /* ... (même CSS que précédemment) ... */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary-blue: #003366; --dark-blue: #002244; --accent-yellow: #ffb347; }
+        
+        body {
+            background: linear-gradient(135deg, #003366 0%, #001a33 100%);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+            animation: fadeInUp 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #003366, #ffb347, #003366);
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-logo i {
+            font-size: 60px;
+            color: var(--primary-blue);
+            background: #f0f2f5;
+            padding: 20px;
+            border-radius: 50%;
+        }
+        
+        .login-title {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .login-subtitle {
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .auth-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            font-size: 11px;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+
+        .twofa-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #003366;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        
+        .input-group-custom {
+            position: relative;
+        }
+        
+        .input-group-custom i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-blue);
+            font-size: 18px;
+            z-index: 1;
+        }
+        
+        .input-group-custom input {
+            width: 100%;
+            padding: 14px 15px 14px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .input-group-custom input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+        }
+        
+        .login-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            background: var(--dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+        
+        .notification-toast {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .footer a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .verification-container {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        .verification-container.active { display: block; }
+
+        .verification-icon { font-size: 60px; color: #003366; margin-bottom: 15px; }
+        .verification-title { font-size: 20px; font-weight: bold; color: #003366; margin-bottom: 10px; }
+        .verification-subtitle { font-size: 14px; color: #666; margin-bottom: 20px; }
+
+        .verification-device {
+            background: #f0f7ff;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border: 1px solid #003366;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .verification-device i { font-size: 30px; color: #003366; }
+        .verification-device .device-info { flex: 1; }
+        .verification-device .device-info .device-name { font-weight: bold; color: #003366; }
+        .verification-device .device-info .device-detail { font-size: 12px; color: #888; }
+
+        .verification-code-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .verification-code-input input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+        .verification-code-input input:focus {
+            outline: none;
+            border-color: #003366;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+        }
+        .verification-code-input input.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .verification-code-input input.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .verification-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .verification-actions .btn-verify {
+            flex: 2;
+            padding: 14px;
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .verification-actions .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        .verification-actions .btn-cancel {
+            flex: 1;
+            padding: 14px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .verification-actions .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .verification-timer {
+            font-size: 13px;
+            color: #888;
+            margin-top: 15px;
+        }
+        .verification-timer span { font-weight: bold; color: #dc3545; }
+        .resend-link {
+            color: #003366;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        .resend-link:hover { color: #ffb347; }
+
+        .code-sent-info {
+            background: #e8f4fd;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-left: 4px solid #003366;
+            font-size: 13px;
+            display: none;
+        }
+        .code-sent-info.show { display: block; }
+        .code-sent-info i { color: #003366; margin-right: 8px; }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-overlay.active { display: flex; }
+
+        .loading-spinner {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            text-align: center;
+        }
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #003366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-spinner p { color: #003366; font-weight: bold; margin: 0; }
+
+        .role-badge {
+            background: #003366;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>⏳ Envoi du code en cours...</p>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-notification"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <h3 class="login-title">Super Administration <span class="auth-badge"><i class="bi bi-shield-lock-fill"></i> Sécurisé</span></h3>
+            <p class="login-subtitle">Faculté Agronomique <span class="twofa-badge"><i class="bi bi-shield-check"></i> 2FA</span></p>
+            
+            <div class="text-center mb-3">
+                <span class="role-badge"><i class="bi bi-shield-fill-check"></i> Rôle : Administrateur</span>
+            </div>
+            
+            <div id="loginFormContainer">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <div class="input-group-custom">
+                            <i class="bi bi-envelope-fill"></i>
+                            <input type="email" class="form-control" id="email" required placeholder="admin@fsa-unilu.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group-custom">
+                            <i class="bi bi-lock-fill"></i>
+                            <input type="password" class="form-control" id="password" required placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <i class="bi bi-box-arrow-in-right"></i> Se connecter
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <small class="text-muted">Compte super administrateur - Contactez le développeur</small>
+                </div>
+            </div>
+            
+            <div id="verificationContainer" class="verification-container">
+                <div class="text-center">
+                    <div class="verification-icon">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <div class="verification-title">Validation en deux étapes</div>
+                    <div class="verification-subtitle">
+                        Afin de protéger votre compte, nous avons envoyé un code de vérification sur votre email.
+                    </div>
+                    
+                    <div class="code-sent-info show" id="codeSentInfo">
+                        <i class="bi bi-envelope-check-fill"></i>
+                        <strong>Code envoyé à :</strong> <span id="verifEmail">---</span>
+                        <br><small>Vérifiez votre boîte mail (y compris les spams).</small>
+                    </div>
+                    
+                    <div class="verification-device">
+                        <i class="bi bi-envelope-fill"></i>
+                        <div class="device-info">
+                            <div class="device-name"><i class="bi bi-key"></i> Code de sécurité</div>
+                            <div class="device-detail">
+                                Entrez le code à 6 chiffres reçu par email
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-code-input">
+                        <input type="text" id="code1" maxlength="1" autofocus>
+                        <input type="text" id="code2" maxlength="1">
+                        <input type="text" id="code3" maxlength="1">
+                        <input type="text" id="code4" maxlength="1">
+                        <input type="text" id="code5" maxlength="1">
+                        <input type="text" id="code6" maxlength="1">
+                    </div>
+                    
+                    <div id="codeError" style="display: none; color: #dc3545; font-size: 14px; margin-bottom: 10px;">
+                        <i class="bi bi-exclamation-circle"></i> Code invalide. Veuillez réessayer.
+                    </div>
+                    
+                    <div class="verification-actions">
+                        <button class="btn-verify" id="btnVerifyCode" onclick="verifierCode()">
+                            <i class="bi bi-check-circle-fill"></i> Vérifier le code
+                        </button>
+                        <button class="btn-cancel" onclick="annulerConnexion()">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </button>
+                    </div>
+                    
+                    <div class="verification-timer">
+                        <i class="bi bi-clock"></i> Code valable pendant <span id="timerCount">120</span> secondes
+                        <br>
+                        <a class="resend-link" onclick="renvoyerCode()">Renvoyer le code</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <i class="bi bi-shield-check"></i> HYBRILINK-TECH | Votre partenaire tech de A à Z
+                <br>
+                <a href="creation-admin.html">Créer un compte administrateur</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
+    
+    <script>
+        // ============================================================
+        // ⭐ CONFIGURATION FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
+            authDomain: "fsa-unilu.firebaseapp.com",
+            projectId: "fsa-unilu",
+            storageBucket: "fsa-unilu.firebasestorage.app",
+            messagingSenderId: "36551990738",
+            appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        // ============================================================
+        // ⭐ CONFIGURATION DES CLOUD FUNCTIONS
+        // ============================================================
+        const functions = firebase.functions('us-central1');
+        
+        console.log('📡 Cloud Functions région: us-central1');
+        
+        // ============================================================
+        // ⭐ RÉFÉRENCES AUX CLOUD FUNCTIONS
+        // ============================================================
+        const sendCodeFunction = functions.httpsCallable('sendVerificationCode');
+        const verifyCodeFunction = functions.httpsCallable('verifyCode');
+        const resendCodeFunction = functions.httpsCallable('resendVerificationCode');
+        const verifyAdminFunction = functions.httpsCallable('verifyAdminSession');
+        
+        // ============================================================
+        // ⭐ VARIABLES GLOBALES
+        // ============================================================
+        let currentEmail = '';
+        let currentPassword = '';
+        let currentUserData = null;
+        let currentCode = '';
+        let codeExpireTimer = null;
+        let timerSeconds = 120;
+        let isVerifying = false;
+        let loginInProgress = false;
+        
+        // ============================================================
+        // ⭐ FONCTIONS 2FA AVEC CLOUD FUNCTIONS
+        // ============================================================
+        
+        function genererCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+        
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+        
+        async function envoyerCodeParEmail(email, code, nom, role) {
+            try {
+                showLoading(true);
+                
+                console.log('📧 Envoi du code via Cloud Function...');
+                console.log('📧 Email:', email);
+                console.log('🔐 Code:', code);
+                
+                const result = await sendCodeFunction({
+                    email: email,
+                    code: code,
+                    nom: nom || 'Administrateur',
+                    role: role || 'admin'
+                });
+                
+                console.log('✅ Réponse:', result.data);
+                showLoading(false);
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Erreur envoi email:', error);
+                console.error('❌ Code erreur:', error.code);
+                console.error('❌ Message:', error.message);
+                
+                showLoading(false);
+                
+                let errorMessage = 'Erreur lors de l\'envoi du code';
+                if (error.code === 'unauthenticated') {
+                    errorMessage = 'Vous devez être authentifié';
+                } else if (error.code === 'invalid-argument') {
+                    errorMessage = 'Données invalides';
+                } else if (error.code === 'resource-exhausted') {
+                    errorMessage = 'Trop de tentatives. Attendez 5 minutes.';
+                }
+                
+                showToast('❌ ' + errorMessage, 'danger');
+                return false;
+            }
+        }
+        
+        async function verifierCodeAvecFirebase(email, code) {
+            try {
+                const result = await verifyCodeFunction({
+                    email: email,
+                    code: code
+                });
+                return { success: true, data: result.data };
+            } catch (error) {
+                console.error('❌ Erreur vérification:', error);
+                let errorMessage = 'Code invalide';
+                if (error.code === 'not-found') {
+                    errorMessage = 'Code invalide ou expiré';
+                } else if (error.code === 'deadline-exceeded') {
+                    errorMessage = 'Le code a expiré';
+                }
+                return { success: false, message: errorMessage };
+            }
+        }
+        
+        async function renvoyerCodeAvecFirebase(email, nom, role) {
+            try {
+                const result = await resendCodeFunction({
+                    email: email,
+                    nom: nom || 'Administrateur',
+                    role: role || 'admin'
+                });
+                return { success: true, data: result.data };
+            } catch (error) {
+                console.error('❌ Erreur renvoi:', error);
+                return { success: false, message: error.message };
+            }
+        }
+        
+        async function envoyerCode() {
+            if (!currentEmail) return false;
+            
+            currentCode = genererCode();
+            showToast('📧 Envoi du code en cours...', 'info');
+            
+            const success = await envoyerCodeParEmail(
+                currentEmail, 
+                currentCode, 
+                currentUserData?.nomComplet || 'Administrateur',
+                'admin'
+            );
+            
+            if (success) {
+                document.getElementById('verifEmail').textContent = currentEmail;
+                document.getElementById('codeSentInfo').classList.add('show');
+                showToast('✅ Code envoyé sur votre email', 'success');
+                return true;
+            } else {
+                showToast('❌ Erreur lors de l\'envoi du code', 'danger');
+                return false;
+            }
+        }
+        
+        function afficherVerification() {
+            document.getElementById('loginFormContainer').style.display = 'none';
+            document.getElementById('verificationContainer').classList.add('active');
+            
+            document.querySelectorAll('.verification-code-input input').forEach(input => {
+                input.value = '';
+                input.className = '';
+            });
+            document.getElementById('codeError').style.display = 'none';
+            
+            setTimeout(() => {
+                document.getElementById('code1').focus();
+            }, 300);
+            
+            timerSeconds = 120;
+            document.getElementById('timerCount').textContent = timerSeconds;
+            
+            if (codeExpireTimer) clearInterval(codeExpireTimer);
+            codeExpireTimer = setInterval(() => {
+                timerSeconds--;
+                document.getElementById('timerCount').textContent = timerSeconds;
+                if (timerSeconds <= 0) {
+                    clearInterval(codeExpireTimer);
+                    document.getElementById('timerCount').textContent = '0';
+                    document.getElementById('btnVerifyCode').disabled = true;
+                    showToast('⏰ Le code a expiré. Cliquez sur "Renvoyer".', 'warning');
+                }
+            }, 1000);
+        }
+        
+        function annulerConnexion() {
+            clearInterval(codeExpireTimer);
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('verificationContainer').classList.remove('active');
+            document.getElementById('btnVerifyCode').disabled = false;
+            document.getElementById('btnVerifyCode').innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+            isVerifying = false;
+            currentEmail = '';
+            currentPassword = '';
+            currentCode = '';
+            document.getElementById('codeSentInfo').classList.remove('show');
+        }
+        
+        function renvoyerCode() {
+            if (isVerifying) return;
+            if (!currentEmail) return;
+            
+            showToast('📧 Envoi d\'un nouveau code...', 'info');
+            
+            renvoyerCodeAvecFirebase(currentEmail, currentUserData?.nomComplet, 'admin')
+                .then(result => {
+                    if (result.success) {
+                        timerSeconds = 120;
+                        document.getElementById('timerCount').textContent = timerSeconds;
+                        document.getElementById('btnVerifyCode').disabled = false;
+                        
+                        if (codeExpireTimer) clearInterval(codeExpireTimer);
+                        codeExpireTimer = setInterval(() => {
+                            timerSeconds--;
+                            document.getElementById('timerCount').textContent = timerSeconds;
+                            if (timerSeconds <= 0) {
+                                clearInterval(codeExpireTimer);
+                                document.getElementById('timerCount').textContent = '0';
+                                document.getElementById('btnVerifyCode').disabled = true;
+                                showToast('⏰ Le code a expiré. Cliquez sur "Renvoyer".', 'warning');
+                            }
+                        }, 1000);
+                        
+                        document.querySelectorAll('.verification-code-input input').forEach(input => {
+                            input.value = '';
+                            input.className = '';
+                        });
+                        document.getElementById('codeError').style.display = 'none';
+                        document.getElementById('code1').focus();
+                        
+                        showToast('📧 Nouveau code envoyé', 'success');
+                    } else {
+                        showToast('❌ ' + (result.message || 'Erreur lors du renvoi'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    showToast('❌ Erreur: ' + error.message, 'danger');
+                });
+        }
+        
+        function getCodeFromInputs() {
+            let code = '';
+            for (let i = 1; i <= 6; i++) {
+                const input = document.getElementById(`code${i}`);
+                if (input) code += input.value;
+            }
+            return code;
+        }
+        
+        async function verifierCode() {
+            if (isVerifying) return;
+            if (timerSeconds <= 0) {
+                showToast('⏰ Le code a expiré. Cliquez sur "Renvoyer".', 'warning');
+                return;
+            }
+            
+            const codeSaisi = getCodeFromInputs();
+            
+            if (codeSaisi.length !== 6) {
+                document.getElementById('codeError').style.display = 'block';
+                document.getElementById('codeError').innerHTML = '<i class="bi bi-exclamation-circle"></i> Veuillez entrer les 6 chiffres du code.';
+                return;
+            }
+            
+            isVerifying = true;
+            const btn = document.getElementById('btnVerifyCode');
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Vérification...';
+            btn.disabled = true;
+            
+            try {
+                const result = await verifierCodeAvecFirebase(currentEmail, codeSaisi);
+                
+                if (!result.success) {
+                    document.getElementById('codeError').style.display = 'block';
+                    document.getElementById('codeError').innerHTML = `<i class="bi bi-exclamation-circle"></i> ${result.message}`;
+                    
+                    document.querySelectorAll('.verification-code-input input').forEach(input => {
+                        input.classList.add('error');
+                        setTimeout(() => input.classList.remove('error'), 500);
+                    });
+                    
+                    isVerifying = false;
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+                    btn.disabled = false;
+                    return;
+                }
+                
+                document.querySelectorAll('.verification-code-input input').forEach(input => {
+                    input.classList.add('correct');
+                });
+                
+                document.getElementById('codeError').style.display = 'none';
+                clearInterval(codeExpireTimer);
+                await finaliserConnexion();
+                
+            } catch (error) {
+                console.error('Erreur vérification:', error);
+                showToast('❌ Erreur: ' + error.message, 'danger');
+                isVerifying = false;
+                btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
+                btn.disabled = false;
+            }
+        }
+        
+        async function finaliserConnexion() {
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(currentEmail, currentPassword);
+                const uid = userCredential.user.uid;
+                
+                const userDoc = await db.collection('utilisateurs').doc(uid).get();
+                
+                if (!userDoc.exists) {
+                    showToast('❌ Compte non trouvé', 'danger');
+                    await auth.signOut();
+                    annulerConnexion();
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                
+                if (userData.role !== 'admin') {
+                    showToast('❌ Accès non autorisé', 'danger');
+                    await auth.signOut();
+                    annulerConnexion();
+                    return;
+                }
+                
+                const sessionData = {
+                    uid: uid,
+                    id: uid,
+                    nomComplet: userData.nomComplet,
+                    email: userData.email,
+                    role: userData.role,
+                    verified2FA: true,
+                    expires: Date.now() + (8 * 60 * 60 * 1000)
+                };
+                
+                localStorage.setItem('admin_user', JSON.stringify(sessionData));
+                
+                await db.collection('utilisateurs').doc(uid).update({
+                    derniereConnexion: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(() => {});
+                
+                showToast('✅ Connexion réussie ! Bienvenue Administrateur', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Erreur finalisation:', error);
+                showToast('❌ Erreur: ' + error.message, 'danger');
+                annulerConnexion();
+            }
+        }
+        
+        // ============================================================
+        // ⭐ AUTO-COMPLÉTION DES CHAMPS DE CODE
+        // ============================================================
+        document.querySelectorAll('.verification-code-input input').forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+                
+                if (this.value.length === 1) {
+                    if (index < 5) {
+                        document.getElementById(`code${index + 2}`).focus();
+                    } else {
+                        document.getElementById('btnVerifyCode').click();
+                    }
+                }
+                
+                document.getElementById('codeError').style.display = 'none';
+                this.classList.remove('error', 'correct');
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    document.getElementById(`code${index}`).focus();
+                }
+                if (e.key === 'Enter') {
+                    document.getElementById('btnVerifyCode').click();
+                }
+            });
+            
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                const digits = paste.replace(/\D/g, '').slice(0, 6);
+                for (let i = 0; i < digits.length && i < 6; i++) {
+                    const field = document.getElementById(`code${i + 1}`);
+                    if (field) {
+                        field.value = digits[i];
+                    }
+                }
+                const lastIndex = Math.min(digits.length, 5);
+                if (lastIndex < 5) {
+                    document.getElementById(`code${lastIndex + 1}`).focus();
+                }
+                if (digits.length === 6) {
+                    document.getElementById('btnVerifyCode').click();
+                }
+            });
+        });
+        
+        // ============================================================
+        // ⭐ FONCTIONS UTILITAIRES
+        // ============================================================
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : (type === 'info' ? '#17a2b8' : '#dc3545'));
+            const textColor = type === 'warning' ? '#333' : 'white';
+            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : (type === 'info' ? 'info-circle-fill' : 'x-circle-fill'));
+            
+            const toastHtml = `
+                <div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
+                    <div class="toast-body">
+                        <i class="bi bi-${icon} me-2"></i>
+                        ${message}
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', toastHtml);
+            setTimeout(() => container.firstElementChild?.remove(), 5000);
+        }
+        
+        // ============================================================
+        // ⭐ FORMULAIRE DE CONNEXION
+        // ============================================================
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (isVerifying || loginInProgress) return;
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showToast('Veuillez remplir tous les champs', 'warning');
+                return;
+            }
+            
+            loginInProgress = true;
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connexion...';
+            
+            try {
+                const usersRef = db.collection('utilisateurs');
+                const q = await usersRef.where('email', '==', email).where('role', '==', 'admin').get();
+                
+                if (q.empty) {
+                    showToast('❌ Email ou mot de passe incorrect', 'danger');
+                    loginInProgress = false;
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    return;
+                }
+                
+                let userFound = null;
+                q.forEach(doc => {
+                    userFound = { id: doc.id, ...doc.data() };
+                });
+                
+                if (!userFound) {
+                    showToast('❌ Compte non trouvé', 'danger');
+                    loginInProgress = false;
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    return;
+                }
+                
+                try {
+                    const tempUser = await auth.signInWithEmailAndPassword(email, password);
+                    await auth.signOut();
+                } catch (authError) {
+                    if (authError.code === 'auth/user-not-found') {
+                        try {
+                            const newUser = await auth.createUserWithEmailAndPassword(email, password);
+                            await newUser.user.delete();
+                            await auth.signOut();
+                        } catch (createError) {
+                            if (createError.code !== 'auth/email-already-in-use') {
+                                showToast('❌ Email ou mot de passe incorrect', 'danger');
+                                loginInProgress = false;
+                                btn.disabled = false;
+                                btn.innerHTML = originalText;
+                                return;
+                            }
+                        }
+                    } else if (authError.code === 'auth/wrong-password') {
+                        showToast('❌ Email ou mot de passe incorrect', 'danger');
+                        loginInProgress = false;
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        return;
+                    } else {
+                        showToast('❌ Erreur: ' + authError.message, 'danger');
+                        loginInProgress = false;
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        return;
+                    }
+                }
+                
+                currentEmail = email;
+                currentPassword = password;
+                currentUserData = userFound;
+                
+                const codeEnvoye = await envoyerCode();
+                
+                if (!codeEnvoye) {
+                    showToast('❌ Erreur lors de l\'envoi du code de vérification', 'danger');
+                    loginInProgress = false;
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    return;
+                }
+                
+                afficherVerification();
+                document.getElementById('loginForm').reset();
+                loginInProgress = false;
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                showToast('❌ Erreur: ' + error.message, 'danger');
+                loginInProgress = false;
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+        
+        // ============================================================
+        // ⭐ VÉRIFICATION DE SESSION EXISTANTE
+        // ============================================================
+        
+        function checkExistingSession() {
+            const session = localStorage.getItem('admin_user');
+            if (session) {
+                try {
+                    const sessionData = JSON.parse(session);
+                    if (Date.now() < sessionData.expires && sessionData.verified2FA === true) {
+                        window.location.href = 'index.html';
+                        return true;
+                    } else {
+                        localStorage.removeItem('admin_user');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('admin_user');
+                }
+            }
+            return false;
+        }
+        
+        // ============================================================
+        // ⭐ INITIALISATION
+        // ============================================================
+        
+        if (!checkExistingSession()) {
+            document.getElementById('email').focus();
+        }
+        
+        window.verifierCode = verifierCode;
+        window.annulerConnexion = annulerConnexion;
+        window.renvoyerCode = renvoyerCode;
+        
+        console.log('✅ Page de connexion Administration - Sécurisée avec Cloud Functions');
+        console.log('📡 Région: us-central1');
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
+            });
+        }
+    </script>
+</body>
+</html>

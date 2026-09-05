@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Super Administration - Faculté Agronomique</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Hybrilink Super Admin">
+    <meta name="description" content="Gestion administrative complète">
+    <meta name="theme-color" content="#003366">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <link rel="icon" type="image/png" href="icon-96x96.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary-blue: #003366; --dark-blue: #002244; --accent-yellow: #ffb347; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar-custom { background: var(--primary-blue); box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding: 10px 0; }
+        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; transition: all 0.3s; }
+        .btn-action:hover { background: var(--dark-blue); transform: translateY(-2px); }
+        .btn-danger-custom { background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 10px; }
+        .btn-danger-custom:hover { background: #c82333; }
+        .btn-success-custom { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 10px; }
+        .btn-success-custom:hover { background: #1e7e34; }
+        .btn-warning-custom { background: var(--accent-yellow); color: var(--primary-blue); border: none; padding: 10px 20px; border-radius: 10px; }
+        .btn-info-custom { background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 10px; }
+        .btn-info-custom:hover { background: #138496; }
+        .card { border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card-header { background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); color: white; border-radius: 15px 15px 0 0; padding: 15px 20px; }
+        .card-header.bg-success { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .card-header.bg-warning { background: linear-gradient(135deg, #ffc107, #e0a800); color: var(--primary-blue); }
+        .card-header.bg-info { background: linear-gradient(135deg, #17a2b8, #0f6b7a); }
+        .card-header.bg-secondary { background: linear-gradient(135deg, #6c757d, #5a6268); }
+        .card-header.bg-professor { background: linear-gradient(135deg, #6f42c1, #5a379a); }
+        .back-btn { background: var(--accent-yellow); color: var(--primary-blue); border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .back-btn:hover { background: #ff9800; transform: translateY(-2px); color: var(--primary-blue); }
+        .toast-notification { position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; }
+        .notification-toast { animation: slideInRight 0.3s ease-out; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .promotion-transfer-card { background: #f8f9fa; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .promotion-selector { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center; }
+        .promotion-selector select { flex: 1; min-width: 200px; padding: 12px; border-radius: 10px; border: 2px solid #dee2e6; }
+        .transfer-icon { font-size: 40px; color: var(--accent-yellow); }
+        .promotions-checkbox-group { background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #dee2e6; max-height: 300px; overflow-y: auto; }
+        .promotion-checkbox-item { margin-bottom: 8px; padding: 5px; border-radius: 5px; transition: all 0.2s; }
+        .promotion-checkbox-item:hover { background: #e9ecef; }
+        .promotion-checkbox-item input { margin-right: 10px; cursor: pointer; transform: scale(1.1); }
+        .checkbox-select-all { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #dee2e6; }
+        .menu-buttons { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; justify-content: center; }
+        .menu-btn { background: white; border: 2px solid var(--primary-blue); color: var(--primary-blue); padding: 12px 25px; border-radius: 50px; cursor: pointer; transition: all 0.3s; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; }
+        .menu-btn:hover, .menu-btn.active { background: var(--primary-blue); color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .menu-btn.professor-btn { border-color: #6f42c1; color: #6f42c1; }
+        .menu-btn.professor-btn:hover, .menu-btn.professor-btn.active { background: #6f42c1; color: white; }
+        .menu-btn.migration-btn { border-color: #dc3545; color: #dc3545; }
+        .menu-btn.migration-btn:hover, .menu-btn.migration-btn.active { background: #dc3545; color: white; }
+        .form-section { display: none; animation: fadeIn 0.3s ease; }
+        .form-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .matricule-example { font-family: monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .excel-format-info { background: #e8f4fd; border-left: 4px solid #003366; padding: 10px 15px; border-radius: 8px; margin-top: 10px; }
+        .import-preview { background: #f8f9fa; border-radius: 10px; padding: 15px; margin-top: 15px; max-height: 400px; overflow-y: auto; }
+        .progress-bar-custom { height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: #28a745; width: 0%; transition: width 0.3s; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-blue); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .app-container { display: block; flex: 1; }
+        .refresh-btn { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
+        .refresh-btn:hover { background: #218838; transform: rotate(180deg); }
+        .refresh-btn i { transition: transform 0.3s; }
+        .refresh-btn:hover i { transform: rotate(180deg); }
+        .sync-status { font-size: 12px; padding: 5px 10px; border-radius: 20px; background: #28a745; color: white; display: inline-flex; align-items: center; gap: 5px; }
+        .sync-status.offline { background: #dc3545; }
+        .last-update-badge { font-size: 11px; color: #888; margin-left: 10px; font-weight: normal; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 550px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease; }
+        @keyframes modalSlideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        .modal-header h4 { margin: 0; color: var(--primary-blue); font-weight: bold; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; transition: color 0.2s; }
+        .modal-close:hover { color: #dc3545; }
+        .modal-actions { display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px; }
+        .promotion-btn { background: #f8f9fa; border: 2px solid #003366; color: #003366; padding: 8px 15px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .promotion-btn:hover, .promotion-btn.active { background: #003366; color: white; transform: translateY(-2px); }
+        .semester-config-card { background: linear-gradient(135deg, #667eea20, #764ba220); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .fiche-selector-item { background: white; border-radius: 10px; padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--primary-blue); }
+        .semester-badge { font-size: 14px; padding: 5px 12px; border-radius: 20px; background: var(--primary-blue); color: white; }
+        .semester-badge.premier { background: #28a745; }
+        .semester-badge.deuxieme { background: #ff9800; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .search-export-bar { background: #f8f9fa; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+        .search-group { flex: 1; min-width: 200px; }
+        .search-input-group { position: relative; }
+        .search-input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+        .search-input-group input { padding-left: 35px; }
+        .clear-search { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; display: none; }
+        .etudiants-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .etudiants-table th { background: var(--primary-blue); color: white; padding: 12px 15px; text-align: left; }
+        .etudiants-table td { padding: 12px 15px; border-bottom: 1px solid #e0e0e0; }
+        .etudiants-table tr:hover { background: #f8f9fa; }
+        .badge-offline { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .role-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .role-badge.admin { background: #dc3545; color: white; }
+        .role-badge.comptabilite { background: #17a2b8; color: white; }
+        .role-badge.academique { background: #28a745; color: white; }
+        .role-badge.professeur { background: #6f42c1; color: white; }
+        .professor-info-card { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 25px; margin-bottom: 20px; border-left: 5px solid #6f42c1; }
+
+        .promotion-semestre-config {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-blue);
+            transition: all 0.3s;
+        }
+        .promotion-semestre-config:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .promotion-semestre-config .promo-title {
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .promotion-semestre-config .fiche-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .promotion-semestre-config .fiche-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .promotion-semestre-config .fiche-item input[type="checkbox"] {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .promo-config-status {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .promo-config-status .badge-fiche {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 3px;
+        }
+        .promo-config-status .badge-fiche.premier {
+            background: #28a745;
+        }
+        .promo-config-status .badge-fiche.deuxieme {
+            background: #ff9800;
+        }
+        .save-promo-config-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .save-promo-config-btn:hover {
+            background: var(--dark-blue);
+            transform: translateY(-2px);
+        }
+        .config-progress {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .config-progress .progress-bar-fill {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .promotion-selector-config {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .promotion-selector-config .promo-select-btn {
+            padding: 8px 20px;
+            border: 2px solid var(--primary-blue);
+            background: white;
+            color: var(--primary-blue);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .promotion-selector-config .promo-select-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .promotion-selector-config .promo-select-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .promotion-selector-config .promo-select-btn .promo-count {
+            background: rgba(255,255,255,0.3);
+            padding: 0 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        .promotion-selector-config .promo-select-btn.active .promo-count {
+            background: rgba(255,255,255,0.2);
+        }
+        .auth-status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .auth-status-badge.exists { background: #28a745; color: white; }
+        .auth-status-badge.missing { background: #dc3545; color: white; }
+        .auth-status-badge.pending { background: #ffc107; color: #333; }
+        
+        .footer { background: #1a1a2e; color: #fff; text-align: center; padding: 15px 0; margin-top: auto; font-size: 14px; }
+        .footer a { color: var(--accent-yellow); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .logout-btn { background: #dc3545; color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .logout-btn:hover { background: #c82333; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div id="appContainer" class="app-container">
+        <nav class="navbar navbar-custom">
+            <div class="container">
+                <a class="navbar-brand text-white" href="#"><i class="bi bi-gear-fill"></i> Super Administration - Faculté Agronomique</a>
+                <div class="d-flex align-items-center gap-3">
+                    <div id="syncStatus" class="sync-status"><i class="bi bi-cloud-check"></i> Synchro</div>
+                    <button class="logout-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Déconnexion</button>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container mt-4" style="flex: 1;">
+            <div id="toastContainer" class="toast-notification"></div>
+            <div class="badge-offline" id="offlineIndicator" style="display: none;">
+                <span class="badge bg-warning text-dark"><i class="bi bi-wifi-off"></i> Mode hors-ligne</span>
+            </div>
+            
+            <!-- Menu des formulaires -->
+            <div class="menu-buttons">
+                <button class="menu-btn" data-section="annee"><i class="bi bi-calendar-week-fill"></i> Année Académique</button>
+                <button class="menu-btn" data-section="compta"><i class="bi bi-person-badge-fill"></i> Compte Comptabilité</button>
+                <button class="menu-btn" data-section="academique"><i class="bi bi-book-fill"></i> Compte Académique</button>
+                <button class="menu-btn professor-btn" data-section="professeur"><i class="bi bi-person-workspace"></i> Professeur</button>
+                <button class="menu-btn" data-section="promotion"><i class="bi bi-trophy-fill"></i> Promotion</button>
+                <button class="menu-btn" data-section="fiche"><i class="bi bi-file-text-fill"></i> Fiche</button>
+                <button class="menu-btn" data-section="etudiant"><i class="bi bi-mortarboard-fill"></i> Étudiant</button>
+                <button class="menu-btn" data-section="semestre"><i class="bi bi-calendar2-week-fill"></i> Config. Semestres</button>
+                <button class="menu-btn" data-section="transfert"><i class="bi bi-arrow-left-right"></i> Transfert Promotion</button>
+                <button class="menu-btn migration-btn" data-section="migration"><i class="bi bi-arrow-repeat"></i> Migration Auth</button>
+            </div>
+            
+            <!-- Section Année Académique -->
+            <div id="section-annee" class="form-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-calendar-week-fill"></i> Années Académiques</h5>
+                            <button class="refresh-btn" id="refreshAnneesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="anneeForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom année académique</label>
+                                    <input type="text" class="form-control" id="nomAnnee" required placeholder="Ex: 2025-2026">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Statut</label>
+                                    <select class="form-select" id="statutAnnee">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action">Créer année académique</button>
+                        </form>
+                        <hr>
+                        <h6>Liste des années existantes <span id="anneeLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="anneesListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Comptabilité -->
+            <div id="section-compta" class="form-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-person-badge-fill"></i> Comptes Comptabilité</h5>
+                            <button class="refresh-btn" id="refreshComptesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <i class="bi bi-shield-lock-fill"></i> 
+                            <strong>Sécurisé :</strong> Les comptes sont créés dans Firebase Authentication.
+                        </div>
+                        <form id="comptaForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom complet</label>
+                                    <input type="text" class="form-control" id="nomCompta" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="emailCompta" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="passwordCompta" required minlength="6">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Confirmer</label>
+                                    <input type="password" class="form-control" id="confirmPasswordCompta" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action">Créer compte comptabilité</button>
+                        </form>
+                        <hr>
+                        <h6>Liste des comptes existants <span id="compteLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="comptesListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECTION COMPTE ACADÉMIQUE -->
+            <div id="section-academique" class="form-section">
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-book-fill"></i> Comptes Académiques</h5>
+                            <button class="refresh-btn" id="refreshAcademiquesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <i class="bi bi-shield-lock-fill"></i> 
+                            <strong>Sécurisé :</strong> Les comptes sont créés dans Firebase Authentication.
+                        </div>
+                        <form id="academiqueForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom complet</label>
+                                    <input type="text" class="form-control" id="nomAcademique" required placeholder="Ex: Prof. Jean KASONGO">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="emailAcademique" required placeholder="prof@fsa-unilu.com">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="passwordAcademique" required minlength="6">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Confirmer mot de passe</label>
+                                    <input type="password" class="form-control" id="confirmPasswordAcademique" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-success-custom">Créer compte académique</button>
+                        </form>
+                        <hr>
+                        <h6>Liste des comptes académiques existants <span id="academiqueLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="academiquesListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECTION PROFESSEUR -->
+            <div id="section-professeur" class="form-section">
+                <div class="card">
+                    <div class="card-header bg-professor">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-person-workspace"></i> Comptes Professeurs</h5>
+                            <button class="refresh-btn" id="refreshProfesseursBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <i class="bi bi-shield-lock-fill"></i> 
+                            <strong>Sécurisé :</strong> Les comptes sont créés dans Firebase Authentication.
+                        </div>
+                        <div class="professor-info-card">
+                            <h6><i class="bi bi-info-circle-fill"></i> Informations sur le compte professeur</h6>
+                            <p class="mb-0">Les professeurs pourront accéder à leur espace dédié avec des fonctionnalités spécifiques à l'enseignement.</p>
+                        </div>
+                        
+                        <form id="professeurForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom complet du professeur</label>
+                                    <input type="text" class="form-control" id="nomProfesseur" required placeholder="Ex: Dr. Pierre LUMUMBA">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email professionnel</label>
+                                    <input type="email" class="form-control" id="emailProfesseur" required placeholder="professeur@fsa-unilu.com">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="passwordProfesseur" required placeholder="Minimum 6 caractères" minlength="6">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Confirmer mot de passe</label>
+                                    <input type="password" class="form-control" id="confirmPasswordProfesseur" required placeholder="Retaper le mot de passe" minlength="6">
+                                </div>
+<div class="col-md-6 mb-3">
+    <label class="form-label">Numéro de téléphone</label>
+    <input type="tel" class="form-control" id="telephoneProfesseur" placeholder="Ex: +243 999 999 999" required>
+</div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Spécialité</label>
+                                    <input type="text" class="form-control" id="specialiteProfesseur" placeholder="Ex: Agronomie, Économie rurale..." required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Département</label>
+                                    <select class="form-select" id="departementProfesseur">
+                                        <option value="">Sélectionner un département</option>
+                                        <option value="Agronomie Générale">Agronomie Générale</option>
+                                        <option value="Économie Agricole">Économie Agricole</option>
+                                        <option value="Sciences du Sol">Sciences du Sol</option>
+                                        <option value="Protection des Végétaux">Protection des Végétaux</option>
+                                        <option value="Zootechnie">Zootechnie</option>
+                                        <option value="Génie Rural">Génie Rural</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action" style="background: #6f42c1; border-color: #6f42c1;">
+                                <i class="bi bi-person-plus-fill"></i> Créer compte professeur
+                            </button>
+                        </form>
+                        <hr>
+                        <h6>Liste des professeurs <span id="professeurLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="professeursListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Promotions -->
+            <div id="section-promotion" class="form-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-trophy-fill"></i> Promotions</h5>
+                            <button class="refresh-btn" id="refreshPromotionsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="promotionForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom promotion</label>
+                                    <input type="text" class="form-control" id="nomPromotion" required placeholder="Ex: Bac 1 AGM">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Capacité</label>
+                                    <input type="number" class="form-control" id="capacitePromotion" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action">Créer promotion</button>
+                        </form>
+                        <hr>
+                        <h6>Liste des promotions existantes <span id="promotionLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="promotionsListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Fiches -->
+            <div id="section-fiche" class="form-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-file-text-fill"></i> Fiches</h5>
+                            <button class="refresh-btn" id="refreshFichesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="ficheForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom fiche</label>
+                                    <input type="text" class="form-control" id="nomFiche" required placeholder="Ex: Frais académique">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Montant (FC)</label>
+                                    <input type="number" class="form-control" id="montantFiche" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-checkbox-multiple"></i> Promotions concernées</label>
+                                <div id="promotionsCheckboxGroup" class="promotions-checkbox-group">
+                                    <div class="checkbox-select-all">
+                                        <input type="checkbox" id="selectAllPromotions"> 
+                                        <label for="selectAllPromotions"><strong>Sélectionner toutes les promotions</strong></label>
+                                    </div>
+                                    <div id="promotionsCheckboxList">Chargement des promotions...</div>
+                                </div>
+                                <small class="text-muted">Sélectionnez une ou plusieurs promotions pour cette fiche</small>
+                            </div>
+                            <button type="submit" class="btn-action">Créer fiche</button>
+                        </form>
+                        <hr>
+                        <h6>Liste des fiches existantes <span id="ficheLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="fichesListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Configuration Semestres -->
+            <div id="section-semestre" class="form-section">
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-calendar2-week-fill"></i> Configuration des semestres par promotion</h5>
+                            <button class="refresh-btn" id="refreshSemestreConfigBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill"></i> 
+                            <strong>Configuration personnalisée par promotion</strong><br>
+                            Sélectionnez une promotion pour configurer les fiches requises pour chaque semestre.
+                        </div>
+                        
+                        <!-- Sélecteur de promotion -->
+                        <div class="promotion-selector-config" id="promotionSelectorConfig">
+                            <button class="promo-select-btn active" data-promo="all">📋 Toutes les promotions <span class="promo-count" id="totalPromoCount">0</span></button>
+                        </div>
+                        
+                        <!-- Zone de configuration -->
+                        <div id="promotionConfigContainer">
+                            <div class="text-center py-4">
+                                <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.3;"></i>
+                                <p class="text-muted mt-3">Sélectionnez une promotion ci-dessus pour configurer ses semestres</p>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Résumé des configurations -->
+                        <div class="card mt-3">
+                            <div class="card-header bg-secondary">
+                                <h6 class="mb-0"><i class="bi bi-list-check"></i> Résumé des configurations</h6>
+                            </div>
+                            <div class="card-body" id="configSummaryContainer">
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-hourglass-split"></i> Chargement des configurations...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Étudiant -->
+            <div id="section-etudiant" class="form-section">
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <div class="panel-header" style="margin-bottom: 0;">
+                            <h5 class="mb-0"><i class="bi bi-person-plus"></i> Ajouter un étudiant</h5>
+                            <button class="refresh-btn" id="refreshEtudiantsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> 
+                            <strong>Matricule:</strong> Format <span class="matricule-example">2026471ET</span> (7 chiffres + "ET") - Généré automatiquement
+                        </div>
+                        
+                        <form id="etudiantForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom complet</label>
+                                    <input type="text" class="form-control" id="nomEtudiant" required placeholder="Ex: Jean MUKENDI">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Promotion</label>
+                                    <select class="form-select" id="promotionEtudiant" required>
+                                        <option value="">Chargement...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action"><i class="bi bi-save"></i> Créer l'étudiant</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Import Excel -->
+                <div class="card mt-3">
+                    <div class="card-header bg-info">
+                        <h5 class="mb-0"><i class="bi bi-file-excel"></i> Import Excel en masse</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Promotion</label>
+                                <select class="form-select" id="importPromotionSelect" required>
+                                    <option value="">Chargement...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fichier Excel</label>
+                                <input type="file" class="form-control" id="excelFileInput" accept=".xlsx, .xls">
+                            </div>
+                        </div>
+                        
+                        <div class="excel-format-info">
+                            <i class="bi bi-file-earmark-excel-fill"></i> 
+                            <strong>Format attendu:</strong> La colonne B (2ème colonne) doit contenir les noms complets des étudiants.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button class="btn-success-custom" id="previewExcelBtn" disabled>
+                                <i class="bi bi-eye"></i> Aperçu
+                            </button>
+                            <button class="btn-action ms-2" id="importExcelBtn" disabled>
+                                <i class="bi bi-cloud-upload"></i> Importer
+                            </button>
+                            <a href="#" class="btn btn-outline-secondary ms-2" id="downloadTemplateBtn">
+                                <i class="bi bi-download"></i> Télécharger le modèle
+                            </a>
+                        </div>
+                        
+                        <div id="importPreview" class="import-preview" style="display:none;">
+                            <h6><i class="bi bi-table"></i> Aperçu des données</h6>
+                            <div id="previewTable"></div>
+                            <div id="importProgress" class="progress-bar-custom" style="display:none;">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Liste des étudiants -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-people-fill"></i> Liste des étudiants <span id="etudiantLastUpdate" class="last-update-badge"></span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="promotionButtons" class="promotion-buttons" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;"></div>
+                        <div class="search-export-bar">
+                            <div class="search-group">
+                                <label><i class="bi bi-search"></i> Rechercher un étudiant</label>
+                                <div class="search-input-group">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="form-control" id="searchEtudiantList" placeholder="Nom, matricule...">
+                                    <i class="bi bi-x-circle-fill clear-search" id="clearSearchEtudiant" style="cursor:pointer;display:none;"></i>
+                                </div>
+                            </div>
+                            <div class="export-group" style="display: flex; gap: 10px;">
+                                <button class="btn-action" id="exportExcelListBtn" style="background: #28a745;"><i class="bi bi-file-excel"></i> Excel</button>
+                                <button class="btn-action" id="exportCsvListBtn"><i class="bi bi-file-text"></i> CSV</button>
+                            </div>
+                        </div>
+                        <div id="etudiantsListeAdmin"><div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;"><i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i><h5 class="mt-3">Sélectionnez une promotion</h5><p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p></div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Transfert -->
+            <div id="section-transfert" class="form-section">
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0"><i class="bi bi-arrow-left-right"></i> Transfert d'étudiants entre promotions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="promotion-transfer-card">
+                            <div class="promotion-selector">
+                                <select id="promotionSource" class="form-select">
+                                    <option value="">Sélectionner promotion source</option>
+                                </select>
+                                <i class="bi bi-arrow-right-short transfer-icon"></i>
+                                <select id="promotionDestination" class="form-select">
+                                    <option value="">Sélectionner promotion destination</option>
+                                </select>
+                                <button class="btn-success-custom" id="transfererEtudiantsBtn">
+                                    <i class="bi bi-arrow-repeat"></i> Transférer tous les étudiants
+                                </button>
+                            </div>
+                            <div id="transferInfo" class="mt-3 text-center text-muted"></div>
+                        </div>
+                        <div id="transferResultat" style="display: none;" class="alert"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECTION MIGRATION VERS AUTH -->
+            <div id="section-migration" class="form-section">
+                <div class="card">
+                    <div class="card-header" style="background: #dc3545; color: white;">
+                        <h5 class="mb-0"><i class="bi bi-arrow-repeat"></i> Migration vers Firebase Auth</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <strong>Attention :</strong> Cette section permet de migrer les comptes existants (comptabilité, académique, professeurs) vers Firebase Authentication.
+                            <br>Les mots de passe seront conservés.
+                        </div>
+                        
+                        <div id="migrationStatus" class="mb-3"></div>
+                        
+                        <div class="d-flex gap-3 flex-wrap">
+                            <button class="btn btn-danger" id="migrateAllBtn">
+                                <i class="bi bi-arrow-repeat"></i> Migrer tous les comptes vers Auth
+                            </button>
+                            <button class="btn btn-warning" id="checkAuthStatusBtn">
+                                <i class="bi bi-check-circle"></i> Vérifier le statut Auth
+                            </button>
+                            <button class="btn btn-danger-custom" id="cleanupBtn" style="background: #dc3545;" disabled>
+                                <i class="bi bi-trash"></i> Supprimer la collection utilisateurs
+                            </button>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h6>Liste des comptes existants <span id="migrationLastUpdate" class="last-update-badge"></span></h6>
+                        <div id="migrationListe" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p class="mb-0">© 2024 HYBRILINK-TECH | Votre partenaire tech de A à Z</p>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script>
+        // ============================================================
+        // ⭐ CONFIGURATION FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
+            authDomain: "fsa-unilu.firebaseapp.com",
+            projectId: "fsa-unilu",
+            storageBucket: "fsa-unilu.firebasestorage.app",
+            messagingSenderId: "36551990738",
+            appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        db.enablePersistence({ synchronizeTabs: true })
+            .then(() => console.log('✅ Persistance Firestore activée'))
+            .catch((err) => console.warn('Persistance non activée:', err));
+        
+        // ============================================================
+        // ⭐ VÉRIFICATION DE SESSION ADMIN
+        // ============================================================
+        function checkAdminSession() {
+            const sessionStr = localStorage.getItem('admin_user');
+            if (!sessionStr) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            try {
+                const session = JSON.parse(sessionStr);
+                if (Date.now() > session.expires || session.role !== 'admin' || !session.verified2FA) {
+                    localStorage.removeItem('admin_user');
+                    window.location.href = 'login.html';
+                    return null;
+                }
+                return session;
+            } catch (e) {
+                localStorage.removeItem('admin_user');
+                window.location.href = 'login.html';
+                return null;
+            }
+        }
+        
+        const currentAdmin = checkAdminSession();
+        if (!currentAdmin) {
+            // Redirection déjà effectuée
+        } else {
+            console.log('✅ Admin connecté:', currentAdmin.nomComplet);
+        }
+        
+        // ============================================================
+        // ⭐ DÉCONNEXION
+        // ============================================================
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+            } catch(e) {}
+            localStorage.removeItem('admin_user');
+            window.location.href = 'login.html';
+        });
+        
+        // ============================================================
+        // ⭐ SYSTÈME DE CACHE
+        // ============================================================
+        class StaticDataCache {
+            constructor() {
+                this.cache = {};
+                this.CACHE_DURATION = 5 * 60 * 1000;
+            }
+            
+            async getCollection(collectionName, forceRefresh = false) {
+                const now = Date.now();
+                if (!forceRefresh && this.cache[collectionName] && 
+                    now - this.cache[collectionName].timestamp < this.CACHE_DURATION) {
+                    console.log(`📦 Cache utilisé pour ${collectionName}`);
+                    return this.cache[collectionName].data;
+                }
+                return this.refreshCollection(collectionName);
+            }
+            
+            async refreshCollection(collectionName) {
+                const cachedData = this.cache[collectionName]?.data;
+                if (cachedData && cachedData.length > 0) {
+                    return cachedData;
+                }
+                try {
+                    const snapshot = await db.collection(collectionName).get({ source: 'cache' });
+                    let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    this.cache[collectionName] = { data: data, timestamp: Date.now() };
+                    return data;
+                } catch (error) {
+                    console.warn(`Erreur chargement ${collectionName}:`, error);
+                    return [];
+                }
+            }
+        }
+        
+        const staticCache = new StaticDataCache();
+        
+        // ============================================================
+        // ⭐ VARIABLES GLOBALES
+        // ============================================================
+        let allPromotions = [];
+        let allEtudiants = [];
+        let allAnnees = [];
+        let allFiches = [];
+        let allUtilisateurs = [];
+        let allAcademiques = [];
+        let allProfesseurs = [];
+        let currentSelectedPromotion = null;
+        let currentSearchTerm = '';
+        let isOnline = navigator.onLine;
+        let isMigrating = false;
+        
+        let promoConfigs = {};
+        let currentSelectedPromoForConfig = null;
+        
+        let lastUpdates = {
+            annees: null,
+            comptes: null,
+            academiques: null,
+            professeurs: null,
+            promotions: null,
+            fiches: null,
+            etudiants: null,
+            migration: null
+        };
+        
+        // ============================================================
+        // ⭐ FONCTIONS UTILITAIRES
+        // ============================================================
+        function updateSyncStatus(online) {
+            const statusEl = document.getElementById('syncStatus');
+            if (!statusEl) return;
+            if (!online) {
+                statusEl.innerHTML = '<i class="bi bi-cloud-off"></i> Hors-ligne';
+                statusEl.className = 'sync-status offline';
+            } else {
+                statusEl.innerHTML = '<i class="bi bi-cloud-check"></i> Synchro';
+                statusEl.className = 'sync-status';
+            }
+        }
+        
+        function updateLastUpdateDisplay(collection) {
+            const elementId = `${collection}LastUpdate`;
+            const element = document.getElementById(elementId);
+            if (element && lastUpdates[collection]) {
+                const date = new Date(lastUpdates[collection]);
+                element.innerHTML = `Dernière mise à jour: ${date.toLocaleTimeString()}`;
+            }
+        }
+        
+        window.addEventListener('online', () => {
+            isOnline = true;
+            updateSyncStatus(true);
+            document.getElementById('offlineIndicator').style.display = 'none';
+            showToast('🟢 Connecté - Synchronisation en cours', 'success');
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            updateSyncStatus(false);
+            document.getElementById('offlineIndicator').style.display = 'block';
+            showToast('🔴 Mode hors-ligne - Données en cache', 'warning');
+        });
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if(!container) return;
+            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
+            const textColor = type === 'warning' ? '#333' : 'white';
+            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
+            const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;"><div class="toast-body"><i class="bi bi-${icon} me-2"></i>${message}</div></div>`;
+            container.insertAdjacentHTML('afterbegin', toastHtml);
+            setTimeout(() => container.firstElementChild?.remove(), 4000);
+        }
+        
+        function escapeHtml(t) { if(!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        
+        function genererMatricule() { return Math.floor(1000000 + Math.random() * 9000000) + "ET"; }
+        async function matriculeExiste(matricule) { const q = await db.collection('etudiants').where('matricule', '==', matricule).get(); return !q.empty; }
+        async function genererMatriculeUnique() { let m, existe; do { m = genererMatricule(); existe = await matriculeExiste(m); } while(existe); return m; }
+        
+        function fermerTousLesModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+        }
+        
+        function ouvrirModal(titre, contenuHtml, onSave) {
+            fermerTousLesModals();
+            const modalHtml = `
+                <div class="modal-overlay" onclick="if(event.target===this) fermerTousLesModals()">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4>${titre}</h4>
+                            <button class="modal-close" onclick="fermerTousLesModals()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            ${contenuHtml}
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-secondary" onclick="fermerTousLesModals()">Annuler</button>
+                            <button class="btn btn-warning-custom" id="modalSaveBtn">Enregistrer</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const saveBtn = document.getElementById('modalSaveBtn');
+            if(saveBtn) {
+                saveBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await onSave();
+                        fermerTousLesModals();
+                    } catch(err) {}
+                });
+            }
+        }
+        
+        // ============================================================
+        // ⭐ CRÉATION DE COMPTES AVEC AUTH
+        // ============================================================
+        async function creerUtilisateurAuth(email, password, nomComplet, role, extraData = {}) {
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const uid = userCredential.user.uid;
+                
+                const userData = {
+                    nomComplet: nomComplet,
+                    email: email,
+                    role: role,
+                    uid: uid,
+                    dateCreation: firebase.firestore.FieldValue.serverTimestamp(),
+                    ...extraData
+                };
+                
+                await db.collection('utilisateurs').doc(uid).set(userData);
+                await auth.signOut();
+                
+                return { success: true, uid: uid };
+            } catch(error) {
+                console.error('Erreur création utilisateur:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        // ============================================================
+        // ⭐ COMPTES COMPTABILITÉ
+        // ============================================================
+        document.getElementById('comptaForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailCompta').value.trim();
+            const password = document.getElementById('passwordCompta').value;
+            const confirm = document.getElementById('confirmPasswordCompta').value;
+            const nomComplet = document.getElementById('nomCompta').value.trim();
+            
+            if(password !== confirm) { 
+                showToast('Les mots de passe ne correspondent pas', 'danger'); 
+                return; 
+            }
+            if(password.length < 6) {
+                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
+                return;
+            }
+            
+            const result = await creerUtilisateurAuth(email, password, nomComplet, 'comptabilite');
+            
+            if(result.success) {
+                showToast('✅ Compte comptabilité créé avec succès', 'success');
+                document.getElementById('comptaForm').reset();
+                refreshComptes();
+            } else {
+                showToast('Erreur: ' + result.error, 'danger');
+            }
+        });
+        
+        // ============================================================
+        // ⭐ COMPTES ACADÉMIQUES
+        // ============================================================
+        document.getElementById('academiqueForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailAcademique').value.trim();
+            const password = document.getElementById('passwordAcademique').value;
+            const confirm = document.getElementById('confirmPasswordAcademique').value;
+            const nomComplet = document.getElementById('nomAcademique').value.trim();
+            
+            if(password !== confirm) { 
+                showToast('Les mots de passe ne correspondent pas', 'danger'); 
+                return; 
+            }
+            if(password.length < 6) {
+                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
+                return;
+            }
+            
+            const result = await creerUtilisateurAuth(email, password, nomComplet, 'academique');
+            
+            if(result.success) {
+                showToast('✅ Compte académique créé avec succès', 'success');
+                document.getElementById('academiqueForm').reset();
+                refreshAcademiques();
+            } else {
+                showToast('Erreur: ' + result.error, 'danger');
+            }
+        });
+        
+        // ============================================================
+        // ⭐ COMPTES PROFESSEURS
+        // ============================================================
+        document.getElementById('professeurForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailProfesseur').value.trim();
+            const password = document.getElementById('passwordProfesseur').value;
+            const confirm = document.getElementById('confirmPasswordProfesseur').value;
+            const nomComplet = document.getElementById('nomProfesseur').value.trim();
+            const specialite = document.getElementById('specialiteProfesseur').value.trim();
+            const departement = document.getElementById('departementProfesseur').value;
+            
+            if(password.length < 6) {
+                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
+                return;
+            }
+            if(password !== confirm) {
+                showToast('Les mots de passe ne correspondent pas', 'danger');
+                return;
+            }
+            if(!nomComplet || !email || !specialite || !departement) {
+                showToast('Veuillez remplir tous les champs', 'danger');
+                return;
+            }
+            
+            const result = await creerUtilisateurAuth(email, password, nomComplet, 'professeur', {
+                specialite: specialite,
+                departement: departement
+            });
+            
+            if(result.success) {
+                showToast('✅ Compte professeur créé avec succès', 'success');
+                document.getElementById('professeurForm').reset();
+                refreshProfesseurs();
+            } else {
+                showToast('Erreur: ' + result.error, 'danger');
+            }
+        });
+        
+        // ============================================================
+        // ⭐ AFFICHAGE DES LISTES
+        // ============================================================
+        async function refreshComptes() {
+            const btn = document.getElementById('refreshComptesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                const data = await staticCache.refreshCollection('utilisateurs');
+                allUtilisateurs = data.filter(u => u.role === 'comptabilite');
+                lastUpdates.comptes = Date.now();
+                afficherComptesListe();
+                updateLastUpdateDisplay('compte');
+                showToast('✅ Comptes comptabilité actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        function afficherComptesListe() {
+            const container = document.getElementById('comptesListe');
+            if(!container) return;
+            if(allUtilisateurs.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun compte comptabilité</div>'; return; }
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>UID Auth</th><th>Actions</th></tr></thead><tbody>';
+            allUtilisateurs.forEach(c => {
+                const hasUid = c.uid ? '✅' : '❌';
+                html += `<tr id="compte-${c.id}">
+                    <td><strong>${escapeHtml(c.nomComplet)}</strong></td>
+                    <td>${escapeHtml(c.email)}</td>
+                    <td><code>${c.uid ? c.uid.substring(0,8) : 'N/A'}</code> ${hasUid}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning-custom" onclick="modifierCompte('${c.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                        <button class="btn btn-sm btn-danger-custom" onclick="supprimerCompte('${c.id}')"><i class="bi bi-trash"></i> Supprimer</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        async function refreshAcademiques() {
+            const btn = document.getElementById('refreshAcademiquesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                const data = await staticCache.refreshCollection('utilisateurs');
+                allAcademiques = data.filter(u => u.role === 'academique');
+                lastUpdates.academiques = Date.now();
+                afficherAcademiquesListe();
+                updateLastUpdateDisplay('academique');
+                showToast('✅ Comptes académiques actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        function afficherAcademiquesListe() {
+            const container = document.getElementById('academiquesListe');
+            if(!container) return;
+            if(allAcademiques.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun compte académique</div>'; return; }
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>UID Auth</th><th>Actions</th></tr></thead><tbody>';
+            allAcademiques.forEach(c => {
+                const hasUid = c.uid ? '✅' : '❌';
+                html += `<tr id="academique-${c.id}">
+                    <td><strong>${escapeHtml(c.nomComplet)}</strong></td>
+                    <td>${escapeHtml(c.email)}</td>
+                    <td><code>${c.uid ? c.uid.substring(0,8) : 'N/A'}</code> ${hasUid}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning-custom" onclick="modifierAcademique('${c.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                        <button class="btn btn-sm btn-danger-custom" onclick="supprimerAcademique('${c.id}')"><i class="bi bi-trash"></i> Supprimer</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        async function refreshProfesseurs() {
+            const btn = document.getElementById('refreshProfesseursBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                const data = await staticCache.refreshCollection('utilisateurs');
+                allProfesseurs = data.filter(u => u.role === 'professeur');
+                lastUpdates.professeurs = Date.now();
+                afficherProfesseursListe();
+                updateLastUpdateDisplay('professeur');
+                showToast('✅ Professeurs actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        function afficherProfesseursListe() {
+    const container = document.getElementById('professeursListe');
+    if(!container) return;
+    if(allProfesseurs.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun professeur enregistré</div>'; return; }
+    let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Spécialité</th><th>Département</th><th>UID Auth</th><th>Actions</th></tr></thead><tbody>';
+    allProfesseurs.forEach(p => {
+        const hasUid = p.uid ? '✅' : '❌';
+        html += `<tr id="professeur-${p.id}">
+            <td><strong>${escapeHtml(p.nomComplet)}</strong></td>
+            <td>${escapeHtml(p.email)}</td>
+            <td>${escapeHtml(p.telephone || '-')}</td>
+            <td>${escapeHtml(p.specialite || '-')}</td>
+            <td>${escapeHtml(p.departement || '-')}</td>
+            <td><code>${p.uid ? p.uid.substring(0,8) : 'N/A'}</code> ${hasUid}</td>
+            <td>
+                <button class="btn btn-sm btn-warning-custom" onclick="modifierProfesseur('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerProfesseur('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+        
+        // ============================================================
+        // ⭐ MODIFICATIONS
+        // ============================================================
+        window.modifierCompte = (id) => {
+            const compte = allUtilisateurs.find(c => c.id === id);
+            if(!compte) return;
+            const contenu = `
+                <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalCompteNom" value="${escapeHtml(compte.nomComplet)}" required></div>
+                <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalCompteEmail" value="${escapeHtml(compte.email)}" required></div>
+                <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici. Utilisez Firebase Console pour réinitialiser.</div>
+            `;
+            ouvrirModal('Modifier le compte comptabilité', contenu, async () => {
+                const nouveauNom = document.getElementById('modalCompteNom').value.trim();
+                const nouvelEmail = document.getElementById('modalCompteEmail').value.trim();
+                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
+                await db.collection('utilisateurs').doc(id).update({ nomComplet: nouveauNom, email: nouvelEmail });
+                showToast('Compte modifié avec succès');
+            });
+        };
+        
+        window.modifierAcademique = (id) => {
+            const compte = allAcademiques.find(c => c.id === id);
+            if(!compte) return;
+            const contenu = `
+                <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalAcademiqueNom" value="${escapeHtml(compte.nomComplet)}" required></div>
+                <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalAcademiqueEmail" value="${escapeHtml(compte.email)}" required></div>
+                <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici. Utilisez Firebase Console pour réinitialiser.</div>
+            `;
+            ouvrirModal('Modifier le compte académique', contenu, async () => {
+                const nouveauNom = document.getElementById('modalAcademiqueNom').value.trim();
+                const nouvelEmail = document.getElementById('modalAcademiqueEmail').value.trim();
+                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
+                await db.collection('utilisateurs').doc(id).update({ nomComplet: nouveauNom, email: nouvelEmail });
+                showToast('Compte académique modifié avec succès');
+            });
+        };
+        
+        window.modifierProfesseur = (id) => {
+    const professeur = allProfesseurs.find(p => p.id === id);
+    if(!professeur) return;
+    const contenu = `
+        <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalProfesseurNom" value="${escapeHtml(professeur.nomComplet)}" required></div>
+        <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalProfesseurEmail" value="${escapeHtml(professeur.email)}" required></div>
+        <div class="mb-3"><label class="form-label">Téléphone</label><input type="tel" class="form-control" id="modalProfesseurTelephone" value="${escapeHtml(professeur.telephone || '')}" required></div>
+        <div class="mb-3"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="modalProfesseurSpecialite" value="${escapeHtml(professeur.specialite || '')}" required></div>
+        <div class="mb-3"><label class="form-label">Département</label>
+            <select class="form-select" id="modalProfesseurDepartement">
+                <option value="">Sélectionner un département</option>
+                <option value="Agronomie Générale" ${professeur.departement === 'Agronomie Générale' ? 'selected' : ''}>Agronomie Générale</option>
+                <option value="Économie Agricole" ${professeur.departement === 'Économie Agricole' ? 'selected' : ''}>Économie Agricole</option>
+                <option value="Sciences du Sol" ${professeur.departement === 'Sciences du Sol' ? 'selected' : ''}>Sciences du Sol</option>
+                <option value="Protection des Végétaux" ${professeur.departement === 'Protection des Végétaux' ? 'selected' : ''}>Protection des Végétaux</option>
+                <option value="Zootechnie" ${professeur.departement === 'Zootechnie' ? 'selected' : ''}>Zootechnie</option>
+                <option value="Génie Rural" ${professeur.departement === 'Génie Rural' ? 'selected' : ''}>Génie Rural</option>
+            </select>
+        </div>
+        <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici. Utilisez Firebase Console pour réinitialiser.</div>
+    `;
+    ouvrirModal('Modifier le professeur', contenu, async () => {
+        const nouveauNom = document.getElementById('modalProfesseurNom').value.trim();
+        const nouvelEmail = document.getElementById('modalProfesseurEmail').value.trim();
+        const nouveauTelephone = document.getElementById('modalProfesseurTelephone').value.trim();
+        const nouvelleSpecialite = document.getElementById('modalProfesseurSpecialite').value.trim();
+        const nouveauDepartement = document.getElementById('modalProfesseurDepartement').value;
+        if(!nouveauNom || !nouvelEmail || !nouveauTelephone) throw new Error('Champs requis');
+        await db.collection('utilisateurs').doc(id).update({ 
+            nomComplet: nouveauNom, 
+            email: nouvelEmail,
+            telephone: nouveauTelephone,
+            specialite: nouvelleSpecialite,
+            departement: nouveauDepartement
+        });
+        showToast('Professeur modifié avec succès');
+    });
+};
+        
+        window.supprimerCompte = async (id) => {
+            const compte = allUtilisateurs.find(c => c.id === id);
+            if(!compte) return;
+            if(confirm(`Supprimer le compte de ${compte.nomComplet} ?`)) {
+                try {
+                    if(compte.uid) {
+                        try {
+                            const user = await auth.signInWithEmailAndPassword(compte.email, 'temp_password');
+                            await user.user.delete();
+                        } catch(e) {}
+                    }
+                    await db.collection('utilisateurs').doc(id).delete();
+                    showToast('Compte supprimé', 'warning');
+                    refreshComptes();
+                } catch(err) {
+                    showToast('Erreur lors de la suppression', 'danger');
+                }
+            }
+        };
+        
+        window.supprimerAcademique = async (id) => {
+            const compte = allAcademiques.find(c => c.id === id);
+            if(!compte) return;
+            if(confirm(`Supprimer le compte de ${compte.nomComplet} ?`)) {
+                try {
+                    if(compte.uid) {
+                        try {
+                            const user = await auth.signInWithEmailAndPassword(compte.email, 'temp_password');
+                            await user.user.delete();
+                        } catch(e) {}
+                    }
+                    await db.collection('utilisateurs').doc(id).delete();
+                    showToast('Compte académique supprimé', 'warning');
+                    refreshAcademiques();
+                } catch(err) {
+                    showToast('Erreur lors de la suppression', 'danger');
+                }
+            }
+        };
+        
+        window.supprimerProfesseur = async (id) => {
+            const professeur = allProfesseurs.find(p => p.id === id);
+            if(!professeur) return;
+            if(confirm(`Supprimer le compte de ${professeur.nomComplet} ?`)) {
+                try {
+                    if(professeur.uid) {
+                        try {
+                            const user = await auth.signInWithEmailAndPassword(professeur.email, 'temp_password');
+                            await user.user.delete();
+                        } catch(e) {}
+                    }
+                    await db.collection('utilisateurs').doc(id).delete();
+                    showToast('Professeur supprimé', 'warning');
+                    refreshProfesseurs();
+                } catch(err) {
+                    showToast('Erreur lors de la suppression', 'danger');
+                }
+            }
+        };
+        
+        // ============================================================
+        // ⭐ ANNÉES ACADÉMIQUES
+        // ============================================================
+        async function refreshAnnees() {
+            const btn = document.getElementById('refreshAnneesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allAnnees = await staticCache.refreshCollection('anneesAcademiques');
+                lastUpdates.annees = Date.now();
+                afficherAnneesListe();
+                updateLastUpdateDisplay('annee');
+                showToast('✅ Années académiques actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        function afficherAnneesListe() {
+            const container = document.getElementById('anneesListe');
+            if(!container) return;
+            if(allAnnees.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune année académique</div>'; return; }
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Année</th><th>Statut</th><th>Actions</th></tr></thead><tbody>';
+            allAnnees.forEach(a => {
+                html += `<tr id="annee-${a.id}"><td><strong>${escapeHtml(a.annee || a.nom)}</strong></td><td>${a.statut === 'active' ? '<span class="text-success">Active</span>' : '<span class="text-muted">Inactive</span>'}</td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierAnnee('${a.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerAnnee('${a.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        window.modifierAnnee = (id) => {
+            const annee = allAnnees.find(a => a.id === id);
+            if(!annee) return;
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de l'année académique</label><input type="text" class="form-control" id="modalAnneeNom" value="${escapeHtml(annee.annee || annee.nom)}" required></div><div class="mb-3"><label class="form-label">Statut</label><select class="form-select" id="modalAnneeStatut"><option value="active" ${annee.statut === 'active' ? 'selected' : ''}>Active</option><option value="inactive" ${annee.statut === 'inactive' ? 'selected' : ''}>Inactive</option></select></div>`;
+            ouvrirModal('Modifier l\'année académique', contenu, async () => {
+                const nouveauNom = document.getElementById('modalAnneeNom').value.trim();
+                const nouveauStatut = document.getElementById('modalAnneeStatut').value;
+                if(!nouveauNom) throw new Error('Nom requis');
+                await db.collection('anneesAcademiques').doc(id).update({ annee: nouveauNom, nom: nouveauNom, statut: nouveauStatut });
+                showToast('Année académique modifiée avec succès');
+            });
+        };
+        
+        window.supprimerAnnee = async (id) => { if(confirm('Supprimer cette année académique ?')) { await db.collection('anneesAcademiques').doc(id).delete(); showToast('Année supprimée', 'warning'); } };
+        
+        // ============================================================
+        // ⭐ PROMOTIONS
+        // ============================================================
+        async function refreshPromotions() {
+            const btn = document.getElementById('refreshPromotionsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allPromotions = await staticCache.refreshCollection('promotions');
+                lastUpdates.promotions = Date.now();
+                afficherPromotionsListe();
+                chargerPromotionsSelects();
+                chargerPromotionsCheckbox();
+                chargerPromotionsSelectsEtudiant();
+                afficherBoutonsPromotions();
+                chargerPromotionsTransfert();
+                updateLastUpdateDisplay('promotion');
+                showToast('✅ Promotions actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        function afficherPromotionsListe() {
+            const container = document.getElementById('promotionsListe');
+            if(!container) return;
+            if(allPromotions.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; return; }
+            
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Capacité</th><th>Étudiants</th><th>Actions</th></tr></thead><tbody>';
+            allPromotions.forEach(p => {
+                let count = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<tr id="promo-${p.id}"><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td>
+                <td><span class="badge ${count > 0 ? 'bg-primary' : 'bg-secondary'}">${count}</span></td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierPromotion('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerPromotion('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        window.modifierPromotion = (id) => {
+            const promotion = allPromotions.find(p => p.id === id);
+            if(!promotion) return;
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de la promotion</label><input type="text" class="form-control" id="modalPromoNom" value="${escapeHtml(promotion.nom)}" required></div><div class="mb-3"><label class="form-label">Capacité</label><input type="number" class="form-control" id="modalPromoCapacite" value="${promotion.capacite || ''}" min="0" required></div>`;
+            ouvrirModal('Modifier la promotion', contenu, async () => {
+                const nouveauNom = document.getElementById('modalPromoNom').value.trim();
+                const nouvelleCapacite = parseInt(document.getElementById('modalPromoCapacite').value);
+                if(!nouveauNom) throw new Error('Nom requis');
+                if(isNaN(nouvelleCapacite) || nouvelleCapacite < 0) throw new Error('Capacité invalide');
+                const nomExiste = allPromotions.some(p => p.id !== id && p.nom.toLowerCase() === nouveauNom.toLowerCase());
+                if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); throw new Error('Nom dupliqué'); }
+                await db.collection('promotions').doc(id).update({ nom: nouveauNom, capacite: nouvelleCapacite });
+                showToast('Promotion modifiée avec succès');
+            });
+        };
+        
+        window.supprimerPromotion = async (id) => {
+            const nbEtudiants = allEtudiants.filter(e => e.promotion === id).length;
+            if(nbEtudiants > 0) { alert(`Impossible: ${nbEtudiants} étudiant(s) sont encore inscrits dans cette promotion.`); return; }
+            if(confirm('Supprimer cette promotion ?')) { await db.collection('promotions').doc(id).delete(); showToast('Promotion supprimée', 'warning'); }
+        };
+        
+        // ============================================================
+        // ⭐ FICHES
+        // ============================================================
+        async function refreshFiches() {
+            const btn = document.getElementById('refreshFichesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allFiches = await staticCache.refreshCollection('fiches');
+                lastUpdates.fiches = Date.now();
+                afficherFichesListe();
+                await chargerConfigurationsPromotions();
+                chargerPromotionSelector();
+                afficherResumeConfigurations();
+                if(currentSelectedPromoForConfig) {
+                    afficherConfigPromotion(currentSelectedPromoForConfig);
+                }
+                updateLastUpdateDisplay('fiche');
+                showToast('✅ Fiches actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        function afficherFichesListe() {
+            const container = document.getElementById('fichesListe');
+            if(!container) return;
+            if(allFiches.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune fiche</div>'; return; }
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Montant</th><th>Promotions</th><th>Actions</th></tr></thead><tbody>';
+            allFiches.forEach(f => {
+                let promotionsText = '';
+                if(f.promotions && Array.isArray(f.promotions)) {
+                    const promoNoms = f.promotions.map(pid => promoMap[pid] || pid).filter(p => p && !p.includes('InRXQHXNqUeQV6CLEoW2'));
+                    promotionsText = promoNoms.join(', ');
+                }
+                if(!promotionsText || promotionsText === '') promotionsText = '-';
+                
+                html += `<tr id="fiche-${f.id}"><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td>
+                <td>${escapeHtml(promotionsText)}</td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierFiche('${f.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerFiche('${f.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        window.modifierFiche = (id) => {
+            const fiche = allFiches.find(f => f.id === id);
+            if(!fiche) return;
+            
+            let checkboxesHtml = '';
+            allPromotions.forEach(p => {
+                const isChecked = (fiche.promotions && fiche.promotions.includes(p.id)) ? 'checked' : '';
+                checkboxesHtml += `<div class="promotion-checkbox-item"><input type="checkbox" class="form-check-input modal-promo-checkbox" value="${p.id}" id="modal_promo_${p.id}" ${isChecked}><label for="modal_promo_${p.id}"><strong>${escapeHtml(p.nom)}</strong></label></div>`;
+            });
+            
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de la fiche</label><input type="text" class="form-control" id="modalFicheNom" value="${escapeHtml(fiche.nom)}" required></div><div class="mb-3"><label class="form-label">Montant (FC)</label><input type="number" class="form-control" id="modalFicheMontant" value="${fiche.montant || 0}" min="0" required></div><div class="mb-3"><label class="form-label">Promotions concernées</label><div class="promotions-checkbox-group" style="max-height: 250px;"><div class="checkbox-select-all"><input type="checkbox" id="modalSelectAllPromos"><label for="modalSelectAllPromos"><strong>Sélectionner toutes</strong></label></div><div id="modalPromosList">${checkboxesHtml}</div></div></div>`;
+            
+            ouvrirModal('Modifier la fiche', contenu, async () => {
+                const nouveauNom = document.getElementById('modalFicheNom').value.trim();
+                const nouveauMontant = parseInt(document.getElementById('modalFicheMontant').value);
+                if(!nouveauNom) throw new Error('Nom requis');
+                if(isNaN(nouveauMontant) || nouveauMontant < 0) throw new Error('Montant invalide');
+                const selectedPromos = [];
+                document.querySelectorAll('.modal-promo-checkbox:checked').forEach(cb => selectedPromos.push(cb.value));
+                if(selectedPromos.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); throw new Error('Aucune promotion sélectionnée'); }
+                await db.collection('fiches').doc(id).update({ nom: nouveauNom, montant: nouveauMontant, promotions: selectedPromos });
+                showToast('Fiche modifiée avec succès');
+            });
+            
+            setTimeout(() => {
+                document.getElementById('modalSelectAllPromos')?.addEventListener('change', (e) => {
+                    document.querySelectorAll('.modal-promo-checkbox').forEach(cb => cb.checked = e.target.checked);
+                });
+            }, 100);
+        };
+        
+        window.supprimerFiche = async (id) => { if(confirm('Supprimer cette fiche ?')) { await db.collection('fiches').doc(id).delete(); showToast('Fiche supprimée', 'warning'); } };
+        
+        // ============================================================
+        // ⭐ ÉTUDIANTS
+        // ============================================================
+        async function refreshEtudiants() {
+            const btn = document.getElementById('refreshEtudiantsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allEtudiants = await staticCache.refreshCollection('etudiants');
+                lastUpdates.etudiants = Date.now();
+                afficherBoutonsPromotions();
+                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion);
+                updateLastUpdateDisplay('etudiant');
+                showToast('✅ Étudiants actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        document.getElementById('etudiantForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const matricule = await genererMatriculeUnique();
+            await db.collection('etudiants').doc(matricule).set({ 
+                nom: document.getElementById('nomEtudiant').value.trim(), 
+                matricule: matricule, 
+                promotion: document.getElementById('promotionEtudiant').value, 
+                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+            document.getElementById('etudiantForm').reset();
+            showToast(`Étudiant créé - Matricule: ${matricule}`);
+            refreshEtudiants();
+        });
+        
+        // ============================================================
+        // ⭐ CONFIGURATION DES SEMESTRES
+        // ============================================================
+        async function chargerConfigurationsPromotions() {
+            try {
+                const configDoc = await db.collection('configurations').doc('promotionsSemestres').get();
+                if(configDoc.exists) {
+                    promoConfigs = configDoc.data();
+                } else {
+                    promoConfigs = {};
+                }
+                return promoConfigs;
+            } catch(err) {
+                console.error('Erreur chargement configurations promotions:', err);
+                return {};
+            }
+        }
+        
+        async function sauvegarderConfigPromotion(promoId, config) {
+            try {
+                promoConfigs[promoId] = config;
+                await db.collection('configurations').doc('promotionsSemestres').set(promoConfigs);
+                showToast(`Configuration enregistrée pour la promotion`, 'success');
+                afficherResumeConfigurations();
+                chargerPromotionSelector();
+                if(currentSelectedPromoForConfig === promoId) {
+                    afficherConfigPromotion(promoId);
+                }
+            } catch(err) {
+                console.error('Erreur sauvegarde config promotion:', err);
+                showToast('Erreur lors de l\'enregistrement', 'danger');
+            }
+        }
+        
+        function afficherConfigPromotion(promoId) {
+            const container = document.getElementById('promotionConfigContainer');
+            const promotion = allPromotions.find(p => p.id === promoId);
+            if(!promotion) {
+                container.innerHTML = `<div class="alert alert-warning">Promotion non trouvée</div>`;
+                return;
+            }
+            
+            const config = promoConfigs[promoId] || { premier: [], deuxieme: [] };
+            const premierFichesIds = config.premier || [];
+            const deuxiemeFichesIds = config.deuxieme || [];
+            
+            const fichesDisponibles = allFiches.filter(f => {
+                const promos = f.promotions || (f.promotion ? [f.promotion] : []);
+                return promos.includes(promoId);
+            });
+            
+            if(fichesDisponibles.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i> 
+                        Aucune fiche n'est associée à cette promotion. 
+                        <a href="#" onclick="document.querySelector('[data-section=\\'fiche\\']').click(); return false;" class="alert-link">Créez des fiches</a> pour cette promotion d'abord.
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <div class="promotion-semestre-config">
+                    <div class="promo-title">
+                        <span><i class="bi bi-trophy-fill"></i> ${escapeHtml(promotion.nom)}</span>
+                        <span class="badge bg-secondary">${fichesDisponibles.length} fiche(s) disponible(s)</span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header" style="background: #28a745; color: white; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0"><i class="bi bi-calendar-check"></i> Premier Semestre</h6>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="fiche-items">
+                                        ${fichesDisponibles.map(f => `
+                                            <div class="fiche-item">
+                                                <input type="checkbox" class="form-check-input promo-semestre-checkbox" 
+                                                       data-promo="${promoId}" data-semestre="premier" 
+                                                       value="${f.id}" id="premier_${promoId}_${f.id}"
+                                                       ${premierFichesIds.includes(f.id) ? 'checked' : ''}>
+                                                <label for="premier_${promoId}_${f.id}" style="font-size: 14px; margin: 0;">
+                                                    ${escapeHtml(f.nom)} <small class="text-muted">(${(f.montant || 0).toLocaleString()} FC)</small>
+                                                </label>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="btn btn-sm btn-success-custom mt-2" onclick="sauvegarderConfigPromotion('${promoId}', { premier: getSelectedFichesForPromotion('${promoId}', 'premier'), deuxieme: getSelectedFichesForPromotion('${promoId}', 'deuxieme') })">
+                                        <i class="bi bi-save"></i> Enregistrer Premier Semestre
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header" style="background: #ff9800; color: white; border-radius: 8px 8px 0 0;">
+                                    <h6 class="mb-0"><i class="bi bi-calendar-week"></i> Deuxième Semestre</h6>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="fiche-items">
+                                        ${fichesDisponibles.map(f => `
+                                            <div class="fiche-item">
+                                                <input type="checkbox" class="form-check-input promo-semestre-checkbox" 
+                                                       data-promo="${promoId}" data-semestre="deuxieme" 
+                                                       value="${f.id}" id="deuxieme_${promoId}_${f.id}"
+                                                       ${deuxiemeFichesIds.includes(f.id) ? 'checked' : ''}>
+                                                <label for="deuxieme_${promoId}_${f.id}" style="font-size: 14px; margin: 0;">
+                                                    ${escapeHtml(f.nom)} <small class="text-muted">(${(f.montant || 0).toLocaleString()} FC)</small>
+                                                </label>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="btn btn-sm btn-warning-custom mt-2" onclick="sauvegarderConfigPromotion('${promoId}', { premier: getSelectedFichesForPromotion('${promoId}', 'premier'), deuxieme: getSelectedFichesForPromotion('${promoId}', 'deuxieme') })">
+                                        <i class="bi bi-save"></i> Enregistrer Deuxième Semestre
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-progress mt-3">
+                        <div class="progress-bar-fill" style="width: ${calculateConfigProgress(promoId)}%"></div>
+                    </div>
+                    <small class="text-muted">Configuration: ${calculateConfigProgress(promoId)}% complétée</small>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        window.getSelectedFichesForPromotion = function(promoId, semestre) {
+            const checkboxes = document.querySelectorAll(`.promo-semestre-checkbox[data-promo="${promoId}"][data-semestre="${semestre}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        };
+        
+        function calculateConfigProgress(promoId) {
+            const fichesDisponibles = allFiches.filter(f => {
+                const promos = f.promotions || (f.promotion ? [f.promotion] : []);
+                return promos.includes(promoId);
+            });
+            
+            if(fichesDisponibles.length === 0) return 0;
+            
+            const config = promoConfigs[promoId] || { premier: [], deuxieme: [] };
+            const totalFiches = fichesDisponibles.length;
+            const totalConfigured = (config.premier || []).length + (config.deuxieme || []).length;
+            const maxPossible = totalFiches * 2;
+            return Math.round((totalConfigured / maxPossible) * 100);
+        }
+        
+        function afficherResumeConfigurations() {
+            const container = document.getElementById('configSummaryContainer');
+            if(!container) return;
+            
+            if(allPromotions.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">Aucune promotion disponible</div>';
+                return;
+            }
+            
+            let html = '<div class="row">';
+            allPromotions.forEach(promo => {
+                const config = promoConfigs[promo.id] || { premier: [], deuxieme: [] };
+                const premierFiches = (config.premier || []).map(id => allFiches.find(f => f.id === id)).filter(f => f);
+                const deuxiemeFiches = (config.deuxieme || []).map(id => allFiches.find(f => f.id === id)).filter(f => f);
+                
+                html += `
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header" style="background: var(--primary-blue); color: white;">
+                                <h6 class="mb-0">${escapeHtml(promo.nom)}</h6>
+                            </div>
+                            <div class="card-body" style="font-size: 13px;">
+                                <div class="mb-2">
+                                    <span class="badge badge-premier" style="background: #28a745;">1er Semestre</span>
+                                    ${premierFiches.length > 0 ? 
+                                        premierFiches.map(f => `<span class="badge-fiche premier">${escapeHtml(f.nom)}</span>`).join(' ') : 
+                                        '<span class="text-muted">Aucune fiche</span>'}
+                                </div>
+                                <div>
+                                    <span class="badge badge-deuxieme" style="background: #ff9800;">2ème Semestre</span>
+                                    ${deuxiemeFiches.length > 0 ? 
+                                        deuxiemeFiches.map(f => `<span class="badge-fiche deuxieme">${escapeHtml(f.nom)}</span>`).join(' ') : 
+                                        '<span class="text-muted">Aucune fiche</span>'}
+                                </div>
+                                <div class="config-progress mt-2">
+                                    <div class="progress-bar-fill" style="width: ${calculateConfigProgress(promo.id)}%"></div>
+                                </div>
+                                <small class="text-muted">${calculateConfigProgress(promo.id)}% configuré</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function chargerPromotionSelector() {
+            const container = document.getElementById('promotionSelectorConfig');
+            if(!container) return;
+            
+            const allBtn = container.querySelector('[data-promo="all"]');
+            if(allBtn) {
+                document.getElementById('totalPromoCount').textContent = allPromotions.length;
+            }
+            
+            container.querySelectorAll('[data-promo]:not([data-promo="all"])').forEach(el => el.remove());
+            
+            allPromotions.forEach(promo => {
+                const config = promoConfigs[promo.id] || { premier: [], deuxieme: [] };
+                const totalFiches = (config.premier || []).length + (config.deuxieme || []).length;
+                const btn = document.createElement('button');
+                btn.className = `promo-select-btn ${currentSelectedPromoForConfig === promo.id ? 'active' : ''}`;
+                btn.dataset.promo = promo.id;
+                btn.innerHTML = `${escapeHtml(promo.nom)} <span class="promo-count">${totalFiches > 0 ? '✅' : '⚪'}</span>`;
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.promo-select-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSelectedPromoForConfig = promo.id;
+                    afficherConfigPromotion(promo.id);
+                });
+                container.appendChild(btn);
+            });
+        }
+        
+        async function refreshAllConfigs() {
+            const btn = document.getElementById('refreshSemestreConfigBtn');
+            if(btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>';
+            }
+            
+            try {
+                await chargerConfigurationsPromotions();
+                chargerPromotionSelector();
+                afficherResumeConfigurations();
+                
+                if(currentSelectedPromoForConfig) {
+                    afficherConfigPromotion(currentSelectedPromoForConfig);
+                }
+                
+                showToast('✅ Configurations actualisées', 'success');
+            } catch(err) {
+                showToast('Erreur lors de l\'actualisation', 'danger');
+            } finally {
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser';
+                }
+            }
+        }
+        
+        // ============================================================
+        // ⭐ FONCTIONS UTILITAIRES POUR LES SÉLECTEURS
+        // ============================================================
+        function chargerPromotionsSelects() {
+            ['promotionEtudiant', 'importPromotionSelect'].forEach(id => {
+                const select = document.getElementById(id);
+                if(select) {
+                    const currentVal = select.value;
+                    select.innerHTML = '<option value="">Sélectionner une promotion</option>';
+                    allPromotions.forEach(p => select.innerHTML += `<option value="${p.id}">${escapeHtml(p.nom)}</option>`);
+                    if(currentVal) select.value = currentVal;
+                }
+            });
+        }
+        
+        function chargerPromotionsSelectsEtudiant() {
+            const select = document.getElementById('promotionEtudiant');
+            if(select) {
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">Sélectionner une promotion</option>';
+                allPromotions.forEach(p => select.innerHTML += `<option value="${p.id}">${escapeHtml(p.nom)}</option>`);
+                if(currentVal) select.value = currentVal;
+            }
+        }
+        
+        function chargerPromotionsCheckbox() {
+            const container = document.getElementById('promotionsCheckboxList');
+            if(!container) return;
+            if(allPromotions.length === 0) { container.innerHTML = '<div class="text-muted">Aucune promotion</div>'; return; }
+            let html = '';
+            allPromotions.forEach(p => html += `<div class="promotion-checkbox-item"><input type="checkbox" class="promotion-checkbox" value="${p.id}" id="promo_${p.id}"><label for="promo_${p.id}"><strong>${escapeHtml(p.nom)}</strong></label></div>`);
+            container.innerHTML = html;
+            document.getElementById('selectAllPromotions')?.addEventListener('change', (e) => document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = e.target.checked));
+        }
+        
+        function chargerPromotionsTransfert() {
+            const sourceSelect = document.getElementById('promotionSource');
+            const destSelect = document.getElementById('promotionDestination');
+            if(sourceSelect && destSelect) {
+                const currentSource = sourceSelect.value;
+                const currentDest = destSelect.value;
+                sourceSelect.innerHTML = '<option value="">Sélectionner promotion source</option>';
+                destSelect.innerHTML = '<option value="">Sélectionner promotion destination</option>';
+                allPromotions.forEach(promo => {
+                    sourceSelect.innerHTML += `<option value="${promo.id}">${escapeHtml(promo.nom)}</option>`;
+                    destSelect.innerHTML += `<option value="${promo.id}">${escapeHtml(promo.nom)}</option>`;
+                });
+                if(currentSource) sourceSelect.value = currentSource;
+                if(currentDest) destSelect.value = currentDest;
+            }
+        }
+        
+        function afficherBoutonsPromotions() {
+            const container = document.getElementById('promotionButtons');
+            if(!container) return;
+            if(allPromotions.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune promotion disponible</div>'; return; }
+            let html = '';
+            allPromotions.forEach(p => {
+                const count = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${count}</span></button>`;
+            });
+            container.innerHTML = html;
+            
+            document.querySelectorAll('#promotionButtons .promotion-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#promotionButtons .promotion-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSelectedPromotion = btn.dataset.promo;
+                    currentSearchTerm = '';
+                    const searchInput = document.getElementById('searchEtudiantList');
+                    if(searchInput) searchInput.value = '';
+                    document.getElementById('clearSearchEtudiant').style.display = 'none';
+                    afficherEtudiantsParPromotion(currentSelectedPromotion);
+                });
+            });
+        }
+        
+        function afficherEtudiantsParPromotion(promoId) {
+            if(!promoId) {
+                document.getElementById('etudiantsListeAdmin').innerHTML = `<div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;"><i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i><h5 class="mt-3">Sélectionnez une promotion</h5><p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p></div>`;
+                return;
+            }
+            
+            let filtres = allEtudiants.filter(e => e.promotion === promoId);
+            if(currentSearchTerm) filtres = filtres.filter(e => e.nom?.toLowerCase().includes(currentSearchTerm.toLowerCase()));
+            const promoMap = {}; allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            
+            if(filtres.length === 0) { 
+                document.getElementById('etudiantsListeAdmin').innerHTML = `<div class="alert alert-info">Aucun étudiant trouvé dans la promotion "${escapeHtml(promoMap[promoId] || promoId)}"${currentSearchTerm ? ' pour la recherche "' + escapeHtml(currentSearchTerm) + '"' : ''}</div>`; 
+                return; 
+            }
+            
+            let html = `<div class="mb-2"><strong>${filtres.length}</strong> étudiant(s)</div>
+                        <div class="table-responsive"><table class="etudiants-table">
+                        <thead><tr><th>#</th><th>Matricule</th><th>Nom</th><th>Actions</th></tr></thead><tbody>`;
+            
+            filtres.forEach((e, idx) => {
+                html += `<tr>
+                    <td>${idx+1}</td>
+                    <td><code>${escapeHtml(e.matricule || e.id.substring(0,8))}</code></td>
+                    <td><strong>${escapeHtml(e.nom)}</strong></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning-custom" onclick="modifierEtudiantAdmin('${e.id}')" style="padding:4px 8px;"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-danger-custom" onclick="supprimerEtudiantAdmin('${e.id}')" style="padding:4px 8px;"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            document.getElementById('etudiantsListeAdmin').innerHTML = html;
+        }
+        
+        window.modifierEtudiantAdmin = (id) => {
+            const etudiant = allEtudiants.find(e => e.id === id);
+            if(!etudiant) return;
+            let optionsHtml = '<option value="">Sélectionner une promotion</option>';
+            allPromotions.forEach(p => {
+                const selected = (etudiant.promotion === p.id) ? 'selected' : '';
+                optionsHtml += `<option value="${p.id}" ${selected}>${escapeHtml(p.nom)}</option>`;
+            });
+            const contenu = `<div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalEtudiantNom" value="${escapeHtml(etudiant.nom)}" required></div><div class="mb-3"><label class="form-label">Matricule</label><input type="text" class="form-control" value="${etudiant.matricule || etudiant.id.substring(0,8)}" disabled><small class="text-muted">Le matricule ne peut pas être modifié</small></div><div class="mb-3"><label class="form-label">Promotion</label><select class="form-select" id="modalEtudiantPromo" required>${optionsHtml}</select></div>`;
+            ouvrirModal('Modifier l\'étudiant', contenu, async () => {
+                const nouveauNom = document.getElementById('modalEtudiantNom').value.trim();
+                const nouvellePromo = document.getElementById('modalEtudiantPromo').value;
+                if(!nouveauNom) throw new Error('Nom requis');
+                if(!nouvellePromo) throw new Error('Promotion requise');
+                await db.collection('etudiants').doc(id).update({ nom: nouveauNom, promotion: nouvellePromo });
+                showToast('Étudiant modifié avec succès');
+            });
+        };
+        
+        window.supprimerEtudiantAdmin = async (id) => { if(confirm('Supprimer cet étudiant ? Cette action est irréversible.')) { await db.collection('etudiants').doc(id).delete(); showToast('Étudiant supprimé', 'warning'); } };
+        
+        function mettreAJourInfoTransfert() {
+            const sourceId = document.getElementById('promotionSource')?.value;
+            const destId = document.getElementById('promotionDestination')?.value;
+            const infoDiv = document.getElementById('transferInfo');
+            if(infoDiv) {
+                if(sourceId && destId && sourceId !== destId) {
+                    const nb = allEtudiants.filter(e => e.promotion === sourceId).length;
+                    infoDiv.innerHTML = `<i class="bi bi-info-circle"></i> ${nb} étudiant(s) à transférer`;
+                } else { infoDiv.innerHTML = ''; }
+            }
+        }
+        
+        // ============================================================
+        // ⭐ EVENTS
+        // ============================================================
+        document.getElementById('searchEtudiantList')?.addEventListener('input', (e) => { 
+            currentSearchTerm = e.target.value; 
+            document.getElementById('clearSearchEtudiant').style.display = currentSearchTerm ? 'block' : 'none';
+            afficherEtudiantsParPromotion(currentSelectedPromotion); 
+        });
+        
+        document.getElementById('clearSearchEtudiant')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('searchEtudiantList');
+            if(searchInput) { searchInput.value = ''; currentSearchTerm = ''; }
+            document.getElementById('clearSearchEtudiant').style.display = 'none';
+            afficherEtudiantsParPromotion(currentSelectedPromotion);
+        });
+        
+        document.getElementById('promotionSource')?.addEventListener('change', mettreAJourInfoTransfert);
+        document.getElementById('promotionDestination')?.addEventListener('change', mettreAJourInfoTransfert);
+        
+        document.getElementById('transfererEtudiantsBtn')?.addEventListener('click', async () => {
+            const sourceId = document.getElementById('promotionSource').value;
+            const destId = document.getElementById('promotionDestination').value;
+            if(!sourceId || !destId) { showToast('Veuillez sélectionner les deux promotions', 'danger'); return; }
+            if(sourceId === destId) { showToast('Les promotions source et destination doivent être différentes', 'danger'); return; }
+            const etudiants = allEtudiants.filter(e => e.promotion === sourceId);
+            if(!etudiants.length) { showToast('Aucun étudiant dans la promotion source', 'warning'); return; }
+            if(!confirm(`Transférer ${etudiants.length} étudiant(s) ?`)) return;
+            const batch = db.batch();
+            etudiants.forEach(e => batch.update(db.collection('etudiants').doc(e.id), { promotion: destId }));
+            await batch.commit();
+            showToast(`${etudiants.length} étudiant(s) transféré(s) avec succès`);
+            refreshEtudiants();
+        });
+        
+        // ============================================================
+        // ⭐ EXCEL IMPORT
+        // ============================================================
+        let excelDataToImport = [];
+        async function lireExcel(file) { 
+            return new Promise((res, rej) => { 
+                const r = new FileReader(); 
+                r.onload = e => { 
+                    const data = new Uint8Array(e.target.result); 
+                    const wb = XLSX.read(data, { type: 'array' }); 
+                    const sheet = wb.Sheets[wb.SheetNames[0]]; 
+                    const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }); 
+                    res(json); 
+                }; 
+                r.onerror = rej; 
+                r.readAsArrayBuffer(file); 
+            }); 
+        }
+        
+        document.getElementById('excelFileInput')?.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            const promoSelect = document.getElementById('importPromotionSelect');
+            if(!file || !promoSelect.value) { 
+                if(!promoSelect.value) showToast('Veuillez d\'abord sélectionner une promotion', 'warning');
+                return; 
+            }
+            try {
+                const raw = await lireExcel(file);
+                excelDataToImport = [];
+                for(let i = 1; i < raw.length; i++) { 
+                    if(raw[i][1] && raw[i][1].toString().trim()) {
+                        excelDataToImport.push({ nom: raw[i][1].toString().trim() }); 
+                    }
+                }
+                if(excelDataToImport.length === 0) { showToast('Aucune donnée valide trouvée dans le fichier', 'warning'); return; }
+                document.getElementById('previewExcelBtn').disabled = false;
+                document.getElementById('importExcelBtn').disabled = false;
+                let previewHtml = `<div class="table-responsive"><table class="table table-sm"><thead><tr><th>#</th><th>Nom</th></tr></thead><tbody>`;
+                excelDataToImport.slice(0, 10).forEach((item, idx) => {
+                    previewHtml += `<tr><td>${idx+1}</td><td>${escapeHtml(item.nom)}</td></tr>`;
+                });
+                if(excelDataToImport.length > 10) previewHtml += `<tr><td colspan="2" class="text-center text-muted">... et ${excelDataToImport.length - 10} autre(s)</td></tr>`;
+                previewHtml += `</tbody></table></div>`;
+                document.getElementById('previewTable').innerHTML = previewHtml;
+                document.getElementById('importPreview').style.display = 'block';
+            } catch(err) { showToast('Erreur lors de la lecture du fichier', 'danger'); console.error(err); }
+        });
+        
+        document.getElementById('previewExcelBtn')?.addEventListener('click', () => { document.getElementById('importPreview').style.display = 'block'; });
+        
+        document.getElementById('importExcelBtn')?.addEventListener('click', async () => {
+            const promoId = document.getElementById('importPromotionSelect').value;
+            if(!excelDataToImport.length || !promoId) return;
+            const progressDiv = document.getElementById('importProgress');
+            const progressFill = progressDiv.querySelector('.progress-fill');
+            progressDiv.style.display = 'block';
+            let success = 0;
+            const batch = db.batch();
+            const batchSize = 500;
+            let count = 0;
+            for(let item of excelDataToImport) {
+                const matricule = await genererMatriculeUnique();
+                const docRef = db.collection('etudiants').doc(matricule);
+                batch.set(docRef, { nom: item.nom, matricule: matricule, promotion: promoId, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
+                success++;
+                count++;
+                if(count % batchSize === 0) { await batch.commit(); const percent = (success / excelDataToImport.length) * 100; progressFill.style.width = percent + '%'; }
+            }
+            if(count % batchSize !== 0) await batch.commit();
+            progressFill.style.width = '100%';
+            showToast(`${success} étudiant(s) importé(s) avec succès`);
+            refreshEtudiants();
+            setTimeout(() => {
+                document.getElementById('excelFileInput').value = '';
+                document.getElementById('importPreview').style.display = 'none';
+                progressDiv.style.display = 'none';
+                progressFill.style.width = '0%';
+                document.getElementById('previewExcelBtn').disabled = true;
+                document.getElementById('importExcelBtn').disabled = true;
+            }, 1500);
+        });
+        
+        document.getElementById('downloadTemplateBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const ws = XLSX.utils.aoa_to_sheet([['MATRICULE (optionnel)', 'NOM COMPLET'], ['', 'Jean MUKENDI'], ['', 'Marie KASONGO']]);
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Modele');
+            XLSX.writeFile(wb, 'modele_import_etudiants.xlsx');
+        });
+        
+        // ============================================================
+        // ⭐ EXPORTS
+        // ============================================================
+        document.getElementById('exportExcelListBtn')?.addEventListener('click', () => {
+            if(!currentSelectedPromotion) { showToast('Sélectionnez d\'abord une promotion', 'warning'); return; }
+            let filtres = allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
+            if(currentSearchTerm) filtres = filtres.filter(e => e.nom?.toLowerCase().includes(currentSearchTerm.toLowerCase()));
+            const promoMap = {}; allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            const data = [['Matricule', 'Nom', 'Promotion']];
+            filtres.forEach(e => data.push([e.matricule || e.id, e.nom, promoMap[e.promotion] || '']));
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Etudiants');
+            XLSX.writeFile(wb, 'liste_etudiants.xlsx');
+            showToast('Export Excel généré');
+        });
+        
+        document.getElementById('exportCsvListBtn')?.addEventListener('click', () => {
+            if(!currentSelectedPromotion) { showToast('Sélectionnez d\'abord une promotion', 'warning'); return; }
+            let filtres = allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
+            if(currentSearchTerm) filtres = filtres.filter(e => e.nom?.toLowerCase().includes(currentSearchTerm.toLowerCase()));
+            const promoMap = {}; allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            let csv = 'Matricule,Nom,Promotion\n';
+            filtres.forEach(e => csv += `"${e.matricule || e.id}","${e.nom}","${promoMap[e.promotion] || ''}"\n`);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'liste_etudiants.csv';
+            link.click();
+            showToast('Export CSV généré');
+        });
+        
+        // ============================================================
+        // ⭐ MIGRATION VERS AUTH
+        // ============================================================
+        async function chargerMigrationListe() {
+            const container = document.getElementById('migrationListe');
+            if(!container) return;
+            
+            try {
+                const snapshot = await db.collection('utilisateurs').get();
+                const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                const aMigrer = users.filter(u => u.role && u.role !== 'admin');
+                
+                if(aMigrer.length === 0) {
+                    container.innerHTML = '<div class="alert alert-success">✅ Tous les comptes sont déjà migrés vers Auth !</div>';
+                    document.getElementById('migrateAllBtn').disabled = true;
+                    document.getElementById('cleanupBtn').disabled = false;
+                    document.getElementById('migrationStatus').innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill"></i> 
+                            <strong>Migration terminée !</strong> Vous pouvez supprimer la collection utilisateurs.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = `<div class="table-responsive"><table class="table table-sm">
+                    <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>UID Auth</th><th>Statut</th></tr></thead><tbody>`;
+                
+                let hasUid = 0;
+                for(let user of aMigrer) {
+                    const hasAuthUid = user.uid ? true : false;
+                    if(hasAuthUid) hasUid++;
+                    
+                    let statusHtml = '';
+                    if(hasAuthUid) {
+                        statusHtml = '<span class="auth-status-badge exists">✅ Migré</span>';
+                    } else {
+                        statusHtml = '<span class="auth-status-badge missing">⏳ En attente</span>';
+                    }
+                    
+                    html += `<tr>
+                        <td>${escapeHtml(user.nomComplet)}</td>
+                        <td>${escapeHtml(user.email)}</td>
+                        <td><span class="badge bg-primary">${escapeHtml(user.role)}</span></td>
+                        <td><code>${user.uid ? user.uid.substring(0,8) : 'N/A'}</code></td>
+                        <td>${statusHtml}</td>
+                    </tr>`;
+                }
+                
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+                
+                const total = aMigrer.length;
+                const migres = aMigrer.filter(u => u.uid).length;
+                
+                document.getElementById('migrationStatus').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>${total}</strong> compte(s) à migrer vers Firebase Auth.
+                        ${migres} déjà migré(s).
+                        ${total - migres > 0 ? `<br>⚠️ ${total - migres} compte(s) en attente de migration.` : ''}
+                    </div>
+                `;
+                
+                document.getElementById('migrateAllBtn').disabled = false;
+                document.getElementById('cleanupBtn').disabled = (total - migres > 0);
+                
+            } catch(err) {
+                console.error('Erreur chargement comptes:', err);
+                container.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des comptes</div>';
+            }
+        }
+        
+        document.getElementById('checkAuthStatusBtn')?.addEventListener('click', async () => {
+            showToast('🔍 Vérification des comptes Auth en cours...', 'warning');
+            await chargerMigrationListe();
+            showToast('✅ Vérification terminée', 'success');
+        });
+        
+        document.getElementById('migrateAllBtn')?.addEventListener('click', async () => {
+            if(isMigrating) return;
+            if(!confirm('⚠️ Voulez-vous vraiment migrer TOUS les comptes vers Firebase Authentication ?\nLes mots de passe seront conservés.')) return;
+            
+            const btn = document.getElementById('migrateAllBtn');
+            btn.disabled = true;
+            isMigrating = true;
+            btn.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;display:inline-block;"></div> Migration en cours...';
+            
+            try {
+                const snapshot = await db.collection('utilisateurs').get();
+                const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const aMigrer = users.filter(u => u.role && u.role !== 'admin' && !u.uid);
+                
+                if(aMigrer.length === 0) {
+                    showToast('✅ Tous les comptes sont déjà migrés !', 'success');
+                    await chargerMigrationListe();
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Migrer tous les comptes vers Auth';
+                    isMigrating = false;
+                    return;
+                }
+                
+                let success = 0;
+                let errors = 0;
+                
+                for(let user of aMigrer) {
+                    try {
+                        let existe = false;
+                        try {
+                            await auth.signInWithEmailAndPassword(user.email, user.motDePasse || 'temp123');
+                            existe = true;
+                            await auth.signOut();
+                        } catch(e) {
+                            existe = false;
+                        }
+                        
+                        if(!existe && user.motDePasse) {
+                            const userCredential = await auth.createUserWithEmailAndPassword(user.email, user.motDePasse);
+                            const uid = userCredential.user.uid;
+                            
+                            await db.collection('utilisateurs').doc(user.id).update({
+                                uid: uid,
+                                migratedToAuth: true,
+                                migrationDate: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            
+                            success++;
+                        } else if(user.uid) {
+                            await db.collection('utilisateurs').doc(user.id).update({
+                                migratedToAuth: true
+                            });
+                            success++;
+                        } else {
+                            errors++;
+                            console.log(`Compte ${user.email} ignoré (pas de mot de passe stocké)`);
+                        }
+                    } catch(err) {
+                        errors++;
+                        console.error(`Erreur pour ${user.email}:`, err);
+                    }
+                }
+                
+                showToast(`✅ Migration terminée : ${success} succès, ${errors} échecs`, success > 0 ? 'success' : 'danger');
+                await chargerMigrationListe();
+                
+            } catch(err) {
+                showToast('❌ Erreur lors de la migration', 'danger');
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Migrer tous les comptes vers Auth';
+                isMigrating = false;
+            }
+        });
+        
+        document.getElementById('cleanupBtn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('cleanupBtn');
+            
+            const snapshot = await db.collection('utilisateurs').get();
+            const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const nonMigres = users.filter(u => u.role && u.role !== 'admin' && !u.uid);
+            
+            if(nonMigres.length > 0) {
+                alert(`⚠️ Il reste ${nonMigres.length} compte(s) non migrés vers Auth.\nVeuillez d'abord migrer tous les comptes.`);
+                return;
+            }
+            
+            if(!confirm('⚠️ Supprimer définitivement la collection "utilisateurs" de Firestore ?\nCette action est irréversible !')) return;
+            if(!confirm('✅ Confirmez-vous que TOUS les comptes sont migrés vers Auth ?')) return;
+            
+            btn.disabled = true;
+            btn.innerHTML = 'Suppression en cours...';
+            
+            try {
+                const usersToDelete = users.filter(u => u.role && u.role !== 'admin');
+                
+                const batch = db.batch();
+                let count = 0;
+                for(let user of usersToDelete) {
+                    batch.delete(db.collection('utilisateurs').doc(user.id));
+                    count++;
+                    if(count % 500 === 0) {
+                        await batch.commit();
+                    }
+                }
+                if(count % 500 !== 0) {
+                    await batch.commit();
+                }
+                
+                showToast(`✅ Collection "utilisateurs" supprimée avec succès (${count} documents)`, 'success');
+                btn.innerHTML = '✅ Collection supprimée';
+                btn.disabled = true;
+                
+                refreshComptes();
+                refreshAcademiques();
+                refreshProfesseurs();
+                chargerMigrationListe();
+                
+            } catch(err) {
+                showToast('❌ Erreur lors de la suppression', 'danger');
+                console.error(err);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-trash"></i> Supprimer la collection utilisateurs';
+            }
+        });
+        
+        // ============================================================
+        // ⭐ FORMULAIRES
+        // ============================================================
+        document.getElementById('anneeForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nom = document.getElementById('nomAnnee').value.trim();
+            await db.collection('anneesAcademiques').add({ annee: nom, nom: nom, statut: document.getElementById('statutAnnee').value, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
+            document.getElementById('anneeForm').reset();
+            showToast('Année créée avec succès');
+            refreshAnnees();
+        });
+        
+        document.getElementById('promotionForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nom = document.getElementById('nomPromotion').value.trim();
+            const capacite = parseInt(document.getElementById('capacitePromotion').value);
+            const nomExiste = allPromotions.some(p => p.nom.toLowerCase() === nom.toLowerCase());
+            if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); return; }
+            await db.collection('promotions').add({ nom: nom, capacite: capacite, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
+            document.getElementById('promotionForm').reset();
+            showToast('Promotion créée avec succès');
+            refreshPromotions();
+        });
+        
+        document.getElementById('ficheForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedPromotions = [];
+            document.querySelectorAll('.promotion-checkbox:checked').forEach(cb => selectedPromotions.push(cb.value));
+            if(selectedPromotions.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); return; }
+            await db.collection('fiches').add({ 
+                nom: document.getElementById('nomFiche').value.trim(), 
+                montant: parseInt(document.getElementById('montantFiche').value), 
+                promotions: selectedPromotions, 
+                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+            document.getElementById('ficheForm').reset();
+            document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllPromotions').checked = false;
+            showToast('Fiche créée avec succès');
+            refreshFiches();
+        });
+        
+        // ============================================================
+        // ⭐ BOUTONS D'ACTUALISATION
+        // ============================================================
+        document.getElementById('refreshAnneesBtn')?.addEventListener('click', refreshAnnees);
+        document.getElementById('refreshComptesBtn')?.addEventListener('click', refreshComptes);
+        document.getElementById('refreshAcademiquesBtn')?.addEventListener('click', refreshAcademiques);
+        document.getElementById('refreshProfesseursBtn')?.addEventListener('click', refreshProfesseurs);
+        document.getElementById('refreshPromotionsBtn')?.addEventListener('click', refreshPromotions);
+        document.getElementById('refreshFichesBtn')?.addEventListener('click', refreshFiches);
+        document.getElementById('refreshEtudiantsBtn')?.addEventListener('click', refreshEtudiants);
+        document.getElementById('refreshSemestreConfigBtn')?.addEventListener('click', refreshAllConfigs);
+        
+        // ============================================================
+        // ⭐ MENU NAVIGATION
+        // ============================================================
+        document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.form-section').forEach(section => section.classList.remove('active'));
+                const sectionId = `section-${btn.dataset.section}`;
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        // ============================================================
+        // ⭐ CHARGEMENT DES DONNÉES
+        // ============================================================
+        function loadAppData() {
+            staticCache.getCollection('anneesAcademiques').then(data => { allAnnees = data; lastUpdates.annees = Date.now(); afficherAnneesListe(); updateLastUpdateDisplay('annee'); });
+            staticCache.getCollection('promotions').then(data => { 
+                allPromotions = data; 
+                lastUpdates.promotions = Date.now(); 
+                afficherPromotionsListe(); 
+                chargerPromotionsSelects(); 
+                chargerPromotionsCheckbox(); 
+                chargerPromotionsSelectsEtudiant(); 
+                afficherBoutonsPromotions(); 
+                chargerPromotionsTransfert(); 
+                updateLastUpdateDisplay('promotion');
+                chargerConfigurationsPromotions().then(() => {
+                    chargerPromotionSelector();
+                    afficherResumeConfigurations();
+                    if(allPromotions.length > 0) {
+                        currentSelectedPromoForConfig = allPromotions[0].id;
+                        const btns = document.querySelectorAll('.promo-select-btn');
+                        btns.forEach(b => b.classList.remove('active'));
+                        const firstPromoBtn = document.querySelector(`.promo-select-btn[data-promo="${allPromotions[0].id}"]`);
+                        if(firstPromoBtn) firstPromoBtn.classList.add('active');
+                        afficherConfigPromotion(allPromotions[0].id);
+                    }
+                });
+            });
+            staticCache.getCollection('fiches').then(data => { 
+                allFiches = data; 
+                lastUpdates.fiches = Date.now(); 
+                afficherFichesListe(); 
+                updateLastUpdateDisplay('fiche');
+            });
+            staticCache.getCollection('etudiants').then(data => { 
+                allEtudiants = data; 
+                lastUpdates.etudiants = Date.now(); 
+                afficherBoutonsPromotions(); 
+                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion); 
+                updateLastUpdateDisplay('etudiant'); 
+            });
+            staticCache.getCollection('utilisateurs').then(data => { 
+                allUtilisateurs = data.filter(u => u.role === 'comptabilite'); 
+                allAcademiques = data.filter(u => u.role === 'academique');
+                allProfesseurs = data.filter(u => u.role === 'professeur');
+                lastUpdates.comptes = Date.now();
+                lastUpdates.academiques = Date.now();
+                lastUpdates.professeurs = Date.now();
+                afficherComptesListe(); 
+                afficherAcademiquesListe();
+                afficherProfesseursListe();
+                updateLastUpdateDisplay('compte');
+                updateLastUpdateDisplay('academique');
+                updateLastUpdateDisplay('professeur');
+                chargerMigrationListe();
+            });
+            
+            // Écouteurs en temps réel
+            db.collection('anneesAcademiques').onSnapshot(() => refreshAnnees());
+            db.collection('promotions').onSnapshot(() => refreshPromotions());
+            db.collection('fiches').onSnapshot(() => refreshFiches());
+            db.collection('etudiants').onSnapshot(() => refreshEtudiants());
+            db.collection('utilisateurs').onSnapshot(() => {
+                refreshComptes();
+                refreshAcademiques();
+                refreshProfesseurs();
+                chargerMigrationListe();
+            });
+        }
+        
+        // ============================================================
+        // ⭐ SERVICE WORKER
+        // ============================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
+            });
+        }
+        
+        // ============================================================
+        // ⭐ INITIALISATION
+        // ============================================================
+        loadAppData();
+        
+        console.log('✅ Dashboard Admin - Sécurisé avec Firebase Auth + 2FA');
+        console.log('👤 Admin connecté:', currentAdmin?.nomComplet);
+    </script>
+</body>
+</html>
