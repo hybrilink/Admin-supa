@@ -16,8 +16,23 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+    // Activer Eruda
+    if (window.eruda) {
+        eruda.init();
+        console.log('✅ Eruda console activée');
+    } else {
+        // Attendre le chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            eruda.init();
+            console.log('✅ Eruda console activée');
+        });
+    }
+</script>
     
     <style>
+        /* ... (même CSS que précédemment) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root { --primary-blue: #003366; --dark-blue: #002244; --accent-yellow: #ffb347; }
         
@@ -202,7 +217,6 @@
             text-decoration: underline;
         }
 
-        /* ===== STYLES 2FA ===== */
         .verification-container {
             display: none;
             animation: fadeInUp 0.5s ease-out;
@@ -378,7 +392,6 @@
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner">
             <div class="spinner"></div>
@@ -400,7 +413,6 @@
                 <span class="role-badge"><i class="bi bi-shield-fill-check"></i> Rôle : Administrateur</span>
             </div>
             
-            <!-- Formulaire de connexion -->
             <div id="loginFormContainer">
                 <form id="loginForm">
                     <div class="form-group">
@@ -424,7 +436,6 @@
                 </div>
             </div>
             
-            <!-- Vérification 2FA -->
             <div id="verificationContainer" class="verification-container">
                 <div class="text-center">
                     <div class="verification-icon">
@@ -512,7 +523,13 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const functions = firebase.functions();
+        
+        // ============================================================
+        // ⭐ CONFIGURATION DES CLOUD FUNCTIONS
+        // ============================================================
+        const functions = firebase.functions('us-central1');
+        
+        console.log('📡 Cloud Functions région: us-central1');
         
         // ============================================================
         // ⭐ RÉFÉRENCES AUX CLOUD FUNCTIONS
@@ -551,7 +568,6 @@
             }
         }
         
-        // ⭐ ENVOYER LE CODE VIA CLOUD FUNCTION
         async function envoyerCodeParEmail(email, code, nom, role) {
             try {
                 showLoading(true);
@@ -559,7 +575,6 @@
                 console.log('📧 Envoi du code via Cloud Function...');
                 console.log('📧 Email:', email);
                 console.log('🔐 Code:', code);
-                console.log('👤 Rôle:', role);
                 
                 const result = await sendCodeFunction({
                     email: email,
@@ -568,19 +583,22 @@
                     role: role || 'admin'
                 });
                 
-                console.log('✅ Réponse Cloud Function:', result.data);
+                console.log('✅ Réponse:', result.data);
                 showLoading(false);
                 return true;
                 
             } catch (error) {
                 console.error('❌ Erreur envoi email:', error);
+                console.error('❌ Code erreur:', error.code);
+                console.error('❌ Message:', error.message);
+                
                 showLoading(false);
                 
                 let errorMessage = 'Erreur lors de l\'envoi du code';
                 if (error.code === 'unauthenticated') {
                     errorMessage = 'Vous devez être authentifié';
                 } else if (error.code === 'invalid-argument') {
-                    errorMessage = 'Données invalides: ' + error.message;
+                    errorMessage = 'Données invalides';
                 } else if (error.code === 'resource-exhausted') {
                     errorMessage = 'Trop de tentatives. Attendez 5 minutes.';
                 }
@@ -590,7 +608,6 @@
             }
         }
         
-        // ⭐ VÉRIFIER LE CODE VIA CLOUD FUNCTION
         async function verifierCodeAvecFirebase(email, code) {
             try {
                 const result = await verifyCodeFunction({
@@ -610,7 +627,6 @@
             }
         }
         
-        // ⭐ RENVOYER LE CODE VIA CLOUD FUNCTION
         async function renvoyerCodeAvecFirebase(email, nom, role) {
             try {
                 const result = await resendCodeFunction({
@@ -625,18 +641,6 @@
             }
         }
         
-        // ⭐ VÉRIFIER LA SESSION VIA CLOUD FUNCTION
-        async function verifierSessionAdmin() {
-            try {
-                const result = await verifyAdminFunction({});
-                return result.data;
-            } catch (error) {
-                console.error('❌ Erreur vérification session:', error);
-                return { isValid: false, message: 'Erreur serveur' };
-            }
-        }
-        
-        // ⭐ ENVOYER LE CODE (WRAPPER)
         async function envoyerCode() {
             if (!currentEmail) return false;
             
@@ -661,7 +665,6 @@
             }
         }
         
-        // ⭐ AFFICHER LA VÉRIFICATION
         function afficherVerification() {
             document.getElementById('loginFormContainer').style.display = 'none';
             document.getElementById('verificationContainer').classList.add('active');
@@ -692,7 +695,6 @@
             }, 1000);
         }
         
-        // ⭐ ANNULER LA CONNEXION
         function annulerConnexion() {
             clearInterval(codeExpireTimer);
             document.getElementById('loginFormContainer').style.display = 'block';
@@ -706,7 +708,6 @@
             document.getElementById('codeSentInfo').classList.remove('show');
         }
         
-        // ⭐ RENVOYER LE CODE (WRAPPER)
         function renvoyerCode() {
             if (isVerifying) return;
             if (!currentEmail) return;
@@ -749,7 +750,6 @@
                 });
         }
         
-        // ⭐ RÉCUPÉRER LE CODE DES CHAMPS
         function getCodeFromInputs() {
             let code = '';
             for (let i = 1; i <= 6; i++) {
@@ -759,7 +759,6 @@
             return code;
         }
         
-        // ⭐ VÉRIFIER LE CODE (APPELÉ PAR LE BOUTON)
         async function verifierCode() {
             if (isVerifying) return;
             if (timerSeconds <= 0) {
@@ -815,7 +814,6 @@
             }
         }
         
-        // ⭐ FINALISER LA CONNEXION
         async function finaliserConnexion() {
             try {
                 const userCredential = await auth.signInWithEmailAndPassword(currentEmail, currentPassword);
@@ -833,7 +831,7 @@
                 const userData = userDoc.data();
                 
                 if (userData.role !== 'admin') {
-                    showToast('❌ Accès non autorisé - Vous n\'êtes pas administrateur', 'danger');
+                    showToast('❌ Accès non autorisé', 'danger');
                     await auth.signOut();
                     annulerConnexion();
                     return;
@@ -1083,6 +1081,7 @@
         window.renvoyerCode = renvoyerCode;
         
         console.log('✅ Page de connexion Administration - Sécurisée avec Cloud Functions');
+        console.log('📡 Région: us-central1');
         
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
