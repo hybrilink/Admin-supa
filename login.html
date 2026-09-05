@@ -1079,7 +1079,7 @@
         }
 
         // ============================================================
-        // ENVOYER LE CODE
+        // ENVOYER LE CODE (CORRIGÉ)
         // ============================================================
 
         async function envoyerCode() {
@@ -1091,13 +1091,18 @@
                     '📧 Génération et envoi du code...'
                 );
 
-                /*
-                 * IMPORTANT :
-                 * Aucun code n'est généré ici.
-                 *
-                 * La Cloud Function génère elle-même
-                 * le code 6 chiffres.
-                 */
+                // ============================================================
+                // FIX: Forcer le rafraîchissement du token ID
+                // Cela garantit que le token est valide et sera transmis
+                // à la Cloud Function.
+                // ============================================================
+                if (auth.currentUser) {
+                    await auth.currentUser.getIdToken(true);
+                } else {
+                    showToast('❌ Utilisateur non authentifié.', 'danger');
+                    return false;
+                }
+                // ============================================================
 
                 const result =
                     await sendCodeFunction({});
@@ -1136,181 +1141,6 @@
 
                 return false;
             }
-        }
-
-        // ============================================================
-        // VERIFIER CODE
-        // ============================================================
-
-        async function verifierCodeAvecFirebase(code) {
-
-            try {
-
-                /*
-                 * Le serveur connaît déjà l'utilisateur
-                 * grâce à context.auth.uid.
-                 *
-                 * On n'envoie donc pas l'email.
-                 */
-
-                const result =
-                    await verifyCodeFunction({
-                        code: code
-                    });
-
-                return {
-                    success: true,
-                    data: result.data
-                };
-
-            } catch (error) {
-
-                console.error(
-                    '❌ Erreur vérification:',
-                    error
-                );
-
-                return {
-                    success: false,
-                    code: error.code,
-                    message: getFirebaseErrorMessage(error)
-                };
-            }
-        }
-
-        // ============================================================
-        // RENVOYER CODE
-        // ============================================================
-
-        async function renvoyerCode() {
-
-            if (resendInProgress) {
-                return;
-            }
-
-            if (!currentEmail) {
-                return;
-            }
-
-            resendInProgress = true;
-
-            try {
-
-                showLoading(
-                    true,
-                    '📧 Envoi d’un nouveau code...'
-                );
-
-                const result =
-                    await resendCodeFunction({});
-
-                console.log(
-                    '✅ Nouveau code envoyé:',
-                    result.data
-                );
-
-                timerSeconds = 120;
-
-                document
-                    .getElementById('timerCount')
-                    .textContent = timerSeconds;
-
-                document
-                    .getElementById('btnVerifyCode')
-                    .disabled = false;
-
-                if (codeExpireTimer) {
-                    clearInterval(codeExpireTimer);
-                }
-
-                codeExpireTimer = setInterval(() => {
-
-                    timerSeconds--;
-
-                    document
-                        .getElementById('timerCount')
-                        .textContent =
-                        Math.max(timerSeconds, 0);
-
-                    if (timerSeconds <= 0) {
-
-                        clearInterval(codeExpireTimer);
-
-                        document
-                            .getElementById('btnVerifyCode')
-                            .disabled = true;
-                    }
-
-                }, 1000);
-
-                document
-                    .querySelectorAll('.verification-code-input input')
-                    .forEach(input => {
-
-                        input.value = '';
-
-                        input.classList.remove(
-                            'error',
-                            'correct'
-                        );
-                    });
-
-                document
-                    .getElementById('codeError')
-                    .style.display = 'none';
-
-                document
-                    .getElementById('code1')
-                    .focus();
-
-                showLoading(false);
-
-                showToast(
-                    '📧 Nouveau code envoyé.',
-                    'success'
-                );
-
-            } catch (error) {
-
-                console.error(
-                    '❌ Erreur renvoi:',
-                    error
-                );
-
-                showLoading(false);
-
-                showToast(
-                    '❌ ' + getFirebaseErrorMessage(error),
-                    'danger'
-                );
-
-            } finally {
-
-                resendInProgress = false;
-            }
-        }
-
-        // ============================================================
-        // RECUPERER CODE
-        // ============================================================
-
-        function getCodeFromInputs() {
-
-            let code = '';
-
-            for (let i = 1; i <= 6; i++) {
-
-                const input =
-                    document.getElementById(
-                        `code${i}`
-                    );
-
-                if (input) {
-                    code += input.value;
-                }
-            }
-
-            return code;
         }
 
         // ============================================================
@@ -1373,12 +1203,20 @@
 
             try {
 
-                const result =
-                    await verifierCodeAvecFirebase(
-                        codeSaisi
-                    );
+                // ============================================================
+                // FIX: Forcer le rafraîchissement du token ID avant la vérification
+                // ============================================================
+                if (auth.currentUser) {
+                    await auth.currentUser.getIdToken(true);
+                }
+                // ============================================================
 
-                if (!result.success) {
+                const result =
+                    await verifyCodeFunction({
+                        code: codeSaisi
+                    });
+
+                if (!result || !result.data || !result.data.success) {
 
                     const errorElement =
                         document.getElementById('codeError');
@@ -1387,7 +1225,7 @@
 
                     errorElement.innerHTML =
                         '<i class="bi bi-exclamation-circle"></i> ' +
-                        escapeHtml(result.message);
+                        (result?.data?.message || 'Code invalide.');
 
                     document
                         .querySelectorAll('.verification-code-input input')
@@ -1401,37 +1239,12 @@
 
                         });
 
-                    /*
-                     * Après 5 erreurs, le serveur invalide
-                     * automatiquement le code.
-                     */
-
                     isVerifying = false;
 
                     btn.innerHTML =
                         '<i class="bi bi-check-circle-fill"></i> Vérifier le code';
 
-                    /*
-                     * Si le code est bloqué, il faut demander
-                     * un nouveau code.
-                     */
-
-                    if (
-                        result.code ===
-                        'functions/resource-exhausted'
-                    ) {
-
-                        btn.disabled = true;
-
-                        showToast(
-                            '🔒 Trop de tentatives. Demandez un nouveau code.',
-                            'warning'
-                        );
-
-                    } else {
-
-                        btn.disabled = false;
-                    }
+                    btn.disabled = false;
 
                     return;
                 }
@@ -1464,10 +1277,14 @@
 
                 showLoading(false);
 
-                showToast(
-                    '❌ ' + getFirebaseErrorMessage(error),
-                    'danger'
-                );
+                const errorElement =
+                    document.getElementById('codeError');
+
+                errorElement.style.display = 'block';
+
+                errorElement.innerHTML =
+                    '<i class="bi bi-exclamation-circle"></i> ' +
+                    getFirebaseErrorMessage(error);
 
                 isVerifying = false;
 
@@ -1496,14 +1313,11 @@
                     );
                 }
 
-                /*
-                 * La Cloud Function verifyCode a déjà :
-                 *
-                 * - vérifié le code
-                 * - vérifié l'identité
-                 * - vérifié le rôle admin
-                 * - créé la session 2FA serveur
-                 */
+                // ============================================================
+                // FIX: Forcer le rafraîchissement du token ID avant la vérification de session
+                // ============================================================
+                await user.getIdToken(true);
+                // ============================================================
 
                 const sessionResult =
                     await verifySessionFunction({});
@@ -1544,13 +1358,6 @@
                         Date.now() +
                         (8 * 60 * 60 * 1000)
                 };
-
-                /*
-                 * Cette donnée sert principalement à l'interface.
-                 *
-                 * La véritable validation de sécurité
-                 * reste côté serveur.
-                 */
 
                 localStorage.setItem(
                     'admin_user',
@@ -1693,6 +1500,25 @@
         // ============================================================
         // AUTO COMPLETION CODE
         // ============================================================
+
+        function getCodeFromInputs() {
+
+            let code = '';
+
+            for (let i = 1; i <= 6; i++) {
+
+                const input =
+                    document.getElementById(
+                        `code${i}`
+                    );
+
+                if (input) {
+                    code += input.value;
+                }
+            }
+
+            return code;
+        }
 
         document
             .querySelectorAll(
@@ -1838,6 +1664,129 @@
             });
 
         // ============================================================
+        // RENVOYER CODE
+        // ============================================================
+
+        async function renvoyerCode() {
+
+            if (resendInProgress) {
+                return;
+            }
+
+            if (!currentEmail) {
+                return;
+            }
+
+            resendInProgress = true;
+
+            try {
+
+                showLoading(
+                    true,
+                    '📧 Envoi d’un nouveau code...'
+                );
+
+                // ============================================================
+                // FIX: Forcer le rafraîchissement du token ID avant le renvoi
+                // ============================================================
+                if (auth.currentUser) {
+                    await auth.currentUser.getIdToken(true);
+                } else {
+                    showToast('❌ Utilisateur non authentifié.', 'danger');
+                    return;
+                }
+                // ============================================================
+
+                const result =
+                    await resendCodeFunction({});
+
+                console.log(
+                    '✅ Nouveau code envoyé:',
+                    result.data
+                );
+
+                timerSeconds = 120;
+
+                document
+                    .getElementById('timerCount')
+                    .textContent = timerSeconds;
+
+                document
+                    .getElementById('btnVerifyCode')
+                    .disabled = false;
+
+                if (codeExpireTimer) {
+                    clearInterval(codeExpireTimer);
+                }
+
+                codeExpireTimer = setInterval(() => {
+
+                    timerSeconds--;
+
+                    document
+                        .getElementById('timerCount')
+                        .textContent =
+                        Math.max(timerSeconds, 0);
+
+                    if (timerSeconds <= 0) {
+
+                        clearInterval(codeExpireTimer);
+
+                        document
+                            .getElementById('btnVerifyCode')
+                            .disabled = true;
+                    }
+
+                }, 1000);
+
+                document
+                    .querySelectorAll('.verification-code-input input')
+                    .forEach(input => {
+
+                        input.value = '';
+
+                        input.classList.remove(
+                            'error',
+                            'correct'
+                        );
+                    });
+
+                document
+                    .getElementById('codeError')
+                    .style.display = 'none';
+
+                document
+                    .getElementById('code1')
+                    .focus();
+
+                showLoading(false);
+
+                showToast(
+                    '📧 Nouveau code envoyé.',
+                    'success'
+                );
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Erreur renvoi:',
+                    error
+                );
+
+                showLoading(false);
+
+                showToast(
+                    '❌ ' + getFirebaseErrorMessage(error),
+                    'danger'
+                );
+
+            } finally {
+
+                resendInProgress = false;
+            }
+        }
+
+        // ============================================================
         // FORMULAIRE LOGIN
         // ============================================================
 
@@ -1895,14 +1844,6 @@
 
                     try {
 
-                        /*
-                         * ETAPE 1
-                         * Firebase Authentication.
-                         *
-                         * IMPORTANT :
-                         * On NE fait PAS signOut() ici.
-                         */
-
                         const credential =
                             await auth
                                 .signInWithEmailAndPassword(
@@ -1920,10 +1861,11 @@
                             );
                         }
 
-                        /*
-                         * ETAPE 2
-                         * Vérification du document utilisateur.
-                         */
+                        // ============================================================
+                        // FIX: Forcer le rafraîchissement du token ID après connexion
+                        // ============================================================
+                        await user.getIdToken(true);
+                        // ============================================================
 
                         const userDoc =
                             await db
@@ -1946,11 +1888,6 @@
                         const userData =
                             userDoc.data();
 
-                        /*
-                         * ETAPE 3
-                         * Ce login est exclusivement ADMIN.
-                         */
-
                         if (
                             userData.role !== 'admin'
                         ) {
@@ -1965,23 +1902,12 @@
                             return;
                         }
 
-                        /*
-                         * ETAPE 4
-                         * Mémorisation uniquement de données
-                         * d'affichage.
-                         */
-
                         currentEmail =
                             user.email ||
                             email;
 
                         currentUserData =
                             userData;
-
-                        /*
-                         * ETAPE 5
-                         * Le serveur génère le code.
-                         */
 
                         const codeEnvoye =
                             await envoyerCode();
@@ -1992,11 +1918,6 @@
 
                             return;
                         }
-
-                        /*
-                         * ETAPE 6
-                         * Afficher 2FA.
-                         */
 
                         afficherVerification();
 
@@ -2054,13 +1975,6 @@
                     'admin_user'
                 );
 
-            /*
-             * Si aucune session locale :
-             * on s'assure également que Firebase
-             * ne conserve pas une ancienne session
-             * partiellement authentifiée.
-             */
-
             if (!session) {
 
                 if (auth.currentUser) {
@@ -2099,11 +2013,6 @@
                     return false;
                 }
 
-                /*
-                 * La validation réelle est faite
-                 * par Cloud Functions.
-                 */
-
                 if (!auth.currentUser) {
 
                     localStorage.removeItem(
@@ -2113,13 +2022,20 @@
                     return false;
                 }
 
+                // ============================================================
+                // FIX: Forcer le rafraîchissement du token ID avant la vérification de session
+                // ============================================================
+                await auth.currentUser.getIdToken(true);
+                // ============================================================
+
                 const result =
-                    await verifierSessionAvecFirebase();
+                    await verifySessionFunction({});
 
                 if (
                     result &&
-                    result.isValid === true &&
-                    result.role === 'admin'
+                    result.data &&
+                    result.data.isValid === true &&
+                    result.data.role === 'admin'
                 ) {
 
                     window.location.href =
@@ -2152,36 +2068,6 @@
                 } catch (_) {}
 
                 return false;
-            }
-        }
-
-        // ============================================================
-        // VERIFICATION SESSION CLOUD FUNCTION
-        // ============================================================
-
-        async function verifierSessionAvecFirebase() {
-
-            try {
-
-                const result =
-                    await verifySessionFunction({});
-
-                return result.data;
-
-            } catch (error) {
-
-                console.error(
-                    '❌ Erreur session serveur:',
-                    error
-                );
-
-                return {
-                    isValid: false,
-                    message:
-                        getFirebaseErrorMessage(
-                            error
-                        )
-                };
             }
         }
 
