@@ -57,8 +57,6 @@
         .menu-btn:hover, .menu-btn.active { background: var(--primary-blue); color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .menu-btn.professor-btn { border-color: #6f42c1; color: #6f42c1; }
         .menu-btn.professor-btn:hover, .menu-btn.professor-btn.active { background: #6f42c1; color: white; }
-        .menu-btn.migration-btn { border-color: #dc3545; color: #dc3545; }
-        .menu-btn.migration-btn:hover, .menu-btn.migration-btn.active { background: #dc3545; color: white; }
         .form-section { display: none; animation: fadeIn 0.3s ease; }
         .form-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -70,7 +68,20 @@
         .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-blue); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .app-container { display: block; flex: 1; }
+        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #003366 0%, #001a33 100%); }
+        .login-card { background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 40px; width: 100%; max-width: 450px; margin: 20px; }
+        .login-logo { text-align: center; margin-bottom: 30px; }
+        .login-logo i { font-size: 60px; color: var(--primary-blue); background: #f0f2f5; padding: 20px; border-radius: 50%; }
+        .login-title { text-align: center; color: var(--primary-blue); margin-bottom: 30px; font-weight: bold; }
+        .login-btn { background: var(--primary-blue); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; transition: all 0.3s; }
+        .login-btn:hover { background: var(--dark-blue); transform: translateY(-2px); }
+        .footer { background: #1a1a2e; color: #fff; text-align: center; padding: 15px 0; margin-top: auto; font-size: 14px; }
+        .footer a { color: var(--accent-yellow); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .logout-btn { background: #dc3545; color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .logout-btn:hover { background: #c82333; transform: translateY(-2px); }
+        .app-container { display: none; flex: 1; }
+        .app-container.active { display: block; }
         .refresh-btn { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
         .refresh-btn:hover { background: #218838; transform: rotate(180deg); }
         .refresh-btn i { transition: transform 0.3s; }
@@ -112,6 +123,7 @@
         .role-badge.professeur { background: #6f42c1; color: white; }
         .professor-info-card { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 25px; margin-bottom: 20px; border-left: 5px solid #6f42c1; }
 
+        /* Nouveaux styles pour la configuration des semestres par promotion */
         .promotion-semestre-config {
             background: white;
             border-radius: 15px;
@@ -196,7 +208,7 @@
         }
         .config-progress .progress-bar-fill {
             height: 100%;
-            background: #28a745;
+            background: var(--success-green);
             width: 0%;
             transition: width 0.5s ease;
         }
@@ -235,25 +247,33 @@
         .promotion-selector-config .promo-select-btn.active .promo-count {
             background: rgba(255,255,255,0.2);
         }
-        .auth-status-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .auth-status-badge.exists { background: #28a745; color: white; }
-        .auth-status-badge.missing { background: #dc3545; color: white; }
-        .auth-status-badge.pending { background: #ffc107; color: #333; }
-        
-        .footer { background: #1a1a2e; color: #fff; text-align: center; padding: 15px 0; margin-top: auto; font-size: 14px; }
-        .footer a { color: var(--accent-yellow); text-decoration: none; }
-        .footer a:hover { text-decoration: underline; }
-        .logout-btn { background: #dc3545; color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
-        .logout-btn:hover { background: #c82333; transform: translateY(-2px); }
     </style>
 </head>
 <body>
+    <!-- Login Container -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <h3 class="login-title">Super Administration - Faculté Agronomique</h3>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="loginEmail" required placeholder="admin@fsa-unilu.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="loginPassword" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="login-btn"><i class="bi bi-box-arrow-in-right"></i> Se connecter</button>
+            </form>
+            <div class="text-center mt-3">
+                <small class="text-muted">Compte super administrateur - Contactez le développeur</small>
+            </div>
+        </div>
+    </div>
+    
     <!-- Main Application Container -->
     <div id="appContainer" class="app-container">
         <nav class="navbar navbar-custom">
@@ -283,7 +303,6 @@
                 <button class="menu-btn" data-section="etudiant"><i class="bi bi-mortarboard-fill"></i> Étudiant</button>
                 <button class="menu-btn" data-section="semestre"><i class="bi bi-calendar2-week-fill"></i> Config. Semestres</button>
                 <button class="menu-btn" data-section="transfert"><i class="bi bi-arrow-left-right"></i> Transfert Promotion</button>
-                <button class="menu-btn migration-btn" data-section="migration"><i class="bi bi-arrow-repeat"></i> Migration Auth</button>
             </div>
             
             <!-- Section Année Académique -->
@@ -329,10 +348,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-success">
-                            <i class="bi bi-shield-lock-fill"></i> 
-                            <strong>Sécurisé :</strong> Les comptes sont créés dans Firebase Authentication.
-                        </div>
                         <form id="comptaForm">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -345,7 +360,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Mot de passe</label>
-                                    <input type="password" class="form-control" id="passwordCompta" required minlength="6">
+                                    <input type="password" class="form-control" id="passwordCompta" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Confirmer</label>
@@ -371,10 +386,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-success">
-                            <i class="bi bi-shield-lock-fill"></i> 
-                            <strong>Sécurisé :</strong> Les comptes sont créés dans Firebase Authentication.
-                        </div>
                         <form id="academiqueForm">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -387,7 +398,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Mot de passe</label>
-                                    <input type="password" class="form-control" id="passwordAcademique" required minlength="6">
+                                    <input type="password" class="form-control" id="passwordAcademique" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Confirmer mot de passe</label>
@@ -413,10 +424,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-success">
-                            <i class="bi bi-shield-lock-fill"></i> 
-                            <strong>Sécurisé :</strong> Les comptes sont créés dans Firebase Authentication.
-                        </div>
                         <div class="professor-info-card">
                             <h6><i class="bi bi-info-circle-fill"></i> Informations sur le compte professeur</h6>
                             <p class="mb-0">Les professeurs pourront accéder à leur espace dédié avec des fonctionnalités spécifiques à l'enseignement.</p>
@@ -440,10 +447,6 @@
                                     <label class="form-label">Confirmer mot de passe</label>
                                     <input type="password" class="form-control" id="confirmPasswordProfesseur" required placeholder="Retaper le mot de passe" minlength="6">
                                 </div>
-<div class="col-md-6 mb-3">
-    <label class="form-label">Numéro de téléphone</label>
-    <input type="tel" class="form-control" id="telephoneProfesseur" placeholder="Ex: +243 999 999 999" required>
-</div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Spécialité</label>
                                     <input type="text" class="form-control" id="specialiteProfesseur" placeholder="Ex: Agronomie, Économie rurale..." required>
@@ -720,41 +723,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- SECTION MIGRATION VERS AUTH -->
-            <div id="section-migration" class="form-section">
-                <div class="card">
-                    <div class="card-header" style="background: #dc3545; color: white;">
-                        <h5 class="mb-0"><i class="bi bi-arrow-repeat"></i> Migration vers Firebase Auth</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <strong>Attention :</strong> Cette section permet de migrer les comptes existants (comptabilité, académique, professeurs) vers Firebase Authentication.
-                            <br>Les mots de passe seront conservés.
-                        </div>
-                        
-                        <div id="migrationStatus" class="mb-3"></div>
-                        
-                        <div class="d-flex gap-3 flex-wrap">
-                            <button class="btn btn-danger" id="migrateAllBtn">
-                                <i class="bi bi-arrow-repeat"></i> Migrer tous les comptes vers Auth
-                            </button>
-                            <button class="btn btn-warning" id="checkAuthStatusBtn">
-                                <i class="bi bi-check-circle"></i> Vérifier le statut Auth
-                            </button>
-                            <button class="btn btn-danger-custom" id="cleanupBtn" style="background: #dc3545;" disabled>
-                                <i class="bi bi-trash"></i> Supprimer la collection utilisateurs
-                            </button>
-                        </div>
-                        
-                        <hr>
-                        
-                        <h6>Liste des comptes existants <span id="migrationLastUpdate" class="last-update-badge"></span></h6>
-                        <div id="migrationListe" class="mt-2"></div>
-                    </div>
-                </div>
-            </div>
         </div>
         
         <!-- Footer -->
@@ -768,11 +736,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script>
-        // ============================================================
-        // ⭐ CONFIGURATION FIREBASE
-        // ============================================================
+        // ========== CONFIGURATION FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
             authDomain: "fsa-unilu.firebaseapp.com",
@@ -784,58 +749,12 @@
         
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
         
         db.enablePersistence({ synchronizeTabs: true })
             .then(() => console.log('✅ Persistance Firestore activée'))
             .catch((err) => console.warn('Persistance non activée:', err));
         
-        // ============================================================
-        // ⭐ VÉRIFICATION DE SESSION ADMIN
-        // ============================================================
-        function checkAdminSession() {
-            const sessionStr = localStorage.getItem('admin_user');
-            if (!sessionStr) {
-                window.location.href = 'login.html';
-                return null;
-            }
-            
-            try {
-                const session = JSON.parse(sessionStr);
-                if (Date.now() > session.expires || session.role !== 'admin' || !session.verified2FA) {
-                    localStorage.removeItem('admin_user');
-                    window.location.href = 'login.html';
-                    return null;
-                }
-                return session;
-            } catch (e) {
-                localStorage.removeItem('admin_user');
-                window.location.href = 'login.html';
-                return null;
-            }
-        }
-        
-        const currentAdmin = checkAdminSession();
-        if (!currentAdmin) {
-            // Redirection déjà effectuée
-        } else {
-            console.log('✅ Admin connecté:', currentAdmin.nomComplet);
-        }
-        
-        // ============================================================
-        // ⭐ DÉCONNEXION
-        // ============================================================
-        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-            try {
-                await auth.signOut();
-            } catch(e) {}
-            localStorage.removeItem('admin_user');
-            window.location.href = 'login.html';
-        });
-        
-        // ============================================================
-        // ⭐ SYSTÈME DE CACHE
-        // ============================================================
+        // ========== SYSTÈME DE CACHE ==========
         class StaticDataCache {
             constructor() {
                 this.cache = {};
@@ -871,9 +790,7 @@
         
         const staticCache = new StaticDataCache();
         
-        // ============================================================
-        // ⭐ VARIABLES GLOBALES
-        // ============================================================
+        // ========== VARIABLES GLOBALES ==========
         let allPromotions = [];
         let allEtudiants = [];
         let allAnnees = [];
@@ -883,9 +800,10 @@
         let allProfesseurs = [];
         let currentSelectedPromotion = null;
         let currentSearchTerm = '';
+        let currentUser = null;
         let isOnline = navigator.onLine;
-        let isMigrating = false;
         
+        // Variables pour la configuration des semestres par promotion
         let promoConfigs = {};
         let currentSelectedPromoForConfig = null;
         
@@ -896,13 +814,10 @@
             professeurs: null,
             promotions: null,
             fiches: null,
-            etudiants: null,
-            migration: null
+            etudiants: null
         };
         
-        // ============================================================
-        // ⭐ FONCTIONS UTILITAIRES
-        // ============================================================
+        // ========== FONCTIONS UTILITAIRES ==========
         function updateSyncStatus(online) {
             const statusEl = document.getElementById('syncStatus');
             if (!statusEl) return;
@@ -983,178 +898,81 @@
             if(saveBtn) {
                 saveBtn.addEventListener('click', async (e) => {
                     e.preventDefault();
-                    try {
-                        await onSave();
-                        fermerTousLesModals();
-                    } catch(err) {}
+                    await onSave();
+                    fermerTousLesModals();
                 });
             }
         }
         
-        // ============================================================
-        // ⭐ CRÉATION DE COMPTES AVEC AUTH
-        // ============================================================
-        async function creerUtilisateurAuth(email, password, nomComplet, role, extraData = {}) {
+        // ========== AUTHENTIFICATION ==========
+        function checkAuth() {
+            const userStr = localStorage.getItem('admin_user');
+            if(userStr) {
+                try {
+                    currentUser = JSON.parse(userStr);
+                    if(currentUser.role !== 'admin') {
+                        logout();
+                        return;
+                    }
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('appContainer').classList.add('active');
+                    loadAppData();
+                } catch(e) { logout(); }
+            } else {
+                document.getElementById('loginContainer').style.display = 'flex';
+                document.getElementById('appContainer').classList.remove('active');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('admin_user');
+            currentUser = null;
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('appContainer').classList.remove('active');
+            showToast('Déconnecté', 'warning');
+        }
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
             try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const uid = userCredential.user.uid;
+                const usersRef = db.collection('utilisateurs');
+                const q = await usersRef.where('email', '==', email).where('role', '==', 'admin').get();
                 
-                const userData = {
-                    nomComplet: nomComplet,
-                    email: email,
-                    role: role,
-                    uid: uid,
-                    dateCreation: firebase.firestore.FieldValue.serverTimestamp(),
-                    ...extraData
-                };
+                if(q.empty) {
+                    showToast('Email ou mot de passe incorrect', 'danger');
+                    return;
+                }
                 
-                await db.collection('utilisateurs').doc(uid).set(userData);
-                await auth.signOut();
+                let userFound = null;
+                q.forEach(doc => {
+                    const userData = doc.data();
+                    if(userData.motDePasse === password) {
+                        userFound = { id: doc.id, ...userData };
+                    }
+                });
                 
-                return { success: true, uid: uid };
-            } catch(error) {
-                console.error('Erreur création utilisateur:', error);
-                return { success: false, error: error.message };
-            }
-        }
-        
-        // ============================================================
-        // ⭐ COMPTES COMPTABILITÉ
-        // ============================================================
-        document.getElementById('comptaForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailCompta').value.trim();
-            const password = document.getElementById('passwordCompta').value;
-            const confirm = document.getElementById('confirmPasswordCompta').value;
-            const nomComplet = document.getElementById('nomCompta').value.trim();
-            
-            if(password !== confirm) { 
-                showToast('Les mots de passe ne correspondent pas', 'danger'); 
-                return; 
-            }
-            if(password.length < 6) {
-                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
-                return;
-            }
-            
-            const result = await creerUtilisateurAuth(email, password, nomComplet, 'comptabilite');
-            
-            if(result.success) {
-                showToast('✅ Compte comptabilité créé avec succès', 'success');
-                document.getElementById('comptaForm').reset();
-                refreshComptes();
-            } else {
-                showToast('Erreur: ' + result.error, 'danger');
+                if(userFound) {
+                    currentUser = userFound;
+                    localStorage.setItem('admin_user', JSON.stringify(userFound));
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('appContainer').classList.add('active');
+                    loadAppData();
+                    showToast(`Bienvenue ${userFound.nomComplet}`, 'success');
+                } else {
+                    showToast('Email ou mot de passe incorrect', 'danger');
+                }
+            } catch(err) {
+                console.error(err);
+                showToast('Erreur de connexion', 'danger');
             }
         });
         
-        // ============================================================
-        // ⭐ COMPTES ACADÉMIQUES
-        // ============================================================
-        document.getElementById('academiqueForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailAcademique').value.trim();
-            const password = document.getElementById('passwordAcademique').value;
-            const confirm = document.getElementById('confirmPasswordAcademique').value;
-            const nomComplet = document.getElementById('nomAcademique').value.trim();
-            
-            if(password !== confirm) { 
-                showToast('Les mots de passe ne correspondent pas', 'danger'); 
-                return; 
-            }
-            if(password.length < 6) {
-                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
-                return;
-            }
-            
-            const result = await creerUtilisateurAuth(email, password, nomComplet, 'academique');
-            
-            if(result.success) {
-                showToast('✅ Compte académique créé avec succès', 'success');
-                document.getElementById('academiqueForm').reset();
-                refreshAcademiques();
-            } else {
-                showToast('Erreur: ' + result.error, 'danger');
-            }
-        });
-        
-        // ============================================================
-        // ⭐ COMPTES PROFESSEURS
-        // ============================================================
-        document.getElementById('professeurForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailProfesseur').value.trim();
-            const password = document.getElementById('passwordProfesseur').value;
-            const confirm = document.getElementById('confirmPasswordProfesseur').value;
-            const nomComplet = document.getElementById('nomProfesseur').value.trim();
-            const specialite = document.getElementById('specialiteProfesseur').value.trim();
-            const departement = document.getElementById('departementProfesseur').value;
-            
-            if(password.length < 6) {
-                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
-                return;
-            }
-            if(password !== confirm) {
-                showToast('Les mots de passe ne correspondent pas', 'danger');
-                return;
-            }
-            if(!nomComplet || !email || !specialite || !departement) {
-                showToast('Veuillez remplir tous les champs', 'danger');
-                return;
-            }
-            
-            const result = await creerUtilisateurAuth(email, password, nomComplet, 'professeur', {
-                specialite: specialite,
-                departement: departement
-            });
-            
-            if(result.success) {
-                showToast('✅ Compte professeur créé avec succès', 'success');
-                document.getElementById('professeurForm').reset();
-                refreshProfesseurs();
-            } else {
-                showToast('Erreur: ' + result.error, 'danger');
-            }
-        });
-        
-        // ============================================================
-        // ⭐ AFFICHAGE DES LISTES
-        // ============================================================
-        async function refreshComptes() {
-            const btn = document.getElementById('refreshComptesBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
-            try {
-                const data = await staticCache.refreshCollection('utilisateurs');
-                allUtilisateurs = data.filter(u => u.role === 'comptabilite');
-                lastUpdates.comptes = Date.now();
-                afficherComptesListe();
-                updateLastUpdateDisplay('compte');
-                showToast('✅ Comptes comptabilité actualisés', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
-            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
-        }
-        
-        function afficherComptesListe() {
-            const container = document.getElementById('comptesListe');
-            if(!container) return;
-            if(allUtilisateurs.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun compte comptabilité</div>'; return; }
-            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>UID Auth</th><th>Actions</th></tr></thead><tbody>';
-            allUtilisateurs.forEach(c => {
-                const hasUid = c.uid ? '✅' : '❌';
-                html += `<tr id="compte-${c.id}">
-                    <td><strong>${escapeHtml(c.nomComplet)}</strong></td>
-                    <td>${escapeHtml(c.email)}</td>
-                    <td><code>${c.uid ? c.uid.substring(0,8) : 'N/A'}</code> ${hasUid}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning-custom" onclick="modifierCompte('${c.id}')"><i class="bi bi-pencil"></i> Modifier</button>
-                        <button class="btn btn-sm btn-danger-custom" onclick="supprimerCompte('${c.id}')"><i class="bi bi-trash"></i> Supprimer</button>
-                    </td>
-                </tr>`;
-            });
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-        
+        // ========== COMPTES ACADÉMIQUES ==========
         async function refreshAcademiques() {
             const btn = document.getElementById('refreshAcademiquesBtn');
             if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
@@ -1173,13 +991,12 @@
             const container = document.getElementById('academiquesListe');
             if(!container) return;
             if(allAcademiques.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun compte académique</div>'; return; }
-            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>UID Auth</th><th>Actions</th></tr></thead><tbody>';
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>Date création</th><th>Actions</th></tr></thead><tbody>';
             allAcademiques.forEach(c => {
-                const hasUid = c.uid ? '✅' : '❌';
                 html += `<tr id="academique-${c.id}">
                     <td><strong>${escapeHtml(c.nomComplet)}</strong></td>
                     <td>${escapeHtml(c.email)}</td>
-                    <td><code>${c.uid ? c.uid.substring(0,8) : 'N/A'}</code> ${hasUid}</td>
+                    <td>${c.dateCreation ? new Date(c.dateCreation.toDate()).toLocaleDateString() : '-'}</td>
                     <td>
                         <button class="btn btn-sm btn-warning-custom" onclick="modifierAcademique('${c.id}')"><i class="bi bi-pencil"></i> Modifier</button>
                         <button class="btn btn-sm btn-danger-custom" onclick="supprimerAcademique('${c.id}')"><i class="bi bi-trash"></i> Supprimer</button>
@@ -1190,6 +1007,50 @@
             container.innerHTML = html;
         }
         
+        window.modifierAcademique = (id) => {
+            const compte = allAcademiques.find(c => c.id === id);
+            if(!compte) return;
+            const contenu = `
+                <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalAcademiqueNom" value="${escapeHtml(compte.nomComplet)}" required></div>
+                <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalAcademiqueEmail" value="${escapeHtml(compte.email)}" required></div>
+                <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici.</div>
+            `;
+            ouvrirModal('Modifier le compte académique', contenu, async () => {
+                const nouveauNom = document.getElementById('modalAcademiqueNom').value.trim();
+                const nouvelEmail = document.getElementById('modalAcademiqueEmail').value.trim();
+                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
+                await db.collection('utilisateurs').doc(id).update({ nomComplet: nouveauNom, email: nouvelEmail });
+                showToast('Compte académique modifié avec succès');
+            });
+        };
+        
+        window.supprimerAcademique = async (id) => {
+            if(confirm('Supprimer ce compte académique définitivement ?')) {
+                await db.collection('utilisateurs').doc(id).delete();
+                showToast('Compte académique supprimé', 'warning');
+            }
+        };
+        
+        document.getElementById('academiqueForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pwd = document.getElementById('passwordAcademique').value;
+            const confirm = document.getElementById('confirmPasswordAcademique').value;
+            if(pwd !== confirm) { showToast('Les mots de passe ne correspondent pas', 'danger'); return; }
+            const id = 'ACAD_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            await db.collection('utilisateurs').doc(id).set({
+                nomComplet: document.getElementById('nomAcademique').value.trim(),
+                email: document.getElementById('emailAcademique').value.trim(),
+                motDePasse: pwd,
+                role: 'academique',
+                id: id,
+                dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById('academiqueForm').reset();
+            showToast('Compte académique créé avec succès');
+            refreshAcademiques();
+        });
+        
+        // ========== COMPTES PROFESSEURS ==========
         async function refreshProfesseurs() {
             const btn = document.getElementById('refreshProfesseursBtn');
             if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
@@ -1205,383 +1066,120 @@
         }
         
         function afficherProfesseursListe() {
-    const container = document.getElementById('professeursListe');
-    if(!container) return;
-    if(allProfesseurs.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun professeur enregistré</div>'; return; }
-    let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Spécialité</th><th>Département</th><th>UID Auth</th><th>Actions</th></tr></thead><tbody>';
-    allProfesseurs.forEach(p => {
-        const hasUid = p.uid ? '✅' : '❌';
-        html += `<tr id="professeur-${p.id}">
-            <td><strong>${escapeHtml(p.nomComplet)}</strong></td>
-            <td>${escapeHtml(p.email)}</td>
-            <td>${escapeHtml(p.telephone || '-')}</td>
-            <td>${escapeHtml(p.specialite || '-')}</td>
-            <td>${escapeHtml(p.departement || '-')}</td>
-            <td><code>${p.uid ? p.uid.substring(0,8) : 'N/A'}</code> ${hasUid}</td>
-            <td>
-                <button class="btn btn-sm btn-warning-custom" onclick="modifierProfesseur('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
-                <button class="btn btn-sm btn-danger-custom" onclick="supprimerProfesseur('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button>
-            </td>
-        </tr>`;
-    });
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
-}
-        
-        // ============================================================
-        // ⭐ MODIFICATIONS
-        // ============================================================
-        window.modifierCompte = (id) => {
-            const compte = allUtilisateurs.find(c => c.id === id);
-            if(!compte) return;
-            const contenu = `
-                <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalCompteNom" value="${escapeHtml(compte.nomComplet)}" required></div>
-                <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalCompteEmail" value="${escapeHtml(compte.email)}" required></div>
-                <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici. Utilisez Firebase Console pour réinitialiser.</div>
-            `;
-            ouvrirModal('Modifier le compte comptabilité', contenu, async () => {
-                const nouveauNom = document.getElementById('modalCompteNom').value.trim();
-                const nouvelEmail = document.getElementById('modalCompteEmail').value.trim();
-                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
-                await db.collection('utilisateurs').doc(id).update({ nomComplet: nouveauNom, email: nouvelEmail });
-                showToast('Compte modifié avec succès');
+            const container = document.getElementById('professeursListe');
+            if(!container) return;
+            if(allProfesseurs.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun professeur enregistré</div>'; return; }
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>Spécialité</th><th>Département</th><th>Date création</th><th>Actions</th></tr></thead><tbody>';
+            allProfesseurs.forEach(p => {
+                html += `<tr id="professeur-${p.id}">
+                    <td><strong>${escapeHtml(p.nomComplet)}</strong></td>
+                    <td>${escapeHtml(p.email)}</td>
+                    <td>${escapeHtml(p.specialite || '-')}</td>
+                    <td>${escapeHtml(p.departement || '-')}</td>
+                    <td>${p.dateCreation ? new Date(p.dateCreation.toDate()).toLocaleDateString() : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning-custom" onclick="modifierProfesseur('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                        <button class="btn btn-sm btn-danger-custom" onclick="supprimerProfesseur('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button>
+                    </td>
+                </tr>`;
             });
-        };
-        
-        window.modifierAcademique = (id) => {
-            const compte = allAcademiques.find(c => c.id === id);
-            if(!compte) return;
-            const contenu = `
-                <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalAcademiqueNom" value="${escapeHtml(compte.nomComplet)}" required></div>
-                <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalAcademiqueEmail" value="${escapeHtml(compte.email)}" required></div>
-                <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici. Utilisez Firebase Console pour réinitialiser.</div>
-            `;
-            ouvrirModal('Modifier le compte académique', contenu, async () => {
-                const nouveauNom = document.getElementById('modalAcademiqueNom').value.trim();
-                const nouvelEmail = document.getElementById('modalAcademiqueEmail').value.trim();
-                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
-                await db.collection('utilisateurs').doc(id).update({ nomComplet: nouveauNom, email: nouvelEmail });
-                showToast('Compte académique modifié avec succès');
-            });
-        };
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
         
         window.modifierProfesseur = (id) => {
-    const professeur = allProfesseurs.find(p => p.id === id);
-    if(!professeur) return;
-    const contenu = `
-        <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalProfesseurNom" value="${escapeHtml(professeur.nomComplet)}" required></div>
-        <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalProfesseurEmail" value="${escapeHtml(professeur.email)}" required></div>
-        <div class="mb-3"><label class="form-label">Téléphone</label><input type="tel" class="form-control" id="modalProfesseurTelephone" value="${escapeHtml(professeur.telephone || '')}" required></div>
-        <div class="mb-3"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="modalProfesseurSpecialite" value="${escapeHtml(professeur.specialite || '')}" required></div>
-        <div class="mb-3"><label class="form-label">Département</label>
-            <select class="form-select" id="modalProfesseurDepartement">
-                <option value="">Sélectionner un département</option>
-                <option value="Agronomie Générale" ${professeur.departement === 'Agronomie Générale' ? 'selected' : ''}>Agronomie Générale</option>
-                <option value="Économie Agricole" ${professeur.departement === 'Économie Agricole' ? 'selected' : ''}>Économie Agricole</option>
-                <option value="Sciences du Sol" ${professeur.departement === 'Sciences du Sol' ? 'selected' : ''}>Sciences du Sol</option>
-                <option value="Protection des Végétaux" ${professeur.departement === 'Protection des Végétaux' ? 'selected' : ''}>Protection des Végétaux</option>
-                <option value="Zootechnie" ${professeur.departement === 'Zootechnie' ? 'selected' : ''}>Zootechnie</option>
-                <option value="Génie Rural" ${professeur.departement === 'Génie Rural' ? 'selected' : ''}>Génie Rural</option>
-            </select>
-        </div>
-        <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici. Utilisez Firebase Console pour réinitialiser.</div>
-    `;
-    ouvrirModal('Modifier le professeur', contenu, async () => {
-        const nouveauNom = document.getElementById('modalProfesseurNom').value.trim();
-        const nouvelEmail = document.getElementById('modalProfesseurEmail').value.trim();
-        const nouveauTelephone = document.getElementById('modalProfesseurTelephone').value.trim();
-        const nouvelleSpecialite = document.getElementById('modalProfesseurSpecialite').value.trim();
-        const nouveauDepartement = document.getElementById('modalProfesseurDepartement').value;
-        if(!nouveauNom || !nouvelEmail || !nouveauTelephone) throw new Error('Champs requis');
-        await db.collection('utilisateurs').doc(id).update({ 
-            nomComplet: nouveauNom, 
-            email: nouvelEmail,
-            telephone: nouveauTelephone,
-            specialite: nouvelleSpecialite,
-            departement: nouveauDepartement
-        });
-        showToast('Professeur modifié avec succès');
-    });
-};
-        
-        window.supprimerCompte = async (id) => {
-            const compte = allUtilisateurs.find(c => c.id === id);
-            if(!compte) return;
-            if(confirm(`Supprimer le compte de ${compte.nomComplet} ?`)) {
-                try {
-                    if(compte.uid) {
-                        try {
-                            const user = await auth.signInWithEmailAndPassword(compte.email, 'temp_password');
-                            await user.user.delete();
-                        } catch(e) {}
-                    }
-                    await db.collection('utilisateurs').doc(id).delete();
-                    showToast('Compte supprimé', 'warning');
-                    refreshComptes();
-                } catch(err) {
-                    showToast('Erreur lors de la suppression', 'danger');
-                }
-            }
-        };
-        
-        window.supprimerAcademique = async (id) => {
-            const compte = allAcademiques.find(c => c.id === id);
-            if(!compte) return;
-            if(confirm(`Supprimer le compte de ${compte.nomComplet} ?`)) {
-                try {
-                    if(compte.uid) {
-                        try {
-                            const user = await auth.signInWithEmailAndPassword(compte.email, 'temp_password');
-                            await user.user.delete();
-                        } catch(e) {}
-                    }
-                    await db.collection('utilisateurs').doc(id).delete();
-                    showToast('Compte académique supprimé', 'warning');
-                    refreshAcademiques();
-                } catch(err) {
-                    showToast('Erreur lors de la suppression', 'danger');
-                }
-            }
+            const professeur = allProfesseurs.find(p => p.id === id);
+            if(!professeur) return;
+            const contenu = `
+                <div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalProfesseurNom" value="${escapeHtml(professeur.nomComplet)}" required></div>
+                <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalProfesseurEmail" value="${escapeHtml(professeur.email)}" required></div>
+                <div class="mb-3"><label class="form-label">Spécialité</label><input type="text" class="form-control" id="modalProfesseurSpecialite" value="${escapeHtml(professeur.specialite || '')}" required></div>
+                <div class="mb-3"><label class="form-label">Département</label>
+                    <select class="form-select" id="modalProfesseurDepartement">
+                        <option value="">Sélectionner un département</option>
+                        <option value="Agronomie Générale" ${professeur.departement === 'Agronomie Générale' ? 'selected' : ''}>Agronomie Générale</option>
+                        <option value="Économie Agricole" ${professeur.departement === 'Économie Agricole' ? 'selected' : ''}>Économie Agricole</option>
+                        <option value="Sciences du Sol" ${professeur.departement === 'Sciences du Sol' ? 'selected' : ''}>Sciences du Sol</option>
+                        <option value="Protection des Végétaux" ${professeur.departement === 'Protection des Végétaux' ? 'selected' : ''}>Protection des Végétaux</option>
+                        <option value="Zootechnie" ${professeur.departement === 'Zootechnie' ? 'selected' : ''}>Zootechnie</option>
+                        <option value="Génie Rural" ${professeur.departement === 'Génie Rural' ? 'selected' : ''}>Génie Rural</option>
+                    </select>
+                </div>
+                <div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici.</div>
+            `;
+            ouvrirModal('Modifier le professeur', contenu, async () => {
+                const nouveauNom = document.getElementById('modalProfesseurNom').value.trim();
+                const nouvelEmail = document.getElementById('modalProfesseurEmail').value.trim();
+                const nouvelleSpecialite = document.getElementById('modalProfesseurSpecialite').value.trim();
+                const nouveauDepartement = document.getElementById('modalProfesseurDepartement').value;
+                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
+                await db.collection('utilisateurs').doc(id).update({ 
+                    nomComplet: nouveauNom, 
+                    email: nouvelEmail,
+                    specialite: nouvelleSpecialite,
+                    departement: nouveauDepartement
+                });
+                showToast('Professeur modifié avec succès');
+            });
         };
         
         window.supprimerProfesseur = async (id) => {
-            const professeur = allProfesseurs.find(p => p.id === id);
-            if(!professeur) return;
-            if(confirm(`Supprimer le compte de ${professeur.nomComplet} ?`)) {
-                try {
-                    if(professeur.uid) {
-                        try {
-                            const user = await auth.signInWithEmailAndPassword(professeur.email, 'temp_password');
-                            await user.user.delete();
-                        } catch(e) {}
-                    }
-                    await db.collection('utilisateurs').doc(id).delete();
-                    showToast('Professeur supprimé', 'warning');
-                    refreshProfesseurs();
-                } catch(err) {
-                    showToast('Erreur lors de la suppression', 'danger');
-                }
+            if(confirm('Supprimer ce professeur définitivement ?')) {
+                await db.collection('utilisateurs').doc(id).delete();
+                showToast('Professeur supprimé', 'warning');
             }
         };
         
-        // ============================================================
-        // ⭐ ANNÉES ACADÉMIQUES
-        // ============================================================
-        async function refreshAnnees() {
-            const btn = document.getElementById('refreshAnneesBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
-            try {
-                allAnnees = await staticCache.refreshCollection('anneesAcademiques');
-                lastUpdates.annees = Date.now();
-                afficherAnneesListe();
-                updateLastUpdateDisplay('annee');
-                showToast('✅ Années académiques actualisées', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
-            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
-        }
-        
-        function afficherAnneesListe() {
-            const container = document.getElementById('anneesListe');
-            if(!container) return;
-            if(allAnnees.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune année académique</div>'; return; }
-            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Année</th><th>Statut</th><th>Actions</th></tr></thead><tbody>';
-            allAnnees.forEach(a => {
-                html += `<tr id="annee-${a.id}"><td><strong>${escapeHtml(a.annee || a.nom)}</strong></td><td>${a.statut === 'active' ? '<span class="text-success">Active</span>' : '<span class="text-muted">Inactive</span>'}</td>
-                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierAnnee('${a.id}')"><i class="bi bi-pencil"></i> Modifier</button>
-                <button class="btn btn-sm btn-danger-custom" onclick="supprimerAnnee('${a.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
-            });
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-        
-        window.modifierAnnee = (id) => {
-            const annee = allAnnees.find(a => a.id === id);
-            if(!annee) return;
-            const contenu = `<div class="mb-3"><label class="form-label">Nom de l'année académique</label><input type="text" class="form-control" id="modalAnneeNom" value="${escapeHtml(annee.annee || annee.nom)}" required></div><div class="mb-3"><label class="form-label">Statut</label><select class="form-select" id="modalAnneeStatut"><option value="active" ${annee.statut === 'active' ? 'selected' : ''}>Active</option><option value="inactive" ${annee.statut === 'inactive' ? 'selected' : ''}>Inactive</option></select></div>`;
-            ouvrirModal('Modifier l\'année académique', contenu, async () => {
-                const nouveauNom = document.getElementById('modalAnneeNom').value.trim();
-                const nouveauStatut = document.getElementById('modalAnneeStatut').value;
-                if(!nouveauNom) throw new Error('Nom requis');
-                await db.collection('anneesAcademiques').doc(id).update({ annee: nouveauNom, nom: nouveauNom, statut: nouveauStatut });
-                showToast('Année académique modifiée avec succès');
-            });
-        };
-        
-        window.supprimerAnnee = async (id) => { if(confirm('Supprimer cette année académique ?')) { await db.collection('anneesAcademiques').doc(id).delete(); showToast('Année supprimée', 'warning'); } };
-        
-        // ============================================================
-        // ⭐ PROMOTIONS
-        // ============================================================
-        async function refreshPromotions() {
-            const btn = document.getElementById('refreshPromotionsBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
-            try {
-                allPromotions = await staticCache.refreshCollection('promotions');
-                lastUpdates.promotions = Date.now();
-                afficherPromotionsListe();
-                chargerPromotionsSelects();
-                chargerPromotionsCheckbox();
-                chargerPromotionsSelectsEtudiant();
-                afficherBoutonsPromotions();
-                chargerPromotionsTransfert();
-                updateLastUpdateDisplay('promotion');
-                showToast('✅ Promotions actualisées', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
-            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
-        }
-        
-        function afficherPromotionsListe() {
-            const container = document.getElementById('promotionsListe');
-            if(!container) return;
-            if(allPromotions.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; return; }
-            
-            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Capacité</th><th>Étudiants</th><th>Actions</th></tr></thead><tbody>';
-            allPromotions.forEach(p => {
-                let count = allEtudiants.filter(e => e.promotion === p.id).length;
-                html += `<tr id="promo-${p.id}"><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td>
-                <td><span class="badge ${count > 0 ? 'bg-primary' : 'bg-secondary'}">${count}</span></td>
-                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierPromotion('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
-                <button class="btn btn-sm btn-danger-custom" onclick="supprimerPromotion('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
-            });
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-        
-        window.modifierPromotion = (id) => {
-            const promotion = allPromotions.find(p => p.id === id);
-            if(!promotion) return;
-            const contenu = `<div class="mb-3"><label class="form-label">Nom de la promotion</label><input type="text" class="form-control" id="modalPromoNom" value="${escapeHtml(promotion.nom)}" required></div><div class="mb-3"><label class="form-label">Capacité</label><input type="number" class="form-control" id="modalPromoCapacite" value="${promotion.capacite || ''}" min="0" required></div>`;
-            ouvrirModal('Modifier la promotion', contenu, async () => {
-                const nouveauNom = document.getElementById('modalPromoNom').value.trim();
-                const nouvelleCapacite = parseInt(document.getElementById('modalPromoCapacite').value);
-                if(!nouveauNom) throw new Error('Nom requis');
-                if(isNaN(nouvelleCapacite) || nouvelleCapacite < 0) throw new Error('Capacité invalide');
-                const nomExiste = allPromotions.some(p => p.id !== id && p.nom.toLowerCase() === nouveauNom.toLowerCase());
-                if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); throw new Error('Nom dupliqué'); }
-                await db.collection('promotions').doc(id).update({ nom: nouveauNom, capacite: nouvelleCapacite });
-                showToast('Promotion modifiée avec succès');
-            });
-        };
-        
-        window.supprimerPromotion = async (id) => {
-            const nbEtudiants = allEtudiants.filter(e => e.promotion === id).length;
-            if(nbEtudiants > 0) { alert(`Impossible: ${nbEtudiants} étudiant(s) sont encore inscrits dans cette promotion.`); return; }
-            if(confirm('Supprimer cette promotion ?')) { await db.collection('promotions').doc(id).delete(); showToast('Promotion supprimée', 'warning'); }
-        };
-        
-        // ============================================================
-        // ⭐ FICHES
-        // ============================================================
-        async function refreshFiches() {
-            const btn = document.getElementById('refreshFichesBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
-            try {
-                allFiches = await staticCache.refreshCollection('fiches');
-                lastUpdates.fiches = Date.now();
-                afficherFichesListe();
-                await chargerConfigurationsPromotions();
-                chargerPromotionSelector();
-                afficherResumeConfigurations();
-                if(currentSelectedPromoForConfig) {
-                    afficherConfigPromotion(currentSelectedPromoForConfig);
-                }
-                updateLastUpdateDisplay('fiche');
-                showToast('✅ Fiches actualisées', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
-            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
-        }
-        
-        function afficherFichesListe() {
-            const container = document.getElementById('fichesListe');
-            if(!container) return;
-            if(allFiches.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune fiche</div>'; return; }
-            const promoMap = {};
-            allPromotions.forEach(p => promoMap[p.id] = p.nom);
-            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Montant</th><th>Promotions</th><th>Actions</th></tr></thead><tbody>';
-            allFiches.forEach(f => {
-                let promotionsText = '';
-                if(f.promotions && Array.isArray(f.promotions)) {
-                    const promoNoms = f.promotions.map(pid => promoMap[pid] || pid).filter(p => p && !p.includes('InRXQHXNqUeQV6CLEoW2'));
-                    promotionsText = promoNoms.join(', ');
-                }
-                if(!promotionsText || promotionsText === '') promotionsText = '-';
-                
-                html += `<tr id="fiche-${f.id}"><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td>
-                <td>${escapeHtml(promotionsText)}</td>
-                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierFiche('${f.id}')"><i class="bi bi-pencil"></i> Modifier</button>
-                <button class="btn btn-sm btn-danger-custom" onclick="supprimerFiche('${f.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
-            });
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-        
-        window.modifierFiche = (id) => {
-            const fiche = allFiches.find(f => f.id === id);
-            if(!fiche) return;
-            
-            let checkboxesHtml = '';
-            allPromotions.forEach(p => {
-                const isChecked = (fiche.promotions && fiche.promotions.includes(p.id)) ? 'checked' : '';
-                checkboxesHtml += `<div class="promotion-checkbox-item"><input type="checkbox" class="form-check-input modal-promo-checkbox" value="${p.id}" id="modal_promo_${p.id}" ${isChecked}><label for="modal_promo_${p.id}"><strong>${escapeHtml(p.nom)}</strong></label></div>`;
-            });
-            
-            const contenu = `<div class="mb-3"><label class="form-label">Nom de la fiche</label><input type="text" class="form-control" id="modalFicheNom" value="${escapeHtml(fiche.nom)}" required></div><div class="mb-3"><label class="form-label">Montant (FC)</label><input type="number" class="form-control" id="modalFicheMontant" value="${fiche.montant || 0}" min="0" required></div><div class="mb-3"><label class="form-label">Promotions concernées</label><div class="promotions-checkbox-group" style="max-height: 250px;"><div class="checkbox-select-all"><input type="checkbox" id="modalSelectAllPromos"><label for="modalSelectAllPromos"><strong>Sélectionner toutes</strong></label></div><div id="modalPromosList">${checkboxesHtml}</div></div></div>`;
-            
-            ouvrirModal('Modifier la fiche', contenu, async () => {
-                const nouveauNom = document.getElementById('modalFicheNom').value.trim();
-                const nouveauMontant = parseInt(document.getElementById('modalFicheMontant').value);
-                if(!nouveauNom) throw new Error('Nom requis');
-                if(isNaN(nouveauMontant) || nouveauMontant < 0) throw new Error('Montant invalide');
-                const selectedPromos = [];
-                document.querySelectorAll('.modal-promo-checkbox:checked').forEach(cb => selectedPromos.push(cb.value));
-                if(selectedPromos.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); throw new Error('Aucune promotion sélectionnée'); }
-                await db.collection('fiches').doc(id).update({ nom: nouveauNom, montant: nouveauMontant, promotions: selectedPromos });
-                showToast('Fiche modifiée avec succès');
-            });
-            
-            setTimeout(() => {
-                document.getElementById('modalSelectAllPromos')?.addEventListener('change', (e) => {
-                    document.querySelectorAll('.modal-promo-checkbox').forEach(cb => cb.checked = e.target.checked);
-                });
-            }, 100);
-        };
-        
-        window.supprimerFiche = async (id) => { if(confirm('Supprimer cette fiche ?')) { await db.collection('fiches').doc(id).delete(); showToast('Fiche supprimée', 'warning'); } };
-        
-        // ============================================================
-        // ⭐ ÉTUDIANTS
-        // ============================================================
-        async function refreshEtudiants() {
-            const btn = document.getElementById('refreshEtudiantsBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
-            try {
-                allEtudiants = await staticCache.refreshCollection('etudiants');
-                lastUpdates.etudiants = Date.now();
-                afficherBoutonsPromotions();
-                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion);
-                updateLastUpdateDisplay('etudiant');
-                showToast('✅ Étudiants actualisés', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
-            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
-        }
-        
-        document.getElementById('etudiantForm')?.addEventListener('submit', async (e) => {
+        document.getElementById('professeurForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const matricule = await genererMatriculeUnique();
-            await db.collection('etudiants').doc(matricule).set({ 
-                nom: document.getElementById('nomEtudiant').value.trim(), 
-                matricule: matricule, 
-                promotion: document.getElementById('promotionEtudiant').value, 
-                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
-            });
-            document.getElementById('etudiantForm').reset();
-            showToast(`Étudiant créé - Matricule: ${matricule}`);
-            refreshEtudiants();
+            const pwd = document.getElementById('passwordProfesseur').value;
+            const confirm = document.getElementById('confirmPasswordProfesseur').value;
+            
+            if(pwd.length < 6) {
+                showToast('Le mot de passe doit contenir au moins 6 caractères', 'danger');
+                return;
+            }
+            
+            if(pwd !== confirm) {
+                showToast('Les mots de passe ne correspondent pas', 'danger');
+                return;
+            }
+            
+            const nom = document.getElementById('nomProfesseur').value.trim();
+            const email = document.getElementById('emailProfesseur').value.trim();
+            const specialite = document.getElementById('specialiteProfesseur').value.trim();
+            const departement = document.getElementById('departementProfesseur').value;
+            
+            if(!nom || !email || !specialite || !departement) {
+                showToast('Veuillez remplir tous les champs', 'danger');
+                return;
+            }
+            
+            try {
+                const id = 'PROF_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                await db.collection('utilisateurs').doc(id).set({
+                    nomComplet: nom,
+                    email: email,
+                    motDePasse: pwd,
+                    role: 'professeur',
+                    specialite: specialite,
+                    departement: departement,
+                    id: id,
+                    dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                document.getElementById('professeurForm').reset();
+                showToast('✅ Compte professeur créé avec succès', 'success');
+                refreshProfesseurs();
+            } catch(error) {
+                console.error('Erreur création professeur:', error);
+                showToast('Erreur lors de la création du compte professeur', 'danger');
+            }
         });
         
-        // ============================================================
-        // ⭐ CONFIGURATION DES SEMESTRES
-        // ============================================================
+        // ========== CONFIGURATION DES SEMESTRES PAR PROMOTION ==========
+        
+        // Fonction pour récupérer les configurations de toutes les promotions
         async function chargerConfigurationsPromotions() {
             try {
                 const configDoc = await db.collection('configurations').doc('promotionsSemestres').get();
@@ -1596,7 +1194,8 @@
                 return {};
             }
         }
-        
+
+        // Fonction pour sauvegarder la configuration d'une promotion
         async function sauvegarderConfigPromotion(promoId, config) {
             try {
                 promoConfigs[promoId] = config;
@@ -1604,6 +1203,7 @@
                 showToast(`Configuration enregistrée pour la promotion`, 'success');
                 afficherResumeConfigurations();
                 chargerPromotionSelector();
+                // Mettre à jour la liste des promotions dans le sélecteur
                 if(currentSelectedPromoForConfig === promoId) {
                     afficherConfigPromotion(promoId);
                 }
@@ -1612,7 +1212,8 @@
                 showToast('Erreur lors de l\'enregistrement', 'danger');
             }
         }
-        
+
+        // Fonction pour afficher la configuration d'une promotion spécifique
         function afficherConfigPromotion(promoId) {
             const container = document.getElementById('promotionConfigContainer');
             const promotion = allPromotions.find(p => p.id === promoId);
@@ -1625,6 +1226,7 @@
             const premierFichesIds = config.premier || [];
             const deuxiemeFichesIds = config.deuxieme || [];
             
+            // Filtrer les fiches disponibles pour cette promotion
             const fichesDisponibles = allFiches.filter(f => {
                 const promos = f.promotions || (f.promotion ? [f.promotion] : []);
                 return promos.includes(promoId);
@@ -1649,6 +1251,7 @@
                     </div>
                     
                     <div class="row">
+                        <!-- Premier Semestre -->
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-header" style="background: #28a745; color: white; border-radius: 8px 8px 0 0;">
@@ -1675,6 +1278,7 @@
                             </div>
                         </div>
                         
+                        <!-- Deuxième Semestre -->
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-header" style="background: #ff9800; color: white; border-radius: 8px 8px 0 0;">
@@ -1711,12 +1315,14 @@
             
             container.innerHTML = html;
         }
-        
+
+        // Fonction pour obtenir les fiches sélectionnées pour une promotion et un semestre
         window.getSelectedFichesForPromotion = function(promoId, semestre) {
             const checkboxes = document.querySelectorAll(`.promo-semestre-checkbox[data-promo="${promoId}"][data-semestre="${semestre}"]:checked`);
             return Array.from(checkboxes).map(cb => cb.value);
         };
-        
+
+        // Fonction pour calculer la progression de la configuration d'une promotion
         function calculateConfigProgress(promoId) {
             const fichesDisponibles = allFiches.filter(f => {
                 const promos = f.promotions || (f.promotion ? [f.promotion] : []);
@@ -1728,10 +1334,13 @@
             const config = promoConfigs[promoId] || { premier: [], deuxieme: [] };
             const totalFiches = fichesDisponibles.length;
             const totalConfigured = (config.premier || []).length + (config.deuxieme || []).length;
+            
+            // Une fiche peut être configurée pour les deux semestres, donc on compte chaque sélection
             const maxPossible = totalFiches * 2;
             return Math.round((totalConfigured / maxPossible) * 100);
         }
-        
+
+        // Fonction pour afficher le résumé des configurations
         function afficherResumeConfigurations() {
             const container = document.getElementById('configSummaryContainer');
             if(!container) return;
@@ -1778,16 +1387,19 @@
             html += '</div>';
             container.innerHTML = html;
         }
-        
+
+        // Fonction pour charger le sélecteur de promotions
         function chargerPromotionSelector() {
             const container = document.getElementById('promotionSelectorConfig');
             if(!container) return;
             
+            // Garder le bouton "Toutes" et ajouter les promotions
             const allBtn = container.querySelector('[data-promo="all"]');
             if(allBtn) {
                 document.getElementById('totalPromoCount').textContent = allPromotions.length;
             }
             
+            // Supprimer les anciens boutons de promotion (sauf "Toutes")
             container.querySelectorAll('[data-promo]:not([data-promo="all"])').forEach(el => el.remove());
             
             allPromotions.forEach(promo => {
@@ -1806,7 +1418,8 @@
                 container.appendChild(btn);
             });
         }
-        
+
+        // Fonction pour rafraîchir toutes les configurations
         async function refreshAllConfigs() {
             const btn = document.getElementById('refreshSemestreConfigBtn');
             if(btn) {
@@ -1833,10 +1446,324 @@
                 }
             }
         }
+
+        // ========== FONCTIONS D'ACTUALISATION ==========
+        async function refreshAnnees() {
+            const btn = document.getElementById('refreshAnneesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allAnnees = await staticCache.refreshCollection('anneesAcademiques');
+                lastUpdates.annees = Date.now();
+                afficherAnneesListe();
+                updateLastUpdateDisplay('annee');
+                showToast('✅ Années académiques actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
         
-        // ============================================================
-        // ⭐ FONCTIONS UTILITAIRES POUR LES SÉLECTEURS
-        // ============================================================
+        async function refreshComptes() {
+            const btn = document.getElementById('refreshComptesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                const data = await staticCache.refreshCollection('utilisateurs');
+                allUtilisateurs = data.filter(u => u.role === 'comptabilite');
+                lastUpdates.comptes = Date.now();
+                afficherComptesListe();
+                updateLastUpdateDisplay('compte');
+                showToast('✅ Comptes comptabilité actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshPromotions() {
+            const btn = document.getElementById('refreshPromotionsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allPromotions = await staticCache.refreshCollection('promotions');
+                lastUpdates.promotions = Date.now();
+                afficherPromotionsListe();
+                chargerPromotionsSelects();
+                chargerPromotionsCheckbox();
+                chargerPromotionsSelectsEtudiant();
+                afficherBoutonsPromotions();
+                chargerPromotionsTransfert();
+                updateLastUpdateDisplay('promotion');
+                showToast('✅ Promotions actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshFiches() {
+            const btn = document.getElementById('refreshFichesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allFiches = await staticCache.refreshCollection('fiches');
+                lastUpdates.fiches = Date.now();
+                afficherFichesListe();
+                // Mettre à jour les configurations
+                await chargerConfigurationsPromotions();
+                chargerPromotionSelector();
+                afficherResumeConfigurations();
+                if(currentSelectedPromoForConfig) {
+                    afficherConfigPromotion(currentSelectedPromoForConfig);
+                }
+                updateLastUpdateDisplay('fiche');
+                showToast('✅ Fiches actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshEtudiants() {
+            const btn = document.getElementById('refreshEtudiantsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allEtudiants = await staticCache.refreshCollection('etudiants');
+                lastUpdates.etudiants = Date.now();
+                afficherBoutonsPromotions();
+                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion);
+                updateLastUpdateDisplay('etudiant');
+                showToast('✅ Étudiants actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        // ========== AFFICHAGE DES LISTES ==========
+        function afficherAnneesListe() {
+            const container = document.getElementById('anneesListe');
+            if(!container) return;
+            if(allAnnees.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune année académique</div>'; return; }
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Année</th><th>Statut</th><th>Actions</th></tr></thead><tbody>';
+            allAnnees.forEach(a => {
+                html += `<tr id="annee-${a.id}"><td><strong>${escapeHtml(a.annee || a.nom)}</strong></td><td>${a.statut === 'active' ? '<span class="text-success">Active</span>' : '<span class="text-muted">Inactive</span>'}</td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierAnnee('${a.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerAnnee('${a.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        function afficherComptesListe() {
+            const container = document.getElementById('comptesListe');
+            if(!container) return;
+            if(allUtilisateurs.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucun compte comptabilité</div>'; return; }
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Email</th><th>Actions</th></tr></thead><tbody>';
+            allUtilisateurs.forEach(c => {
+                html += `<tr id="compte-${c.id}"><td><strong>${escapeHtml(c.nomComplet)}</strong></td><td>${escapeHtml(c.email)}</td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierCompte('${c.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerCompte('${c.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        function afficherPromotionsListe() {
+            const container = document.getElementById('promotionsListe');
+            if(!container) return;
+            if(allPromotions.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; return; }
+            
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Capacité</th><th>Étudiants</th><th>Actions</th></tr></thead><tbody>';
+            allPromotions.forEach(p => {
+                let count = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<tr id="promo-${p.id}"><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td>
+                <td><span class="badge ${count > 0 ? 'bg-primary' : 'bg-secondary'}">${count}</span></td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierPromotion('${p.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerPromotion('${p.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        function afficherFichesListe() {
+            const container = document.getElementById('fichesListe');
+            if(!container) return;
+            if(allFiches.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune fiche</div>'; return; }
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            let html = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nom</th><th>Montant</th><th>Promotions</th><th>Actions</th></tr></thead><tbody>';
+            allFiches.forEach(f => {
+                let promotionsText = '';
+                if(f.promotions && Array.isArray(f.promotions)) {
+                    const promoNoms = f.promotions.map(pid => promoMap[pid] || pid).filter(p => p && !p.includes('InRXQHXNqUeQV6CLEoW2'));
+                    promotionsText = promoNoms.join(', ');
+                }
+                if(!promotionsText || promotionsText === '') promotionsText = '-';
+                
+                html += `<tr id="fiche-${f.id}"><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td>
+                <td>${escapeHtml(promotionsText)}</td>
+                <td><button class="btn btn-sm btn-warning-custom" onclick="modifierFiche('${f.id}')"><i class="bi bi-pencil"></i> Modifier</button>
+                <button class="btn btn-sm btn-danger-custom" onclick="supprimerFiche('${f.id}')"><i class="bi bi-trash"></i> Supprimer</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        // ========== MODIFICATIONS ==========
+        window.modifierAnnee = (id) => {
+            const annee = allAnnees.find(a => a.id === id);
+            if(!annee) return;
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de l'année académique</label><input type="text" class="form-control" id="modalAnneeNom" value="${escapeHtml(annee.annee || annee.nom)}" required></div><div class="mb-3"><label class="form-label">Statut</label><select class="form-select" id="modalAnneeStatut"><option value="active" ${annee.statut === 'active' ? 'selected' : ''}>Active</option><option value="inactive" ${annee.statut === 'inactive' ? 'selected' : ''}>Inactive</option></select></div>`;
+            ouvrirModal('Modifier l\'année académique', contenu, async () => {
+                const nouveauNom = document.getElementById('modalAnneeNom').value.trim();
+                const nouveauStatut = document.getElementById('modalAnneeStatut').value;
+                if(!nouveauNom) throw new Error('Nom requis');
+                await db.collection('anneesAcademiques').doc(id).update({ annee: nouveauNom, nom: nouveauNom, statut: nouveauStatut });
+                showToast('Année académique modifiée avec succès');
+            });
+        };
+        
+        window.modifierCompte = (id) => {
+            const compte = allUtilisateurs.find(c => c.id === id);
+            if(!compte) return;
+            const contenu = `<div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalCompteNom" value="${escapeHtml(compte.nomComplet)}" required></div><div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="modalCompteEmail" value="${escapeHtml(compte.email)}" required></div><div class="alert alert-info"><i class="bi bi-info-circle"></i> Le mot de passe ne peut pas être modifié ici.</div>`;
+            ouvrirModal('Modifier le compte comptabilité', contenu, async () => {
+                const nouveauNom = document.getElementById('modalCompteNom').value.trim();
+                const nouvelEmail = document.getElementById('modalCompteEmail').value.trim();
+                if(!nouveauNom || !nouvelEmail) throw new Error('Champs requis');
+                await db.collection('utilisateurs').doc(id).update({ nomComplet: nouveauNom, email: nouvelEmail });
+                showToast('Compte modifié avec succès');
+            });
+        };
+        
+        window.modifierPromotion = (id) => {
+            const promotion = allPromotions.find(p => p.id === id);
+            if(!promotion) return;
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de la promotion</label><input type="text" class="form-control" id="modalPromoNom" value="${escapeHtml(promotion.nom)}" required></div><div class="mb-3"><label class="form-label">Capacité</label><input type="number" class="form-control" id="modalPromoCapacite" value="${promotion.capacite || ''}" min="0" required></div>`;
+            ouvrirModal('Modifier la promotion', contenu, async () => {
+                const nouveauNom = document.getElementById('modalPromoNom').value.trim();
+                const nouvelleCapacite = parseInt(document.getElementById('modalPromoCapacite').value);
+                if(!nouveauNom) throw new Error('Nom requis');
+                if(isNaN(nouvelleCapacite) || nouvelleCapacite < 0) throw new Error('Capacité invalide');
+                const nomExiste = allPromotions.some(p => p.id !== id && p.nom.toLowerCase() === nouveauNom.toLowerCase());
+                if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); throw new Error('Nom dupliqué'); }
+                await db.collection('promotions').doc(id).update({ nom: nouveauNom, capacite: nouvelleCapacite });
+                showToast('Promotion modifiée avec succès');
+            });
+        };
+        
+        window.modifierFiche = (id) => {
+            const fiche = allFiches.find(f => f.id === id);
+            if(!fiche) return;
+            
+            let checkboxesHtml = '';
+            allPromotions.forEach(p => {
+                const isChecked = (fiche.promotions && fiche.promotions.includes(p.id)) ? 'checked' : '';
+                checkboxesHtml += `<div class="promotion-checkbox-item"><input type="checkbox" class="form-check-input modal-promo-checkbox" value="${p.id}" id="modal_promo_${p.id}" ${isChecked}><label for="modal_promo_${p.id}"><strong>${escapeHtml(p.nom)}</strong></label></div>`;
+            });
+            
+            const contenu = `<div class="mb-3"><label class="form-label">Nom de la fiche</label><input type="text" class="form-control" id="modalFicheNom" value="${escapeHtml(fiche.nom)}" required></div><div class="mb-3"><label class="form-label">Montant (FC)</label><input type="number" class="form-control" id="modalFicheMontant" value="${fiche.montant || 0}" min="0" required></div><div class="mb-3"><label class="form-label">Promotions concernées</label><div class="promotions-checkbox-group" style="max-height: 250px;"><div class="checkbox-select-all"><input type="checkbox" id="modalSelectAllPromos"><label for="modalSelectAllPromos"><strong>Sélectionner toutes</strong></label></div><div id="modalPromosList">${checkboxesHtml}</div></div></div>`;
+            
+            ouvrirModal('Modifier la fiche', contenu, async () => {
+                const nouveauNom = document.getElementById('modalFicheNom').value.trim();
+                const nouveauMontant = parseInt(document.getElementById('modalFicheMontant').value);
+                if(!nouveauNom) throw new Error('Nom requis');
+                if(isNaN(nouveauMontant) || nouveauMontant < 0) throw new Error('Montant invalide');
+                const selectedPromos = [];
+                document.querySelectorAll('.modal-promo-checkbox:checked').forEach(cb => selectedPromos.push(cb.value));
+                if(selectedPromos.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); throw new Error('Aucune promotion sélectionnée'); }
+                await db.collection('fiches').doc(id).update({ nom: nouveauNom, montant: nouveauMontant, promotions: selectedPromos });
+                showToast('Fiche modifiée avec succès');
+            });
+            
+            setTimeout(() => {
+                document.getElementById('modalSelectAllPromos')?.addEventListener('change', (e) => {
+                    document.querySelectorAll('.modal-promo-checkbox').forEach(cb => cb.checked = e.target.checked);
+                });
+            }, 100);
+        };
+        
+        window.modifierEtudiantAdmin = (id) => {
+            const etudiant = allEtudiants.find(e => e.id === id);
+            if(!etudiant) return;
+            let optionsHtml = '<option value="">Sélectionner une promotion</option>';
+            allPromotions.forEach(p => {
+                const selected = (etudiant.promotion === p.id) ? 'selected' : '';
+                optionsHtml += `<option value="${p.id}" ${selected}>${escapeHtml(p.nom)}</option>`;
+            });
+            const contenu = `<div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalEtudiantNom" value="${escapeHtml(etudiant.nom)}" required></div><div class="mb-3"><label class="form-label">Matricule</label><input type="text" class="form-control" value="${etudiant.matricule || etudiant.id.substring(0,8)}" disabled><small class="text-muted">Le matricule ne peut pas être modifié</small></div><div class="mb-3"><label class="form-label">Promotion</label><select class="form-select" id="modalEtudiantPromo" required>${optionsHtml}</select></div>`;
+            ouvrirModal('Modifier l\'étudiant', contenu, async () => {
+                const nouveauNom = document.getElementById('modalEtudiantNom').value.trim();
+                const nouvellePromo = document.getElementById('modalEtudiantPromo').value;
+                if(!nouveauNom) throw new Error('Nom requis');
+                if(!nouvellePromo) throw new Error('Promotion requise');
+                await db.collection('etudiants').doc(id).update({ nom: nouveauNom, promotion: nouvellePromo });
+                showToast('Étudiant modifié avec succès');
+            });
+        };
+        
+        window.supprimerAnnee = async (id) => { if(confirm('Supprimer cette année académique ?')) { await db.collection('anneesAcademiques').doc(id).delete(); showToast('Année supprimée', 'warning'); } };
+        window.supprimerCompte = async (id) => { if(confirm('Supprimer ce compte comptabilité ?')) { await db.collection('utilisateurs').doc(id).delete(); showToast('Compte supprimé', 'warning'); } };
+        window.supprimerPromotion = async (id) => {
+            const nbEtudiants = allEtudiants.filter(e => e.promotion === id).length;
+            if(nbEtudiants > 0) { alert(`Impossible: ${nbEtudiants} étudiant(s) sont encore inscrits dans cette promotion.`); return; }
+            if(confirm('Supprimer cette promotion ?')) { await db.collection('promotions').doc(id).delete(); showToast('Promotion supprimée', 'warning'); }
+        };
+        window.supprimerFiche = async (id) => { if(confirm('Supprimer cette fiche ?')) { await db.collection('fiches').doc(id).delete(); showToast('Fiche supprimée', 'warning'); } };
+        window.supprimerEtudiantAdmin = async (id) => { if(confirm('Supprimer cet étudiant ? Cette action est irréversible.')) { await db.collection('etudiants').doc(id).delete(); showToast('Étudiant supprimé', 'warning'); } };
+        
+        // ========== FORMULAIRES ==========
+        document.getElementById('anneeForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nom = document.getElementById('nomAnnee').value.trim();
+            await db.collection('anneesAcademiques').add({ annee: nom, nom: nom, statut: document.getElementById('statutAnnee').value, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
+            document.getElementById('anneeForm').reset();
+            showToast('Année créée avec succès');
+            refreshAnnees();
+        });
+        
+        document.getElementById('comptaForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pwd = document.getElementById('passwordCompta').value;
+            const confirm = document.getElementById('confirmPasswordCompta').value;
+            if(pwd !== confirm) { showToast('Les mots de passe ne correspondent pas', 'danger'); return; }
+            const matricule = 'COMPTA_' + Date.now();
+            await db.collection('utilisateurs').doc(matricule).set({
+                nomComplet: document.getElementById('nomCompta').value.trim(),
+                email: document.getElementById('emailCompta').value.trim(),
+                motDePasse: pwd,
+                role: 'comptabilite',
+                id: matricule,
+                dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById('comptaForm').reset();
+            showToast('Compte comptabilité créé avec succès');
+            refreshComptes();
+        });
+        
+        document.getElementById('promotionForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nom = document.getElementById('nomPromotion').value.trim();
+            const capacite = parseInt(document.getElementById('capacitePromotion').value);
+            const nomExiste = allPromotions.some(p => p.nom.toLowerCase() === nom.toLowerCase());
+            if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); return; }
+            await db.collection('promotions').add({ nom: nom, capacite: capacite, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
+            document.getElementById('promotionForm').reset();
+            showToast('Promotion créée avec succès');
+            refreshPromotions();
+        });
+        
+        document.getElementById('ficheForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedPromotions = [];
+            document.querySelectorAll('.promotion-checkbox:checked').forEach(cb => selectedPromotions.push(cb.value));
+            if(selectedPromotions.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); return; }
+            await db.collection('fiches').add({ nom: document.getElementById('nomFiche').value.trim(), montant: parseInt(document.getElementById('montantFiche').value), promotions: selectedPromotions, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
+            document.getElementById('ficheForm').reset();
+            document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllPromotions').checked = false;
+            showToast('Fiche créée avec succès');
+            refreshFiches();
+        });
+        
+        document.getElementById('etudiantForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const matricule = await genererMatriculeUnique();
+            await db.collection('etudiants').doc(matricule).set({ nom: document.getElementById('nomEtudiant').value.trim(), matricule: matricule, promotion: document.getElementById('promotionEtudiant').value, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
+            document.getElementById('etudiantForm').reset();
+            showToast(`Étudiant créé - Matricule: ${matricule}`);
+            refreshEtudiants();
+        });
+        
+        // ========== FONCTIONS UTILITAIRES ==========
         function chargerPromotionsSelects() {
             ['promotionEtudiant', 'importPromotionSelect'].forEach(id => {
                 const select = document.getElementById(id);
@@ -1945,27 +1872,6 @@
             document.getElementById('etudiantsListeAdmin').innerHTML = html;
         }
         
-        window.modifierEtudiantAdmin = (id) => {
-            const etudiant = allEtudiants.find(e => e.id === id);
-            if(!etudiant) return;
-            let optionsHtml = '<option value="">Sélectionner une promotion</option>';
-            allPromotions.forEach(p => {
-                const selected = (etudiant.promotion === p.id) ? 'selected' : '';
-                optionsHtml += `<option value="${p.id}" ${selected}>${escapeHtml(p.nom)}</option>`;
-            });
-            const contenu = `<div class="mb-3"><label class="form-label">Nom complet</label><input type="text" class="form-control" id="modalEtudiantNom" value="${escapeHtml(etudiant.nom)}" required></div><div class="mb-3"><label class="form-label">Matricule</label><input type="text" class="form-control" value="${etudiant.matricule || etudiant.id.substring(0,8)}" disabled><small class="text-muted">Le matricule ne peut pas être modifié</small></div><div class="mb-3"><label class="form-label">Promotion</label><select class="form-select" id="modalEtudiantPromo" required>${optionsHtml}</select></div>`;
-            ouvrirModal('Modifier l\'étudiant', contenu, async () => {
-                const nouveauNom = document.getElementById('modalEtudiantNom').value.trim();
-                const nouvellePromo = document.getElementById('modalEtudiantPromo').value;
-                if(!nouveauNom) throw new Error('Nom requis');
-                if(!nouvellePromo) throw new Error('Promotion requise');
-                await db.collection('etudiants').doc(id).update({ nom: nouveauNom, promotion: nouvellePromo });
-                showToast('Étudiant modifié avec succès');
-            });
-        };
-        
-        window.supprimerEtudiantAdmin = async (id) => { if(confirm('Supprimer cet étudiant ? Cette action est irréversible.')) { await db.collection('etudiants').doc(id).delete(); showToast('Étudiant supprimé', 'warning'); } };
-        
         function mettreAJourInfoTransfert() {
             const sourceId = document.getElementById('promotionSource')?.value;
             const destId = document.getElementById('promotionDestination')?.value;
@@ -1978,9 +1884,7 @@
             }
         }
         
-        // ============================================================
-        // ⭐ EVENTS
-        // ============================================================
+        // ========== EVENTS ==========
         document.getElementById('searchEtudiantList')?.addEventListener('input', (e) => { 
             currentSearchTerm = e.target.value; 
             document.getElementById('clearSearchEtudiant').style.display = currentSearchTerm ? 'block' : 'none';
@@ -2012,9 +1916,7 @@
             refreshEtudiants();
         });
         
-        // ============================================================
-        // ⭐ EXCEL IMPORT
-        // ============================================================
+        // ========== EXCEL IMPORT ==========
         let excelDataToImport = [];
         async function lireExcel(file) { 
             return new Promise((res, rej) => { 
@@ -2101,9 +2003,7 @@
             XLSX.writeFile(wb, 'modele_import_etudiants.xlsx');
         });
         
-        // ============================================================
-        // ⭐ EXPORTS
-        // ============================================================
+        // ========== EXPORTS ==========
         document.getElementById('exportExcelListBtn')?.addEventListener('click', () => {
             if(!currentSelectedPromotion) { showToast('Sélectionnez d\'abord une promotion', 'warning'); return; }
             let filtres = allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
@@ -2133,258 +2033,7 @@
             showToast('Export CSV généré');
         });
         
-        // ============================================================
-        // ⭐ MIGRATION VERS AUTH
-        // ============================================================
-        async function chargerMigrationListe() {
-            const container = document.getElementById('migrationListe');
-            if(!container) return;
-            
-            try {
-                const snapshot = await db.collection('utilisateurs').get();
-                const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                const aMigrer = users.filter(u => u.role && u.role !== 'admin');
-                
-                if(aMigrer.length === 0) {
-                    container.innerHTML = '<div class="alert alert-success">✅ Tous les comptes sont déjà migrés vers Auth !</div>';
-                    document.getElementById('migrateAllBtn').disabled = true;
-                    document.getElementById('cleanupBtn').disabled = false;
-                    document.getElementById('migrationStatus').innerHTML = `
-                        <div class="alert alert-success">
-                            <i class="bi bi-check-circle-fill"></i> 
-                            <strong>Migration terminée !</strong> Vous pouvez supprimer la collection utilisateurs.
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let html = `<div class="table-responsive"><table class="table table-sm">
-                    <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>UID Auth</th><th>Statut</th></tr></thead><tbody>`;
-                
-                let hasUid = 0;
-                for(let user of aMigrer) {
-                    const hasAuthUid = user.uid ? true : false;
-                    if(hasAuthUid) hasUid++;
-                    
-                    let statusHtml = '';
-                    if(hasAuthUid) {
-                        statusHtml = '<span class="auth-status-badge exists">✅ Migré</span>';
-                    } else {
-                        statusHtml = '<span class="auth-status-badge missing">⏳ En attente</span>';
-                    }
-                    
-                    html += `<tr>
-                        <td>${escapeHtml(user.nomComplet)}</td>
-                        <td>${escapeHtml(user.email)}</td>
-                        <td><span class="badge bg-primary">${escapeHtml(user.role)}</span></td>
-                        <td><code>${user.uid ? user.uid.substring(0,8) : 'N/A'}</code></td>
-                        <td>${statusHtml}</td>
-                    </tr>`;
-                }
-                
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-                
-                const total = aMigrer.length;
-                const migres = aMigrer.filter(u => u.uid).length;
-                
-                document.getElementById('migrationStatus').innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        <strong>${total}</strong> compte(s) à migrer vers Firebase Auth.
-                        ${migres} déjà migré(s).
-                        ${total - migres > 0 ? `<br>⚠️ ${total - migres} compte(s) en attente de migration.` : ''}
-                    </div>
-                `;
-                
-                document.getElementById('migrateAllBtn').disabled = false;
-                document.getElementById('cleanupBtn').disabled = (total - migres > 0);
-                
-            } catch(err) {
-                console.error('Erreur chargement comptes:', err);
-                container.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des comptes</div>';
-            }
-        }
-        
-        document.getElementById('checkAuthStatusBtn')?.addEventListener('click', async () => {
-            showToast('🔍 Vérification des comptes Auth en cours...', 'warning');
-            await chargerMigrationListe();
-            showToast('✅ Vérification terminée', 'success');
-        });
-        
-        document.getElementById('migrateAllBtn')?.addEventListener('click', async () => {
-            if(isMigrating) return;
-            if(!confirm('⚠️ Voulez-vous vraiment migrer TOUS les comptes vers Firebase Authentication ?\nLes mots de passe seront conservés.')) return;
-            
-            const btn = document.getElementById('migrateAllBtn');
-            btn.disabled = true;
-            isMigrating = true;
-            btn.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;display:inline-block;"></div> Migration en cours...';
-            
-            try {
-                const snapshot = await db.collection('utilisateurs').get();
-                const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const aMigrer = users.filter(u => u.role && u.role !== 'admin' && !u.uid);
-                
-                if(aMigrer.length === 0) {
-                    showToast('✅ Tous les comptes sont déjà migrés !', 'success');
-                    await chargerMigrationListe();
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Migrer tous les comptes vers Auth';
-                    isMigrating = false;
-                    return;
-                }
-                
-                let success = 0;
-                let errors = 0;
-                
-                for(let user of aMigrer) {
-                    try {
-                        let existe = false;
-                        try {
-                            await auth.signInWithEmailAndPassword(user.email, user.motDePasse || 'temp123');
-                            existe = true;
-                            await auth.signOut();
-                        } catch(e) {
-                            existe = false;
-                        }
-                        
-                        if(!existe && user.motDePasse) {
-                            const userCredential = await auth.createUserWithEmailAndPassword(user.email, user.motDePasse);
-                            const uid = userCredential.user.uid;
-                            
-                            await db.collection('utilisateurs').doc(user.id).update({
-                                uid: uid,
-                                migratedToAuth: true,
-                                migrationDate: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                            
-                            success++;
-                        } else if(user.uid) {
-                            await db.collection('utilisateurs').doc(user.id).update({
-                                migratedToAuth: true
-                            });
-                            success++;
-                        } else {
-                            errors++;
-                            console.log(`Compte ${user.email} ignoré (pas de mot de passe stocké)`);
-                        }
-                    } catch(err) {
-                        errors++;
-                        console.error(`Erreur pour ${user.email}:`, err);
-                    }
-                }
-                
-                showToast(`✅ Migration terminée : ${success} succès, ${errors} échecs`, success > 0 ? 'success' : 'danger');
-                await chargerMigrationListe();
-                
-            } catch(err) {
-                showToast('❌ Erreur lors de la migration', 'danger');
-                console.error(err);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Migrer tous les comptes vers Auth';
-                isMigrating = false;
-            }
-        });
-        
-        document.getElementById('cleanupBtn')?.addEventListener('click', async () => {
-            const btn = document.getElementById('cleanupBtn');
-            
-            const snapshot = await db.collection('utilisateurs').get();
-            const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const nonMigres = users.filter(u => u.role && u.role !== 'admin' && !u.uid);
-            
-            if(nonMigres.length > 0) {
-                alert(`⚠️ Il reste ${nonMigres.length} compte(s) non migrés vers Auth.\nVeuillez d'abord migrer tous les comptes.`);
-                return;
-            }
-            
-            if(!confirm('⚠️ Supprimer définitivement la collection "utilisateurs" de Firestore ?\nCette action est irréversible !')) return;
-            if(!confirm('✅ Confirmez-vous que TOUS les comptes sont migrés vers Auth ?')) return;
-            
-            btn.disabled = true;
-            btn.innerHTML = 'Suppression en cours...';
-            
-            try {
-                const usersToDelete = users.filter(u => u.role && u.role !== 'admin');
-                
-                const batch = db.batch();
-                let count = 0;
-                for(let user of usersToDelete) {
-                    batch.delete(db.collection('utilisateurs').doc(user.id));
-                    count++;
-                    if(count % 500 === 0) {
-                        await batch.commit();
-                    }
-                }
-                if(count % 500 !== 0) {
-                    await batch.commit();
-                }
-                
-                showToast(`✅ Collection "utilisateurs" supprimée avec succès (${count} documents)`, 'success');
-                btn.innerHTML = '✅ Collection supprimée';
-                btn.disabled = true;
-                
-                refreshComptes();
-                refreshAcademiques();
-                refreshProfesseurs();
-                chargerMigrationListe();
-                
-            } catch(err) {
-                showToast('❌ Erreur lors de la suppression', 'danger');
-                console.error(err);
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-trash"></i> Supprimer la collection utilisateurs';
-            }
-        });
-        
-        // ============================================================
-        // ⭐ FORMULAIRES
-        // ============================================================
-        document.getElementById('anneeForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nom = document.getElementById('nomAnnee').value.trim();
-            await db.collection('anneesAcademiques').add({ annee: nom, nom: nom, statut: document.getElementById('statutAnnee').value, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
-            document.getElementById('anneeForm').reset();
-            showToast('Année créée avec succès');
-            refreshAnnees();
-        });
-        
-        document.getElementById('promotionForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nom = document.getElementById('nomPromotion').value.trim();
-            const capacite = parseInt(document.getElementById('capacitePromotion').value);
-            const nomExiste = allPromotions.some(p => p.nom.toLowerCase() === nom.toLowerCase());
-            if(nomExiste) { showToast('Ce nom de promotion existe déjà', 'danger'); return; }
-            await db.collection('promotions').add({ nom: nom, capacite: capacite, dateCreation: firebase.firestore.FieldValue.serverTimestamp() });
-            document.getElementById('promotionForm').reset();
-            showToast('Promotion créée avec succès');
-            refreshPromotions();
-        });
-        
-        document.getElementById('ficheForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const selectedPromotions = [];
-            document.querySelectorAll('.promotion-checkbox:checked').forEach(cb => selectedPromotions.push(cb.value));
-            if(selectedPromotions.length === 0) { showToast('Sélectionnez au moins une promotion', 'danger'); return; }
-            await db.collection('fiches').add({ 
-                nom: document.getElementById('nomFiche').value.trim(), 
-                montant: parseInt(document.getElementById('montantFiche').value), 
-                promotions: selectedPromotions, 
-                dateCreation: firebase.firestore.FieldValue.serverTimestamp() 
-            });
-            document.getElementById('ficheForm').reset();
-            document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = false);
-            document.getElementById('selectAllPromotions').checked = false;
-            showToast('Fiche créée avec succès');
-            refreshFiches();
-        });
-        
-        // ============================================================
-        // ⭐ BOUTONS D'ACTUALISATION
-        // ============================================================
+        // ========== BOUTONS D'ACTUALISATION ==========
         document.getElementById('refreshAnneesBtn')?.addEventListener('click', refreshAnnees);
         document.getElementById('refreshComptesBtn')?.addEventListener('click', refreshComptes);
         document.getElementById('refreshAcademiquesBtn')?.addEventListener('click', refreshAcademiques);
@@ -2394,9 +2043,7 @@
         document.getElementById('refreshEtudiantsBtn')?.addEventListener('click', refreshEtudiants);
         document.getElementById('refreshSemestreConfigBtn')?.addEventListener('click', refreshAllConfigs);
         
-        // ============================================================
-        // ⭐ MENU NAVIGATION
-        // ============================================================
+        // ========== MENU NAVIGATION ==========
         document.querySelectorAll('.menu-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
@@ -2407,9 +2054,7 @@
             });
         });
         
-        // ============================================================
-        // ⭐ CHARGEMENT DES DONNÉES
-        // ============================================================
+        // ========== CHARGEMENT DES DONNÉES ==========
         function loadAppData() {
             staticCache.getCollection('anneesAcademiques').then(data => { allAnnees = data; lastUpdates.annees = Date.now(); afficherAnneesListe(); updateLastUpdateDisplay('annee'); });
             staticCache.getCollection('promotions').then(data => { 
@@ -2422,6 +2067,7 @@
                 afficherBoutonsPromotions(); 
                 chargerPromotionsTransfert(); 
                 updateLastUpdateDisplay('promotion');
+                // Charger les configurations après avoir chargé les promotions
                 chargerConfigurationsPromotions().then(() => {
                     chargerPromotionSelector();
                     afficherResumeConfigurations();
@@ -2461,10 +2107,8 @@
                 updateLastUpdateDisplay('compte');
                 updateLastUpdateDisplay('academique');
                 updateLastUpdateDisplay('professeur');
-                chargerMigrationListe();
             });
             
-            // Écouteurs en temps réel
             db.collection('anneesAcademiques').onSnapshot(() => refreshAnnees());
             db.collection('promotions').onSnapshot(() => refreshPromotions());
             db.collection('fiches').onSnapshot(() => refreshFiches());
@@ -2473,26 +2117,38 @@
                 refreshComptes();
                 refreshAcademiques();
                 refreshProfesseurs();
-                chargerMigrationListe();
             });
         }
         
-        // ============================================================
-        // ⭐ SERVICE WORKER
-        // ============================================================
+        // Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
             });
         }
         
-        // ============================================================
-        // ⭐ INITIALISATION
-        // ============================================================
-        loadAppData();
+        // Créer un compte administrateur par défaut s'il n'existe pas
+        async function createDefaultAdmin() {
+            const adminEmail = "admin@fsa-unilu.com";
+            const adminPassword = "admin123";
+            const adminId = "ADMIN_001";
+            
+            const adminExists = await db.collection('utilisateurs').doc(adminId).get();
+            if(!adminExists.exists) {
+                await db.collection('utilisateurs').doc(adminId).set({
+                    id: adminId,
+                    nomComplet: "Super Administrateur",
+                    email: adminEmail,
+                    motDePasse: adminPassword,
+                    role: "admin",
+                    dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log("✅ Compte administrateur par défaut créé");
+            }
+        }
         
-        console.log('✅ Dashboard Admin - Sécurisé avec Firebase Auth + 2FA');
-        console.log('👤 Admin connecté:', currentAdmin?.nomComplet);
+        createDefaultAdmin();
+        checkAuth();
     </script>
 </body>
 </html>
